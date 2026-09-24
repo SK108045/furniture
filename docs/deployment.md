@@ -30,3 +30,11 @@ No database password, SQLite file, native database package, or persistent disk i
 The visit-page enquiry preview and AI chat do not currently save submissions/conversations. Redeploying does not erase any Supabase records. Orders and profiles follow the same Clerk account across devices.
 
 `npm run preview` is not supported by the Vercel adapter; use `npm run dev` locally or a Vercel preview deployment. No development server needs to run after deploying.
+
+## Sign-in configuration
+
+The build explicitly reads the repository's `.env` and validates the Clerk publishable key and required server settings. A blank Vercel variable falls back to the file value. Non-empty Vercel settings still take precedence. Missing configuration now fails the build with the setting name instead of deploying unusable sign-in forms.
+
+Each server-rendered page also supplies the current Clerk publishable key to the browser, keeping it consistent with the server's account configuration. No secret key is included in that page metadata.
+
+If an older deployment shows “Accounts are temporarily unavailable”, push these changes and redeploy. Ensure `.env` is present in the deployed revision, or configure its values in Vercel. If replacing a deployment that had an empty key, redeploy without the previous build cache.

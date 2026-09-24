@@ -9,10 +9,11 @@ import '../styles/navbar.css';
 import {phone,phoneInternational,whatsapp} from '../data/contact';
 import Icon from '../components/Icon.astro';
 import AIChatWidget from '../components/AIChatWidget.astro';
+import {env} from '../server/config';
 const {title='Nicoo Furniture — Make room for better.'}=Astro.props;
 const path=Astro.url.pathname;
 ---
-<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="description" content="Discover office chairs, desks and workspaces at Nicoo Furniture, Donholm, Nairobi. Make room for a better working day."/><meta name="theme-color" content="#242924"/><link rel="icon" type="image/svg+xml" href="/favicon.svg"/><title>{title}</title></head><body>
+<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="clerk-publishable-key" content={env('PUBLIC_CLERK_PUBLISHABLE_KEY')}/><meta name="description" content="Discover office chairs, desks and workspaces at Nicoo Furniture, Donholm, Nairobi. Make room for a better working day."/><meta name="theme-color" content="#242924"/><link rel="icon" type="image/svg+xml" href="/favicon.svg"/><title>{title}</title></head><body>
 <div class="announcement"><a href={whatsapp} target="_blank" rel="noopener noreferrer">CALL / WHATSAPP {phone} · LET’S TALK FURNITURE</a><span><Icon name="pin" size={13}/> DONHOLM, NAIROBI</span></div>
 <header class="header site-header" id="site-header">
   <div class="header-left">

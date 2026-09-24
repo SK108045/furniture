@@ -18,7 +18,8 @@ function script(src: string, key?: string) {
   });
 }
 export const authReady: Promise<ClerkClient> = (async () => {
-  const key=import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY || '';
+  // SSR supplies the current public key; the compiled value covers static pages.
+  const key=document.querySelector<HTMLMetaElement>('meta[name="clerk-publishable-key"]')?.content.trim() || import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY || '';
   const host=clerkHost(key);
   if(!host) throw new Error('Accounts are temporarily unavailable. Please contact the shop.');
   await Promise.all([script(`https://${host}/npm/@clerk/ui@1/dist/ui.browser.js`),script(`https://${host}/npm/@clerk/clerk-js@6/dist/clerk.browser.js`,key)]);
