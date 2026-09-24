@@ -31,6 +31,14 @@ Vercel functions use the shared Supabase database over HTTPS. Transactional data
 
 No real STK request or end-to-end payment test was performed during implementation, at the user's request.
 
+## Diagnosing gateway errors on Vercel
+
+After deploying, run `npm run payment:check -- https://furniture-chi-eight.vercel.app` locally. This authenticates a merchant diagnostic with the callback token and checks Swifta **from the deployed Vercel function** using an empty request, without a phone, amount, or order. Expected response: HTTP 400 JSON saying phone and amount are required. This checks connectivity, not a completed payment. The diagnostic refuses redirects so the token cannot be forwarded to another host.
+
+Inspect the **POST `/api/orders`** invocation (or PATCH `/api/orders/:id` for paying a draft), not the subsequent GET status polls. Search for `Swifta STK response` or `Swifta STK transport` and match the order reference. Logs include upstream HTTP status, response format, Cloudflare Ray ID, challenge header, and provider checkout ID when supplied. Credentials, phone numbers and raw response bodies are excluded.
+
+HTML is not payment confirmation. Explicit gateway rejections become failed attempts; ambiguous 2xx/5xx responses and timeouts remain uncertain to avoid duplicate payment requests. A Cloudflare challenge or HTTP 403 may require Swifta to allow server-to-server requests to `/stkpush`; share the logged Ray ID with its operator. The furniture app cannot resolve a provider firewall challenge itself. Never automatically resend an uncertain payment. The HTTP status of a GET order poll does not describe Swifta's original POST response.
+
 ## Merchant reconciliation fallback
 
 If the callback has not been connected yet, verify the transaction in Swifta first, then run on the server:

@@ -11,7 +11,8 @@
     "check": "astro check",
     "order:reconcile": "node --env-file=.env --import tsx scripts/reconcile-order.ts",
     "db:export-legacy": "python3 scripts/export-legacy.py",
-    "db:check": "node --env-file=.env --import tsx scripts/check-database.ts"
+    "db:check": "node --env-file=.env --import tsx scripts/check-database.ts",
+    "payment:check": "node --env-file=.env --import tsx scripts/check-swifta.ts"
   },
   "dependencies": {
     "@astrojs/vercel": "^8.2.11",
