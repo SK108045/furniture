@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.astro/
+# Environment variables (tracked for private deployment per user request)
+# .env
+# .env.*
+!.env.example
+playwright-report/
+test-results/
+.npm-cache/
+
+/data/
+artifacts/
+

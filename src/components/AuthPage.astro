@@ -1,0 +1,34 @@
+---
+import Layout from '../layouts/Layout.astro';
+const {mode='sign-in'}=Astro.props;
+const signup=mode==='sign-up';
+---
+<Layout title={`${signup?'Create an account':'Welcome back'} — Nicoo Furniture`}>
+  <section class="auth-shell">
+    <aside class="auth-story">
+      <img src="/images/nairobi-people.webp" alt="A Kenyan-inspired workspace with people gathered around a desk"/>
+      <div class="auth-story-copy"><p class="eyebrow">YOUR NEXT CHAPTER STARTS HERE</p><h1>A little more<br/>room for <em>you.</em></h1><p>Good furniture. Big ideas. Your own corner of Nairobi.</p><span>DONHOLM ROOTS. EVERYDAY COMFORT.</span></div>
+      <small class="auth-image-note">AI-generated lifestyle inspiration</small>
+    </aside>
+    <div class="auth-panel" data-auth-page={mode}>
+      <a class="auth-back" href="/collection">← Back to shopping</a>
+      <p class="eyebrow">KARIBU NICOO</p>
+      <h2>{signup?'Make yourself at home.':'Good to see you again.'}</h2>
+      <p class="auth-intro">{signup?'Create your account, then find something that feels like you.':'Sign in to manage your account and keep exploring.'}</p>
+      <div data-auth-status role="status" aria-live="polite">Preparing your secure sign-in…</div>
+      <form data-email-auth class="email-auth" hidden>
+        <div data-identity-fields><label>Email address<input name="email" type="email" autocomplete="email" required placeholder="you@example.com" maxlength="254"/></label></div>
+        <div data-verification-fields hidden><label>Email verification code<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="000000"/></label><p class="auth-small">Check your inbox and spam folder. Enter the six-digit code to continue.</p><button type="button" class="auth-text-button" data-resend>Send another code</button></div>
+        <label data-password-field>{signup?'Create a password':'Password'}<input name="password" type="password" autocomplete={signup?'new-password':'current-password'} required minlength={signup?15:1}/><small>{signup?'Use at least 15 characters. A memorable phrase works well.':''}</small></label>
+        <div id="clerk-captcha"></div>
+        <button class="button dark" type="submit">{signup?'Create your account':'Sign in'} →</button>
+        {!signup&&<div class="auth-alternatives"><button type="button" class="auth-text-button" data-email-code>Sign in with an email code</button><button type="button" class="auth-text-button" data-reset-password>Forgot password?</button></div>}
+        <button type="button" class="auth-text-button" data-auth-back hidden>← Start again</button>
+      </form>
+      <div data-auth-fallback hidden><p>We couldn’t connect to your account. Please refresh the page to try again.</p><a class="button dark" href={signup?'/sign-up':'/sign-in'}>Try again ↗</a></div>
+      <p class="auth-switch">{signup?'Already part of Nicoo?':'New around here?'} <a data-auth-switch href={signup?'/sign-in':'/sign-up'}>{signup?'Sign in':'Create an account'} ↗</a></p>
+      <div class="auth-guest"><span>No account? Hakuna shida.</span><a href="/collection">Continue shopping as a guest →</a></div>
+      <noscript>Please enable JavaScript to use secure sign-in. You can still browse the collection.</noscript>
+    </div>
+  </section>
+</Layout>

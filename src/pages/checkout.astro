@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import {whatsapp} from '../data/contact';
+---
+<Layout title="Secure Checkout — Nicoo Furniture">
+<section class="checkout checkout-live">
+  <a href="/collection" class="back-link">← Back to the collection</a>
+  <div class="checkout-heading"><p class="eyebrow">YOUR SPACE IS ABOUT TO GET BETTER</p><h1>Make it <em>yours.</em></h1><p>A few details. One M-Pesa prompt. A little closer to your next chapter.</p></div>
+  <ol class="checkout-progress" aria-label="Checkout steps"><li><span>01</span> Your details</li><li><span>02</span> Delivery or pickup</li><li><span>03</span> Pay with M-Pesa</li></ol>
+  <div class="checkout-grid">
+    <div>
+      <div id="checkout-auth" class="checkout-auth" role="status">Connecting your secure account…</div>
+      <form id="checkout-form">
+        <fieldset id="checkout-fields" disabled>
+          <div class="form-heading"><span>01</span><h2>The person behind the space.</h2></div>
+          <div class="field-grid"><label>First name<input name="firstName" autocomplete="given-name" required maxlength="60" placeholder="First name"/></label><label>Last name<input name="lastName" autocomplete="family-name" required maxlength="60" placeholder="Last name"/></label></div>
+          <label>Email address<input name="email" type="email" autocomplete="email" readonly aria-describedby="verified-email-note"/></label><p class="field-help" id="verified-email-note">Your verified account email. Manage it in your account.</p>
+          <div class="form-heading"><span>02</span><h2>From Donholm to your space.</h2></div>
+          <div class="delivery-options"><label><input type="radio" name="delivery" value="delivery" checked/><span><strong>Nairobi delivery</strong><small>Delivery fee arranged separately</small></span></label><label><input type="radio" name="delivery" value="pickup"/><span><strong>Pick up in Donholm</strong><small>No pickup fee</small></span></label></div>
+          <label id="address-label">Delivery address<textarea name="address" autocomplete="street-address" rows="3" required maxlength="400" placeholder="Estate, building, house number and nearest landmark"></textarea></label>
+          <div class="form-heading"><span>03</span><h2>Pay the familiar way.</h2></div>
+          <div class="mpesa-box"><div class="mpesa-heading"><img src="/images/mpesa.svg" alt="M-Pesa" width="152" height="43"/><span>STK PUSH</span></div><p>No till number to copy. We’ll send a payment prompt straight to your phone.</p><label>M-Pesa phone number<input type="tel" name="phone" autocomplete="tel" required placeholder="0712 345 678" maxlength="30"/></label><small>You can use a different number from your contact number.</small><ol class="mpesa-steps"><li><span>1</span> Keep your phone nearby</li><li><span>2</span> Check the amount on the prompt</li><li><span>3</span> Enter your M-Pesa PIN on your phone</li></ol></div>
+          <label class="checkout-consent"><input type="checkbox" name="confirm" required/><span>I’ve checked my items and understand that any delivery fee is agreed with the shop separately.</span></label>
+          <button id="checkout-submit" type="submit" class="button dark" disabled><Icon name="shield" size={18}/> <span data-pay-label>Pay with M-Pesa</span> <Icon/></button>
+          <p class="checkout-privacy">Your PIN stays on your phone. We never ask for it here. Your order and delivery details are saved to your Nicoo account.</p>
+        </fieldset>
+        <div id="checkout-error" class="checkout-error" role="alert" hidden></div>
+      </form>
+      <section id="payment-result" class="payment-result" hidden aria-live="polite" tabindex="-1"><span class="payment-orbit" aria-hidden="true">↗</span><p class="eyebrow">YOUR NICOO ORDER</p><h2 data-payment-title>Check your phone.</h2><p data-payment-note></p><dl><div><dt>Order reference</dt><dd data-payment-reference></dd></div><div><dt>Amount</dt><dd data-payment-amount></dd></div><div data-receipt-row hidden><dt>M-Pesa receipt</dt><dd data-payment-receipt></dd></div></dl><p class="field-help">An STK prompt is a payment request. Your order will show as paid once payment has been verified.</p><div class="payment-result-actions"><a class="button dark" href="/account">View my orders ↗</a><button type="button" id="check-payment" class="button outline-button">Refresh status</button></div><a id="payment-help" class="text-link" href={whatsapp} target="_blank" rel="noopener noreferrer">Need a hand? Talk to Nicoo ↗</a><button id="retry-payment" type="button" class="auth-text-button" hidden>Check details & try again</button></section>
+    </div>
+    <aside class="order-summary"><div class="summary-title"><div><p class="eyebrow">THE GOOD STUFF</p><h2>Coming home with you.</h2></div><button data-cart-open type="button">Edit bag</button></div><div id="checkout-items"></div><div class="summary-row"><span>Furniture subtotal</span><span id="checkout-subtotal">KSh 0</span></div><div class="summary-row"><span id="delivery-title">Delivery</span><span id="delivery-value">Arranged separately</span></div><div class="summary-total"><span id="total-title">Pay now</span><span id="checkout-total">KSh 0</span></div><div class="summary-note"><Icon name="shield" size={22}/><p>Secure account. M-Pesa on your phone.<br/>Your order, all in one place.</p></div><div class="checkout-support"><p>Good furniture. A real conversation.</p><a href={whatsapp} target="_blank" rel="noopener noreferrer">Ask us before you pay ↗</a><span>DONHOLM, NAIROBI · KARIBU NICOO</span></div></aside>
+  </div>
+</section>
+</Layout>
+<script>import '../scripts/checkout';</script>

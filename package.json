@@ -1,0 +1,31 @@
+{
+  "name": "nicoo-furniture",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --host 0.0.0.0",
+    "start": "astro dev --host 0.0.0.0",
+    "build": "astro build",
+    "preview": "astro preview --host 0.0.0.0",
+    "serve": "node --env-file=.env ./dist/server/entry.mjs",
+    "check": "astro check",
+    "order:reconcile": "node --env-file=.env --import tsx scripts/reconcile-order.ts"
+  },
+  "dependencies": {
+    "@astrojs/node": "^9.5.5",
+    "@clerk/backend": "^3.19.0",
+    "@tailwindcss/vite": "^4.1.0",
+    "astro": "^5.16.0",
+    "better-sqlite3": "^11.10.0",
+    "motion": "^12.0.0",
+    "tailwindcss": "^4.1.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@playwright/test": "^1.63.0",
+    "@types/better-sqlite3": "^9.6.0",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  }
+}
