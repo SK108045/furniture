@@ -40,19 +40,61 @@ const path=Astro.url.pathname;
       <span class="cart-label">Cart</span>
       <span class="cart-count-pill" data-cart-count>0</span>
     </button>
+    <button
+      class="nav-menu-toggle"
+      type="button"
+      data-mobile-menu-toggle
+      aria-expanded="false"
+      aria-controls="mobile-site-menu"
+      aria-label="Open navigation menu"
+    >
+      <span class="hamburger-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+    </button>
   </div>
+  <nav id="mobile-site-menu" class="mobile-site-menu" aria-label="Mobile navigation" hidden>
+    <div class="mobile-site-menu-inner">
+      <a class:list={['mobile-menu-link', { active: path === '/' }]} href="/">Home</a>
+      <a class:list={['mobile-menu-link', { active: path === '/collection' }]} href="/collection">Shop furniture</a>
+      <a class:list={['mobile-menu-link', { active: path === '/about' }]} href="/about">Our story</a>
+      <a class:list={['mobile-menu-link', { active: path === '/visit' }]} href="/visit">Visit us <span aria-hidden="true">↗</span></a>
+    </div>
+  </nav>
 </header>
-<nav class="mobile-nav-subbar" aria-label="Mobile Navigation">
-  <a class:list={{ active: path === '/' }} href="/">Home</a>
-  <a class:list={{ active: path === '/collection' }} href="/collection">Shop</a>
-  <a class:list={{ active: path === '/about' }} href="/about">Story</a>
-  <a class:list={{ active: path === '/visit' }} href="/visit">Visit ↗</a>
-</nav>
 <main id="main-content"><slot/></main>
 <footer id="visit"><div class="footer-top"><div><p class="eyebrow">KARIBU NICOO · DONHOLM, NAIROBI</p><h2>Good spaces start<br/>with a conversation<span>.</span></h2></div><div class="visit-info"><Icon name="pin" size={28}/><h3>Find us in Donholm.</h3><p>Nairobi, Kenya</p><a href="/visit">Plan your visit & talk to us ↗</a></div></div><div class="footer-links"><a href="/collection">Shop the collection</a><a href="/#offers">Furniture offers</a><a href="/about">Our story</a><a href="/visit">Visit Donholm</a><a href={whatsapp} target="_blank" rel="noopener noreferrer">WhatsApp {phone}</a><a href={`tel:${phoneInternational}`}>Call the shop</a></div><div class="footer-bottom"><a class="brand" href="/">nicoo<span class="brand-dot">.</span><small>FURNITURE</small></a><p>Furniture for the way you work.</p><span>© {new Date().getFullYear()} Nicoo Furniture</span></div><p class="demo-note">Furniture prices exclude delivery. Confirm dimensions, finishes and availability with the shop. Lifestyle images are AI-generated inspiration.</p></footer>
 <dialog id="cart-dialog" class="cart-dialog" aria-labelledby="cart-title"><div class="drawer-top"><h2 id="cart-title">Your bag <span data-cart-count>0</span></h2><button class="icon-button" data-close="cart-dialog" aria-label="Close shopping bag"><Icon name="close"/></button></div><div id="cart-items"></div><div id="cart-summary"></div></dialog>
 <dialog id="product-dialog" class="product-dialog" aria-labelledby="product-title"><button class="icon-button modal-close" data-close="product-dialog" aria-label="Close product details"><Icon name="close"/></button><div id="product-details"></div></dialog>
 <AIChatWidget />
 <div id="toast" role="status" aria-live="polite"></div>
-<script>import '../scripts/store'; import '../scripts/auth';</script>
+<script>
+  import '../scripts/store';
+  import '../scripts/auth';
+
+  const menuToggle = document.querySelector<HTMLButtonElement>('[data-mobile-menu-toggle]');
+  const mobileMenu = document.querySelector<HTMLElement>('#mobile-site-menu');
+
+  const setMobileMenu = (open: boolean) => {
+    if (!menuToggle || !mobileMenu) return;
+    menuToggle.setAttribute('aria-expanded', String(open));
+    menuToggle.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+    mobileMenu.hidden = !open;
+    document.documentElement.classList.toggle('mobile-menu-open', open);
+  };
+
+  menuToggle?.addEventListener('click', () => {
+    setMobileMenu(menuToggle.getAttribute('aria-expanded') !== 'true');
+  });
+
+  mobileMenu?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => setMobileMenu(false));
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setMobileMenu(false);
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 760) setMobileMenu(false);
+  });
+</script>
 </body></html>
