@@ -4,20 +4,53 @@ import '../styles/shop-pages.css';
 import '../styles/showroom.css';
 import '../styles/auth.css';
 import '../styles/commerce.css';
-import WhatsApp from '../components/WhatsApp.astro';
+import '../styles/navbar.css';
 import {phone,phoneInternational,whatsapp} from '../data/contact';
 import Icon from '../components/Icon.astro';
+import AIChatWidget from '../components/AIChatWidget.astro';
 const {title='Nicoo Furniture — Make room for better.'}=Astro.props;
 const path=Astro.url.pathname;
 ---
 <!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="description" content="Discover office chairs, desks and workspaces at Nicoo Furniture, Donholm, Nairobi. Make room for a better working day."/><meta name="theme-color" content="#242924"/><link rel="icon" type="image/svg+xml" href="/favicon.svg"/><title>{title}</title></head><body>
 <div class="announcement"><a href={whatsapp} target="_blank" rel="noopener noreferrer">CALL / WHATSAPP {phone} · LET’S TALK FURNITURE</a><span><Icon name="pin" size={13}/> DONHOLM, NAIROBI</span></div>
-<header class="header"><a class="brand" href="/" aria-label="Nicoo Furniture home">nicoo<span class="brand-dot">.</span><small>FURNITURE</small></a><nav aria-label="Main navigation"><a class:list={{active:path==='/'}} href="/">Home</a><a class:list={{active:path==='/collection'}} href="/collection">Shop furniture</a><a class:list={{active:path==='/about'}} href="/about">Our story</a><a class:list={{active:path==='/visit'}} href="/visit">Visit us <span class="small-arrow">↗</span></a></nav><div class="header-actions"><a class="signup" href="/sign-in" data-account-link><span data-account-label>Sign in</span><Icon name="user" size={18}/></a><button class="cart-trigger" data-cart-open aria-label="Open shopping bag"><Icon name="bag" size={21}/><span class="bag-label">Cart</span><span data-cart-count>0</span></button></div></header>
+<header class="header site-header" id="site-header">
+  <div class="header-left">
+    <a class="brand" href="/" aria-label="Nicoo Furniture home">
+      <span class="brand-text">nicoo<span class="brand-dot">.</span></span>
+      <span class="brand-sub">FURNITURE</span>
+    </a>
+  </div>
+  <nav class="header-center" aria-label="Main navigation">
+    <div class="header-nav-links">
+      <a class:list={['nav-link', { active: path === '/' }]} href="/">Home</a>
+      <a class:list={['nav-link', { active: path === '/collection' }]} href="/collection">Shop furniture</a>
+      <a class:list={['nav-link', { active: path === '/about' }]} href="/about">Our story</a>
+      <a class:list={['nav-link', { active: path === '/visit' }]} href="/visit">Visit us <span class="nav-arrow" aria-hidden="true">↗</span></a>
+    </div>
+  </nav>
+  <div class="header-right">
+    <a class="nav-account" href="/sign-in" data-account-link aria-label="Account">
+      <span data-account-label>Sign in</span>
+      <Icon name="user" size={18}/>
+    </a>
+    <button class="nav-cart" data-cart-open aria-label="Open shopping bag">
+      <Icon name="bag" size={20}/>
+      <span class="cart-label">Cart</span>
+      <span class="cart-count-pill" data-cart-count>0</span>
+    </button>
+  </div>
+</header>
+<nav class="mobile-nav-subbar" aria-label="Mobile Navigation">
+  <a class:list={{ active: path === '/' }} href="/">Home</a>
+  <a class:list={{ active: path === '/collection' }} href="/collection">Shop</a>
+  <a class:list={{ active: path === '/about' }} href="/about">Story</a>
+  <a class:list={{ active: path === '/visit' }} href="/visit">Visit ↗</a>
+</nav>
 <main id="main-content"><slot/></main>
 <footer id="visit"><div class="footer-top"><div><p class="eyebrow">KARIBU NICOO · DONHOLM, NAIROBI</p><h2>Good spaces start<br/>with a conversation<span>.</span></h2></div><div class="visit-info"><Icon name="pin" size={28}/><h3>Find us in Donholm.</h3><p>Nairobi, Kenya</p><a href="/visit">Plan your visit & talk to us ↗</a></div></div><div class="footer-links"><a href="/collection">Shop the collection</a><a href="/#offers">Demo offers</a><a href="/about">Our story</a><a href="/visit">Visit Donholm</a><a href={whatsapp} target="_blank" rel="noopener noreferrer">WhatsApp {phone}</a><a href={`tel:${phoneInternational}`}>Call the shop</a></div><div class="footer-bottom"><a class="brand" href="/">nicoo<span class="brand-dot">.</span><small>FURNITURE</small></a><p>Furniture for the way you work.</p><span>© {new Date().getFullYear()} Nicoo Furniture</span></div><p class="demo-note">Showroom preview · Product names are illustrative. Confirm prices and specifications with the shop. Marked discounts are illustrative demo offers. Lifestyle images are AI-generated inspiration.</p></footer>
 <dialog id="cart-dialog" class="cart-dialog" aria-labelledby="cart-title"><div class="drawer-top"><h2 id="cart-title">Your bag <span data-cart-count>0</span></h2><button class="icon-button" data-close="cart-dialog" aria-label="Close shopping bag"><Icon name="close"/></button></div><div id="cart-items"></div><div id="cart-summary"></div></dialog>
 <dialog id="product-dialog" class="product-dialog" aria-labelledby="product-title"><button class="icon-button modal-close" data-close="product-dialog" aria-label="Close product details"><Icon name="close"/></button><div id="product-details"></div></dialog>
-<a class="whatsapp-float" href={whatsapp} target="_blank" rel="noopener noreferrer" aria-label="Chat with Nicoo Furniture on WhatsApp, 0114551129"><span class="whatsapp-label">Tuongee on WhatsApp</span><WhatsApp size={29}/></a>
+<AIChatWidget />
 <div id="toast" role="status" aria-live="polite"></div>
 <script>import '../scripts/store'; import '../scripts/auth';</script>
 </body></html>

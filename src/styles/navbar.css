@@ -1,0 +1,332 @@
+/* ==========================================================================
+   TOP NAVBAR — REFINED ARCHITECTURAL EDITORIAL NAVIGATION
+   Nicoo Furniture
+   ========================================================================== */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  height: 82px !important;
+  margin: 0 !important;
+  background: rgba(250, 249, 246, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(220, 224, 216, 0.85);
+  display: grid !important;
+  grid-template-columns: 1fr auto 1fr !important;
+  align-items: center;
+  padding: 0 5%;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+@media (min-width: 1600px) {
+  .site-header {
+    padding-left: max(5%, calc((100vw - 1440px) / 2)) !important;
+    padding-right: max(5%, calc((100vw - 1440px) / 2)) !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Left Column: Brand Identity
+   -------------------------------------------------------------------------- */
+.header-left {
+  justify-self: start;
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  display: flex !important;
+  flex-direction: column !important;
+  text-decoration: none;
+  line-height: 1 !important;
+  transition: opacity 0.2s ease;
+}
+
+.brand:hover {
+  opacity: 0.85;
+}
+
+.brand-text {
+  font-size: 34px !important;
+  font-weight: 800 !important;
+  letter-spacing: -2px !important;
+  color: #242924 !important;
+  line-height: 0.88 !important;
+}
+
+.brand-dot {
+  color: #c34e23 !important;
+}
+
+.brand-sub {
+  font-size: 8.5px !important;
+  letter-spacing: 3.2px !important;
+  font-weight: 600 !important;
+  color: #71776c !important;
+  margin-top: 5px !important;
+  margin-left: 2px !important;
+}
+
+/* --------------------------------------------------------------------------
+   Center Column: Mathematically True Center Nav Links (Clean, No Capsules)
+   -------------------------------------------------------------------------- */
+.header-center {
+  justify-self: center !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.header-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 38px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link {
+  position: relative;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: #555b50;
+  text-decoration: none;
+  padding: 10px 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  letter-spacing: -0.15px;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  color: #1a221b;
+}
+
+.nav-link.active {
+  color: #1a221b !important;
+  font-weight: 600 !important;
+}
+
+/* Refined 2px accent underline spanning exactly the text width */
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #c34e23;
+  border-radius: 1px;
+}
+
+/* Override any old conflicting styles */
+.header nav a.active:after,
+.nav-item.active:after {
+  display: none !important;
+}
+
+.nav-arrow {
+  color: #c34e23;
+  font-size: 13px;
+  transition: transform 0.2s ease;
+}
+
+.nav-link:hover .nav-arrow {
+  transform: translate(2px, -2px);
+}
+
+/* --------------------------------------------------------------------------
+   Right Column: Minimalist Account & Cart Actions
+   -------------------------------------------------------------------------- */
+.header-right {
+  justify-self: end !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 26px !important;
+}
+
+.nav-account {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #454d42;
+  text-decoration: none;
+  padding: 8px 0;
+  transition: color 0.2s ease;
+}
+
+.nav-account:hover {
+  color: #1a221b;
+}
+
+.nav-account svg {
+  color: #656d61;
+  transition: color 0.2s ease;
+}
+
+.nav-account:hover svg {
+  color: #1a221b;
+}
+
+.nav-cart {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #242924;
+  background: transparent;
+  border: 0;
+  padding: 8px 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.nav-cart:hover {
+  color: #c34e23;
+}
+
+.nav-cart svg {
+  color: #242924;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.nav-cart:hover svg {
+  color: #c34e23;
+  transform: scale(1.06);
+}
+
+.cart-label {
+  font-weight: 500;
+}
+
+.cart-count-pill {
+  background: #eaece4;
+  color: #242924;
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 4px;
+  box-sizing: border-box;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+/* When cart has items, light it up with Nicoo terracotta */
+.cart-count-pill:not([data-cart-count="0"]) {
+  background: #c34e23;
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   Announcement Bar
+   -------------------------------------------------------------------------- */
+.announcement {
+  background: #1f2520 !important;
+  color: #f0eee6 !important;
+  padding: 9px 5% !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  font-size: 11px !important;
+  letter-spacing: 1.4px !important;
+}
+
+.announcement a {
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.announcement a:hover {
+  color: #ffcf96;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Design
+   -------------------------------------------------------------------------- */
+@media (max-width: 1050px) {
+  .site-header {
+    height: 74px !important;
+    padding: 0 4% !important;
+  }
+  .header-nav-links {
+    gap: 24px;
+  }
+  .nav-link {
+    font-size: 13.5px;
+  }
+  .header-right {
+    gap: 18px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-header {
+    height: 64px !important;
+    padding: 0 16px !important;
+    grid-template-columns: auto 1fr auto !important;
+  }
+
+  .brand-text {
+    font-size: 27px !important;
+  }
+
+  .header-center {
+    display: none !important;
+  }
+
+  .header-right {
+    gap: 14px !important;
+  }
+
+  .nav-account span {
+    display: none;
+  }
+
+  .cart-label {
+    display: none;
+  }
+
+  /* Compact Mobile Bar underneath */
+  .mobile-nav-subbar {
+    display: flex !important;
+    justify-content: space-around;
+    background: #f1f2eb;
+    border-bottom: 1px solid #dce0d5;
+    padding: 9px 12px;
+    font-size: 12.5px;
+    font-weight: 500;
+  }
+
+  .mobile-nav-subbar a {
+    color: #4b5246;
+    padding: 5px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+  }
+
+  .mobile-nav-subbar a.active {
+    color: #172118;
+    font-weight: 600;
+    background: #ffffff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  }
+}
+
+@media (min-width: 761px) {
+  .mobile-nav-subbar {
+    display: none !important;
+  }
+}

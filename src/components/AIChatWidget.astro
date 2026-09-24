@@ -1,0 +1,703 @@
+---
+import WhatsApp from './WhatsApp.astro';
+import Icon from './Icon.astro';
+import { whatsapp, phone } from '../data/contact';
+
+interface Props {
+  whatsappUrl?: string;
+  phoneNumber?: string;
+}
+
+const { whatsappUrl = whatsapp, phoneNumber = phone } = Astro.props;
+---
+
+<div id="ai-chat-root" class="ai-chat-root">
+  <!-- Floating WhatsApp & Chat Launcher Button -->
+  <button
+    id="chat-toggle-btn"
+    class="chat-launcher-btn"
+    type="button"
+    aria-label="Open Nicoo AI Assistant and WhatsApp Chat"
+    aria-expanded="false"
+  >
+    <span class="launcher-icon icon-whatsapp">
+      <WhatsApp size={28} />
+    </span>
+    <span class="launcher-icon icon-close" aria-hidden="true">
+      <Icon name="close" size={20} />
+    </span>
+    <span class="launcher-tooltip">Chat with Nicoo AI / WhatsApp</span>
+  </button>
+
+  <!-- Interactive AI Chat Window -->
+  <div
+    id="chat-window"
+    class="chat-window"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Nicoo Furniture AI Chat"
+  >
+    <!-- Chat Header with WhatsApp Escalation Button -->
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar-wrap">
+          <span class="chat-avatar-icon">
+            <WhatsApp size={20} />
+          </span>
+          <span class="chat-status-dot" title="Online"></span>
+        </div>
+        <div>
+          <h3 class="chat-title">Nicoo Assistant</h3>
+        </div>
+      </div>
+      <div class="chat-header-actions">
+        <a
+          href={whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="header-wa-btn"
+          title={`Chat with shop on WhatsApp (${phoneNumber})`}
+        >
+          <WhatsApp size={15} />
+          <span>WhatsApp ↗</span>
+        </a>
+        <button id="chat-close-btn" class="chat-close-btn" type="button" aria-label="Close chat window">
+          <Icon name="close" size={17} />
+        </button>
+      </div>
+    </div>
+
+    <!-- Pinned WhatsApp Direct Escalation Banner -->
+    <div class="chat-wa-banner">
+      <span class="wa-banner-text">Prefer chatting with the Donholm shop team?</span>
+      <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" class="wa-banner-link">
+        Chat on WhatsApp 💬
+      </a>
+    </div>
+
+    <!-- Message Stream -->
+    <div id="chat-messages" class="chat-messages">
+      <div class="message-bubble bot-message">
+        <div class="message-text">
+          Habari! 👋 Welcome to Nicoo Furniture. I'm your AI assistant. Ask me anything about our ergonomic chairs, desks, Donholm showroom, or Nairobi delivery!
+        </div>
+        <span class="message-time">Just now</span>
+      </div>
+
+      <!-- Quick Suggestion Chips -->
+      <div class="chat-suggestions" id="chat-suggestions">
+        <button type="button" class="suggestion-chip">Best chair for long hours?</button>
+        <button type="button" class="suggestion-chip">What desks do you have?</button>
+        <button type="button" class="suggestion-chip">Where in Donholm are you?</button>
+        <button type="button" class="suggestion-chip">How does Nairobi delivery work?</button>
+      </div>
+    </div>
+
+    <!-- Animated Typing Indicator -->
+    <div id="chat-typing" class="chat-typing-row" hidden>
+      <div class="typing-bubble">
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+      </div>
+      <span class="typing-label">Nicoo is typing…</span>
+    </div>
+
+    <!-- Input Bar -->
+    <form id="chat-form" class="chat-input-bar">
+      <input
+        id="chat-input"
+        type="text"
+        placeholder="Ask a question..."
+        maxlength="250"
+        autocomplete="off"
+        required
+      />
+      <button id="chat-send-btn" type="submit" aria-label="Send question">
+        <Icon name="arrow" size={18} />
+      </button>
+    </form>
+  </div>
+</div>
+
+<style>
+  .ai-chat-root {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 999;
+    font-family: inherit;
+  }
+
+  /* --------------------------------------------------------------------------
+     Floating Launcher Button with Spring Hover & Icon Morph
+     -------------------------------------------------------------------------- */
+  .chat-launcher-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #178844;
+    color: #ffffff;
+    border: 2.5px solid #ffffff;
+    box-shadow: 0 8px 26px rgba(19, 45, 37, 0.35);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, box-shadow 0.25s ease;
+  }
+
+  .chat-launcher-btn:hover {
+    transform: translateY(-3px) scale(1.04);
+    background: #13773b;
+    box-shadow: 0 12px 32px rgba(19, 45, 37, 0.45);
+  }
+
+  .launcher-icon {
+    display: grid;
+    place-items: center;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+  }
+
+  .icon-close {
+    position: absolute;
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.6);
+  }
+
+  .ai-chat-root.is-open .icon-whatsapp {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.6);
+  }
+
+  .ai-chat-root.is-open .icon-close {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+
+  /* Tooltip Pill on Hover */
+  .launcher-tooltip {
+    position: absolute;
+    right: 72px;
+    white-space: nowrap;
+    background: #ffffff;
+    color: #26352d;
+    border: 1px solid #d3dace;
+    padding: 9px 14px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  @media (min-width: 761px) {
+    .chat-launcher-btn:hover .launcher-tooltip,
+    .chat-launcher-btn:focus-visible .launcher-tooltip {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .ai-chat-root.is-open .launcher-tooltip {
+    display: none !important;
+  }
+
+  /* --------------------------------------------------------------------------
+     Chat Window — Smooth Spring Open/Close Transitions
+     -------------------------------------------------------------------------- */
+  .chat-window {
+    position: absolute;
+    right: 0;
+    bottom: 74px;
+    width: 380px;
+    max-width: calc(100vw - 32px);
+    height: 540px;
+    max-height: calc(100vh - 120px);
+    background: #ffffff;
+    border: 1px solid rgba(215, 222, 212, 0.9);
+    border-radius: 18px;
+    box-shadow: 0 24px 60px -12px rgba(18, 32, 24, 0.32), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform-origin: bottom right;
+    opacity: 0;
+    transform: scale(0.92) translateY(20px);
+    pointer-events: none;
+    transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .ai-chat-root.is-open .chat-window {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: auto;
+  }
+
+  /* --------------------------------------------------------------------------
+     Header: WhatsApp Brand Styling & Direct Link
+     -------------------------------------------------------------------------- */
+  .chat-header {
+    background: #1b2d22;
+    color: #ffffff;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .chat-header-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .chat-avatar-wrap {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #167a3d;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+
+  .chat-avatar-icon {
+    color: #ffffff;
+    display: flex;
+  }
+
+  .chat-status-dot {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #34d399;
+    border: 2px solid #1b2d22;
+  }
+
+  .chat-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+    color: #ffffff;
+    line-height: 1.2;
+  }
+
+
+  .chat-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .header-wa-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #178844;
+    color: #ffffff;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 9999px;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .header-wa-btn:hover {
+    background: #13773b;
+    transform: translateY(-1px);
+  }
+
+  .chat-close-btn {
+    background: transparent;
+    border: 0;
+    color: #a4b0a0;
+    cursor: pointer;
+    padding: 4px;
+    display: grid;
+    place-items: center;
+    border-radius: 4px;
+    transition: color 0.2s ease, background 0.2s ease;
+  }
+
+  .chat-close-btn:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  /* --------------------------------------------------------------------------
+     Pinned WhatsApp Escalation Banner
+     -------------------------------------------------------------------------- */
+  .chat-wa-banner {
+    background: #f1f6f1;
+    border-bottom: 1px solid #d6e2d6;
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 11.5px;
+  }
+
+  .wa-banner-text {
+    color: #3b5042;
+    font-weight: 500;
+  }
+
+  .wa-banner-link {
+    color: #127538;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    border-bottom: 1px dashed #127538;
+    transition: color 0.2s ease;
+  }
+
+  .wa-banner-link:hover {
+    color: #0c5929;
+  }
+
+  /* --------------------------------------------------------------------------
+     Chat Messages Body
+     -------------------------------------------------------------------------- */
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #fafaf7;
+    scroll-behavior: smooth;
+  }
+
+  .message-bubble {
+    max-width: 84%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    word-break: break-word;
+  }
+
+  .bot-message {
+    align-self: flex-start;
+  }
+
+  .bot-message .message-text {
+    background: #ffffff;
+    color: #242924;
+    padding: 11px 14px;
+    border-radius: 14px 14px 14px 2px;
+    border: 1px solid #e1e4dc;
+    font-size: 13.5px;
+    line-height: 1.5;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  }
+
+  .user-message {
+    align-self: flex-end;
+  }
+
+  .user-message .message-text {
+    background: #24352b;
+    color: #ffffff;
+    padding: 11px 14px;
+    border-radius: 14px 14px 2px 14px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    box-shadow: 0 2px 8px rgba(36, 53, 43, 0.15);
+  }
+
+  .message-time {
+    font-size: 10px;
+    color: #8c9388;
+    padding: 0 4px;
+  }
+
+  .user-message .message-time {
+    align-self: flex-end;
+  }
+
+  /* Suggestion Chips */
+  .chat-suggestions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .suggestion-chip {
+    background: #ffffff;
+    border: 1px solid #d3d8ce;
+    color: #3b4237;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  }
+
+  .suggestion-chip:hover {
+    background: #f1f4ec;
+    border-color: #bcc3b5;
+    transform: translateX(2px);
+    color: #172118;
+  }
+
+  /* --------------------------------------------------------------------------
+     Typing Indicator
+     -------------------------------------------------------------------------- */
+  .chat-typing-row {
+    padding: 6px 16px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fafaf7;
+  }
+
+  .typing-bubble {
+    background: #ffffff;
+    border: 1px solid #e1e4dc;
+    padding: 6px 10px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .typing-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #178844;
+    animation: typing-bounce 1.4s infinite ease-in-out both;
+  }
+
+  .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+  .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+  @keyframes typing-bounce {
+    0%, 80%, 100% {
+      transform: scale(0.6);
+      opacity: 0.4;
+    }
+    40% {
+      transform: scale(1.1);
+      opacity: 1;
+    }
+  }
+
+  .typing-label {
+    font-size: 11px;
+    color: #7b8275;
+  }
+
+  /* --------------------------------------------------------------------------
+     Input Bar
+     -------------------------------------------------------------------------- */
+  .chat-input-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    background: #ffffff;
+    border-top: 1px solid #e2e6de;
+  }
+
+  .chat-input-bar input {
+    flex: 1;
+    border: 1px solid #d4dad0;
+    border-radius: 20px;
+    padding: 10px 14px;
+    font-size: 13.5px;
+    outline: none;
+    color: #242924;
+    background: #fafaf7;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+
+  .chat-input-bar input:focus {
+    border-color: #178844;
+    background: #ffffff;
+  }
+
+  .chat-input-bar button {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #178844;
+    color: #ffffff;
+    border: 0;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+
+  .chat-input-bar button:hover {
+    background: #13773b;
+    transform: scale(1.05);
+  }
+
+  .chat-input-bar button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* --------------------------------------------------------------------------
+     Mobile Responsiveness
+     -------------------------------------------------------------------------- */
+  @media (max-width: 600px) {
+    .ai-chat-root {
+      right: 16px;
+      bottom: 16px;
+    }
+
+    .chat-window {
+      right: 0;
+      bottom: 68px;
+      width: calc(100vw - 32px);
+      height: 480px;
+    }
+  }
+</style>
+
+<script>
+  const root = document.getElementById('ai-chat-root')!;
+  const toggleBtn = document.getElementById('chat-toggle-btn') as HTMLButtonElement;
+  const closeBtn = document.getElementById('chat-close-btn') as HTMLButtonElement;
+  const chatMessages = document.getElementById('chat-messages') as HTMLElement;
+  const chatForm = document.getElementById('chat-form') as HTMLFormElement;
+  const chatInput = document.getElementById('chat-input') as HTMLInputElement;
+  const chatSendBtn = document.getElementById('chat-send-btn') as HTMLButtonElement;
+  const chatTyping = document.getElementById('chat-typing') as HTMLElement;
+  const suggestionsBox = document.getElementById('chat-suggestions') as HTMLElement;
+
+  let isOpen = false;
+  let isSending = false;
+  const conversationHistory: Array<{ role: 'user' | 'model'; text: string }> = [];
+
+  function setOpen(open: boolean) {
+    isOpen = open;
+    root.classList.toggle('is-open', isOpen);
+    toggleBtn.setAttribute('aria-expanded', String(isOpen));
+    if (isOpen) {
+      setTimeout(() => chatInput.focus(), 250);
+      scrollToBottom();
+    }
+  }
+
+  toggleBtn.addEventListener('click', () => setOpen(!isOpen));
+  closeBtn?.addEventListener('click', () => setOpen(false));
+
+  if (window.location.search.includes('chat=open') || window.location.hash === '#chat') {
+    setTimeout(() => setOpen(true), 150);
+  }
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isOpen) {
+      setOpen(false);
+    }
+  });
+
+  function scrollToBottom() {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function appendMessage(role: 'user' | 'bot', text: string) {
+    const bubble = document.createElement('div');
+    bubble.className = `message-bubble ${role === 'user' ? 'user-message' : 'bot-message'}`;
+
+    const textEl = document.createElement('div');
+    textEl.className = 'message-text';
+    textEl.textContent = text;
+
+    const timeEl = document.createElement('span');
+    timeEl.className = 'message-time';
+    const now = new Date();
+    timeEl.textContent = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    bubble.appendChild(textEl);
+    bubble.appendChild(timeEl);
+    chatMessages.appendChild(bubble);
+
+    scrollToBottom();
+  }
+
+  async function handleSend(userText: string) {
+    const query = userText.trim();
+    if (!query || isSending) return;
+
+    isSending = true;
+    chatInput.value = '';
+    chatSendBtn.disabled = true;
+    appendMessage('user', query);
+
+    // Hide suggestions after first interaction
+    if (suggestionsBox) {
+      suggestionsBox.style.display = 'none';
+    }
+
+    // Show typing
+    chatTyping.hidden = false;
+    scrollToBottom();
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: query,
+          history: conversationHistory,
+        }),
+      });
+
+      const data = await res.json();
+      const reply = data.reply || "Karibu! Reach us on WhatsApp at 0114 551 129 for fast help.";
+
+      appendMessage('bot', reply);
+
+      // Record to history
+      conversationHistory.push({ role: 'user', text: query });
+      conversationHistory.push({ role: 'model', text: reply });
+    } catch {
+      appendMessage(
+        'bot',
+        "Sorry, I had trouble connecting. Please tap the WhatsApp button above to chat directly with our Donholm team!"
+      );
+    } finally {
+      chatTyping.hidden = true;
+      chatSendBtn.disabled = false;
+      isSending = false;
+      chatInput.focus();
+      scrollToBottom();
+    }
+  }
+
+  chatForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    handleSend(chatInput.value);
+  });
+
+  // Suggestion chips
+  document.querySelectorAll<HTMLButtonElement>('.suggestion-chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      handleSend(chip.textContent || '');
+    });
+  });
+</script>
