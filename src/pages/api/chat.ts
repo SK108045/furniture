@@ -9,7 +9,7 @@ const productList = products
   .map(
     (p) =>
       `• ${p.name} (${p.category}): ${money(p.price)}${
-        p.demoOffer ? ` [Demo Offer 10% off, was ${money(p.originalPrice)}]` : ''
+        p.onSale ? ` [Selling price; original ${money(p.originalPrice)}, save ${money(p.savings)}]` : ''
       } - ${p.description}`
   )
   .join('\n');

@@ -8,7 +8,7 @@ The checkout sends the exact Swifta request shape supplied for this project:
 
 The phone is normalized to `07…` / `01…`, the amount is calculated from the server catalogue, and `accountReference` is `Nicoo Furnitures NF-YYMMDD-XXXXXXXX`. The customer sees the generated Nicoo order reference immediately. The M-Pesa receipt number comes from the successful payment callback; it is not invented by the shop.
 
-A verified Clerk session is required to order. SQLite stores the order before the STK request. The same checkout-attempt ID returns the existing order, preventing repeated clicks or transport retries from requesting payment twice. An interrupted or ambiguous request remains awaiting review. The checkout polls saved status every 10 seconds for five minutes and also offers a manual refresh. Account history always reads the latest saved status.
+A verified Clerk session is required to order. Supabase stores the order before the STK request. The same checkout-attempt ID returns the existing order, preventing repeated clicks or transport retries from requesting payment twice. An interrupted or ambiguous request remains awaiting review. The checkout polls saved status every 10 seconds for five minutes and also offers a manual refresh. Account history always reads the latest saved status.
 
 ## Callback connection
 
@@ -27,7 +27,7 @@ Until Swifta is pointed to this app, requests can still send STK prompts, but or
 
 ## Runtime
 
-Run one Node application with a persistent, backed-up `DATABASE_PATH`. SQLite is suitable for this deployment; multiple replicas need a shared transactional database instead. Delivery fees remain separately agreed with the shop and are excluded from the furniture payment, as explained in checkout.
+Vercel functions use the shared Supabase database over HTTPS. Transactional database functions claim payment attempts, apply callbacks, and protect order edits across concurrent requests. Run `supabase/schema.sql` before checkout. Delivery fees remain separately agreed with the shop and are excluded from the furniture payment, as explained in checkout.
 
 No real STK request or end-to-end payment test was performed during implementation, at the user's request.
 

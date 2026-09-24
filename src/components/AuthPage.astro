@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import AccountLoader from './AccountLoader.astro';
 const {mode='sign-in'}=Astro.props;
 const signup=mode==='sign-up';
 ---
@@ -16,6 +17,7 @@ const signup=mode==='sign-up';
       <h2>{signup?'Make yourself at home.':'Good to see you again.'}</h2>
       <p class="auth-intro">{signup?'Create your account, then find something that feels like you.':'Sign in to manage your account and keep exploring.'}</p>
       <div data-auth-status role="status" aria-live="polite">Preparing your secure sign-in…</div>
+      <AccountLoader compact label="Opening your secure account…"/>
       <form data-email-auth class="email-auth" hidden>
         <div data-identity-fields><label>Email address<input name="email" type="email" autocomplete="email" required placeholder="you@example.com" maxlength="254"/></label></div>
         <div data-verification-fields hidden><label>Email verification code<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="000000"/></label><p class="auth-small">Check your inbox and spam folder. Enter the six-digit code to continue.</p><button type="button" class="auth-text-button" data-resend>Send another code</button></div>

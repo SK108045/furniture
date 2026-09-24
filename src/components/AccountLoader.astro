@@ -1,0 +1,8 @@
+---
+const {compact=false,label='Making room for you…'}=Astro.props;
+---
+<div class:list={['account-loader',{'loader-compact':compact}]} data-account-loader role="status" aria-live="polite">
+  <div class="loader-chair" aria-hidden="true"><svg viewBox="0 0 96 96" fill="none"><path class="chair-back" d="M29 42V23a8 8 0 0 1 8-8h22a8 8 0 0 1 8 8v19"/><path class="chair-seat" d="M22 48a6 6 0 0 1 6-6h40a6 6 0 0 1 6 6v10H22z"/><path class="chair-legs" d="M29 59l-5 23m43-23 5 23M35 59h26"/></svg><span></span></div>
+  <div><p class="eyebrow">YOUR CORNER OF NICOO</p><strong data-loader-label>{label}</strong><p>Gathering your orders and saved details.</p></div>
+  {!compact&&<div class="loader-skeletons" aria-hidden="true"><i></i><i></i><i></i></div>}
+</div>

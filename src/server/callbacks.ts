@@ -1,8 +1,7 @@
 import {createHash,createHmac,timingSafeEqual} from 'node:crypto';
-import {db} from './database';
+import {rpc} from './database';
 import {env} from './config';
 import {HttpError} from './http';
-import type {OrderRow} from './orders';
 function equal(a:string,b:string){const left=Buffer.from(a),right=Buffer.from(b);return left.length===right.length&&timingSafeEqual(left,right);}
 export function authorizeCallback(request: Request) {
   const expected=env('SWIFTA_CALLBACK_TOKEN');
@@ -36,32 +35,10 @@ export function normalizeCallback(body: any) {
   return {providerId,reference,code:Number(code),amount:Number(amount)||0,phone:String(phone||'').replace(/^\+?254/,'0'),receipt:typeof receipt==='string'?receipt.toUpperCase():null};
 }
 type Callback=ReturnType<typeof normalizeCallback>;
-function callbackStore(){
-  const connection=db();
-  connection.exec('CREATE TABLE IF NOT EXISTS payment_callbacks (id TEXT PRIMARY KEY, provider_id TEXT NOT NULL, reference TEXT NOT NULL, payload TEXT NOT NULL, received_at TEXT NOT NULL, applied INTEGER NOT NULL DEFAULT 0)');
-  return connection;
+export async function applyCallbacks(providerId:string,reference='') {
+  await rpc('nicoo_apply_callbacks',{p_provider_id:providerId,p_reference:reference});
 }
-export function applyCallbacks(providerId: string,reference='') {
-  const connection=callbackStore();
-  connection.transaction(()=>{
-    const order=connection.prepare("SELECT * FROM orders WHERE (provider_id=? AND ?!='') OR (id=? AND ?!='')").get(providerId,providerId,reference,reference) as OrderRow|undefined;
-    if(!order)return;
-    const events=connection.prepare("SELECT * FROM payment_callbacks WHERE ((provider_id=? AND ?!='') OR reference=?) AND applied=0 ORDER BY received_at").all(order.provider_id||'',order.provider_id||'',order.id) as {id:string;payload:string}[];
-    for(const event of events){
-      const payload=JSON.parse(event.payload) as Callback;
-      const details=JSON.parse(order.details);
-      if(payload.reference&&payload.reference!==order.id)continue;
-      if(payload.providerId&&order.provider_id&&payload.providerId!==order.provider_id)continue;
-      if(payload.code===0&&(payload.amount!==order.total||payload.phone!==details.customer.phone))continue;
-      // A duplicate or late failure never overwrites an already verified payment.
-      connection.prepare("UPDATE orders SET status=?,receipt=?,payment_note=?,updated_at=? WHERE id=? AND status!='paid'").run(payload.code===0?'paid':'failed',payload.code===0?payload.receipt:null,payload.code===0?'Your M-Pesa payment is confirmed. Thank you! Contact the shop to arrange delivery or pickup.':'The M-Pesa payment was not completed. You can return to checkout and try again.',new Date().toISOString(),order.id);
-      connection.prepare('UPDATE payment_callbacks SET applied=1 WHERE id=?').run(event.id);
-    }
-  })();
-}
-export function receiveCallback(payload: Callback) {
-  const serialized=JSON.stringify(payload);
-  const id=createHash('sha256').update(serialized).digest('hex');
-  callbackStore().prepare('INSERT OR IGNORE INTO payment_callbacks (id,provider_id,reference,payload,received_at) VALUES (?,?,?,?,?)').run(id,payload.providerId,payload.reference,serialized,new Date().toISOString());
-  applyCallbacks(payload.providerId,payload.reference);
+export async function receiveCallback(payload:Callback) {
+  const id=createHash('sha256').update(JSON.stringify(payload)).digest('hex');
+  await rpc('nicoo_receive_callback',{p_id:id,p_payload:payload});
 }

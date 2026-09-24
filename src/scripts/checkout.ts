@@ -10,16 +10,40 @@ const error=document.querySelector<HTMLElement>('#checkout-error')!;
 const result=document.querySelector<HTMLElement>('#payment-result')!;
 const retry=document.querySelector<HTMLButtonElement>('#retry-payment')!;
 let busy=false;
-let attempt: {key:string;payload:any;userId:string}|null=null;
+let attempt: {key:string;payload:any;userId:string;orderId?:string}|null=null;
 let orderId='';
 let poll:ReturnType<typeof setTimeout>;
 let polls=0;
+let activeOrder:any=null;
+function currentItems(){return Object.entries(getCart()).map(([id,quantity])=>({id:Number(id),quantity}));}
+function sameItems(items:any){
+  if(!Array.isArray(items))return false;
+  const cart=currentItems();
+  return items.length===cart.length&&items.every((item:any)=>cart.some(line=>line.id===item.id&&line.quantity===item.quantity));
+}
+function currentTotal(){return products.reduce((sum,p)=>sum+p.price*(getCart()[p.id]||0),0);}
+function earlierPayment(message?:string){
+  const notice=document.querySelector<HTMLElement>('#previous-payment-notice')!;notice.hidden=false;
+  if(message)notice.querySelector('[data-previous-payment-message]')!.textContent=message;
+}
+function returnToBag(){clearTimeout(poll);orderId='';activeOrder=null;attempt=null;saveAttempt();polls=0;form.hidden=false;result.hidden=true;updatePay();}
 function delivery(){const pickup=new FormData(form).get('delivery')==='pickup';const label=document.querySelector<HTMLElement>('#address-label')!;label.hidden=pickup;label.querySelector('textarea')!.required=!pickup;document.querySelector('#delivery-title')!.textContent=pickup?'Shop pickup':'Delivery';document.querySelector('#delivery-value')!.textContent=pickup?'Free':'Arranged separately';}
 form.addEventListener('change',delivery);
 function updatePay(){const cart=getCart();const total=products.reduce((sum,p)=>sum+p.price*(cart[p.id]||0),0);submit.querySelector('[data-pay-label]')!.textContent=busy?'Sending payment request…':total?`Pay ${money(total)} with M-Pesa`:'Pay with M-Pesa';submit.disabled=busy||!total;}
-window.addEventListener('nicoo:cart',updatePay);
+window.addEventListener('nicoo:cart',()=>{
+  if(!busy&&activeOrder&&activeOrder.status!=='paid'&&(!sameItems(activeOrder.items)||activeOrder.total!==currentTotal())){
+    earlierPayment('Your earlier payment is saved in your account. Checkout below is for the items currently in your bag.');returnToBag();
+  }
+  if(!busy&&attempt&&!sameItems(attempt.payload?.items)){attempt=null;saveAttempt();}
+  updatePay();
+});
 function saveAttempt(){try{if(attempt)sessionStorage.setItem('nicoo-checkout-attempt',JSON.stringify(attempt));else sessionStorage.removeItem('nicoo-checkout-attempt');}catch{}}
 function showOrder(order:any){
+  activeOrder=order;
+  if(order.status!=='paid'&&(!sameItems(order.items)||order.total!==currentTotal())){
+    earlierPayment(`Order ${order.id} for ${money(order.total)} is saved in your account. You can pay for your current bag below.`);returnToBag();return;
+  }
+  if(attempt){attempt.orderId=order.id;saveAttempt();}
   orderId=order.id;form.hidden=true;result.hidden=false;
   try{if(order.status!=='failed'&&order.status!=='paid')localStorage.setItem('nicoo-active-order',order.id);}catch{}
   const titles:Record<string,string>={requesting:'Your request is being sent.',pending:'Check your phone.',uncertain:'Let’s check that payment.',failed:'The request didn’t go through.',paid:'Asante. Payment received!'};
@@ -37,15 +61,31 @@ function showOrder(order:any){
 }
 async function refresh(){
   if(!orderId)return;
+  const requestedId=orderId;
   polls++;
   const button=document.querySelector<HTMLButtonElement>('#check-payment')!;button.disabled=true;
-  try{showOrder((await api(`/api/orders/${encodeURIComponent(orderId)}`)).order);}
+  try{const data=await api(`/api/orders/${encodeURIComponent(requestedId)}`);if(orderId===requestedId)showOrder(data.order);}
   catch(e){result.querySelector('[data-payment-note]')!.textContent=errorMessage(e);}
   finally{button.disabled=false;}
 }
 document.querySelector('#check-payment')!.addEventListener('click',()=>void refresh());
-retry.addEventListener('click',()=>{attempt=null;saveAttempt();orderId='';form.hidden=false;result.hidden=true;fields.disabled=false;updatePay();});
+retry.addEventListener('click',()=>{returnToBag();fields.disabled=false;updatePay();});
 window.addEventListener('pagehide',()=>clearTimeout(poll));
+let draftAttempt: {key:string;payload:any}|null=null;
+document.querySelector('#checkout-save-draft')!.addEventListener('click',async()=>{
+  if(busy)return;
+  const consent=form.elements.namedItem('confirm') as HTMLInputElement;
+  consent.required=false;const valid=form.reportValidity();consent.required=true;if(!valid)return;
+  if(attempt){error.textContent='A payment attempt is already saved. Review your account before creating a draft.';error.hidden=false;return;}
+  const payload={action:'draft',items:Object.entries(getCart()).map(([id,quantity])=>({id:Number(id),quantity})),customer:Object.fromEntries(new FormData(form))};
+  if(!draftAttempt||JSON.stringify(draftAttempt.payload)!==JSON.stringify(payload))draftAttempt={key:crypto.randomUUID(),payload};
+  busy=true;fields.disabled=true;error.hidden=true;
+  try{
+    await api('/api/orders',{method:'POST',headers:{'Idempotency-Key':draftAttempt.key},body:JSON.stringify(draftAttempt.payload)});
+    location.assign('/account#orders');
+  }catch(e){error.textContent=errorMessage(e);error.hidden=false;}
+  finally{busy=false;fields.disabled=false;updatePay();}
+});
 form.addEventListener('submit',async event=>{
   event.preventDefault();if(busy)return;
   error.hidden=true;
@@ -75,13 +115,16 @@ async function init(){
     (form.elements.namedItem('firstName') as HTMLInputElement).value=user.firstName||'';
     (form.elements.namedItem('lastName') as HTMLInputElement).value=user.lastName||'';
     clerk.addListener(()=>{if(!clerk.isSignedIn){fields.disabled=true;location.replace('/sign-in?next=/checkout');}});
-    try{const saved=JSON.parse(sessionStorage.getItem('nicoo-checkout-attempt')||'null');if(saved?.userId===user.id&&saved.key&&saved.payload)attempt=saved;}catch{}
+    try{const saved=JSON.parse(sessionStorage.getItem('nicoo-checkout-attempt')||'null');if(saved?.userId===user.id&&saved.key&&sameItems(saved.payload?.items))attempt=saved;else sessionStorage.removeItem('nicoo-checkout-attempt');}catch{}
     try{const {profile}=await api('/api/account/profile');if(profile)for(const [key,value] of Object.entries(profile)){const el=form.elements.namedItem(key);if(el instanceof HTMLInputElement||el instanceof HTMLTextAreaElement)el.value=String(value);else if(el instanceof RadioNodeList)el.value=String(value);}}catch{}
     delivery();fields.disabled=false;updatePay();
     const {orders}=await api('/api/orders');
-    const pending=orders.find((o:any)=>['requesting','pending','uncertain'].includes(o.status));
-    if(pending)showOrder(pending);
-    else if(attempt){
+    const pending=orders.filter((o:any)=>['requesting','pending','uncertain'].includes(o.status));
+    const current=attempt?.orderId?orders.find((o:any)=>o.id===attempt!.orderId):null;
+    if(pending.some((o:any)=>o.id!==current?.id))earlierPayment();
+    if(current&&sameItems(current.items)&&current.total===currentTotal())showOrder(current);
+    else if(attempt?.orderId){attempt=null;saveAttempt();}
+    if(attempt&&result.hidden){
       for(const [key,value] of Object.entries(attempt.payload.customer||{})){const el=form.elements.namedItem(key);if(el instanceof HTMLInputElement&&el.type!=='checkbox'&&key!=='email'||el instanceof HTMLTextAreaElement)el.value=String(value);else if(el instanceof RadioNodeList)el.value=String(value);}
       delivery();
     }

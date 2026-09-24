@@ -1,26 +1,32 @@
-import Database from 'better-sqlite3';
-import { mkdirSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { env } from './config';
-let connection: Database.Database;
-export function db() {
-  if (connection) return connection;
-  const path = resolve(env('DATABASE_PATH') || './data/nicoo.sqlite');
-  mkdirSync(dirname(path), {recursive: true, mode: 0o700});
-  connection = new Database(path);
-  connection.pragma('journal_mode = WAL');
-  connection.pragma('busy_timeout = 5000');
-  connection.exec(`
-    CREATE TABLE IF NOT EXISTS orders (
-      id TEXT PRIMARY KEY, user_id TEXT NOT NULL, idempotency_key TEXT NOT NULL,
-      fingerprint TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
-      status TEXT NOT NULL, total INTEGER NOT NULL, details TEXT NOT NULL,
-      provider_id TEXT, receipt TEXT UNIQUE, payment_note TEXT,
-      UNIQUE(user_id, idempotency_key)
-    );
-    CREATE UNIQUE INDEX IF NOT EXISTS orders_provider ON orders(provider_id) WHERE provider_id IS NOT NULL;
-    CREATE INDEX IF NOT EXISTS orders_user ON orders(user_id, created_at);
-    CREATE TABLE IF NOT EXISTS profiles (user_id TEXT PRIMARY KEY, details TEXT NOT NULL);
-  `);
-  return connection;
+import {env} from './config';
+import {HttpError} from './http';
+
+// Supabase's HTTPS Data API works in Vercel functions without a local database,
+// native SQLite binaries, or persistent TCP connections. Never import in a client script.
+export async function database<T>(resource:string, options:RequestInit={}):Promise<T> {
+  const url=env('SUPABASE_URL');
+  const secret=env('SUPABASE_SECRET_KEY') || env('SUPABASE_SERVICE_ROLE_KEY');
+  if(!url||!secret)throw new HttpError(503,'Database setup is incomplete. Add the Supabase project URL and server secret key.');
+  const headers:Record<string,string>={'Content-Type':'application/json',apikey:secret};
+  if(secret.startsWith('eyJ'))headers.Authorization=`Bearer ${secret}`;
+  let response:Response;
+  try {
+    response=await fetch(`${url.replace(/\/$/,'')}/rest/v1/${resource}`,{
+      ...options,headers:{...headers,...options.headers},signal:AbortSignal.timeout(12000),redirect:'error',
+    });
+  } catch {throw new HttpError(503,'The database could not be reached. Please try again shortly.');}
+  const text=await response.text();
+  let data:any=null;
+  if(text){try{data=JSON.parse(text);}catch{throw new HttpError(502,'The database returned an unexpected response.');}}
+  if(!response.ok){
+    if(/^PT(400|403|404|409|429)$/.test(data?.code||''))throw new HttpError(Number(data.code.slice(2)),data.message);
+    console.error('Supabase request failed:',response.status,data?.code||'unknown');
+    if(['PGRST202','PGRST205','42P01','42883'].includes(data?.code))throw new HttpError(503,'Database tables are not ready. Run supabase/schema.sql in the Supabase SQL Editor.');
+    if(response.status===401||response.status===403)throw new HttpError(503,'The Supabase server key or database permissions need updating.');
+    if(data?.code==='23505')throw new HttpError(409,'This record already exists. Refresh and try again.');
+    throw new HttpError(503,'The database could not save this change. Please try again.');
+  }
+  return data as T;
 }
+export const query=(params:Record<string,string>)=>new URLSearchParams(params).toString();
+export const rpc=<T>(name:string,params:object)=>database<T>(`rpc/${name}`,{method:'POST',body:JSON.stringify(params)});

@@ -4,6 +4,7 @@ import '../styles/shop-pages.css';
 import '../styles/showroom.css';
 import '../styles/auth.css';
 import '../styles/commerce.css';
+import '../styles/portal.css';
 import '../styles/navbar.css';
 import {phone,phoneInternational,whatsapp} from '../data/contact';
 import Icon from '../components/Icon.astro';
@@ -47,7 +48,7 @@ const path=Astro.url.pathname;
   <a class:list={{ active: path === '/visit' }} href="/visit">Visit ↗</a>
 </nav>
 <main id="main-content"><slot/></main>
-<footer id="visit"><div class="footer-top"><div><p class="eyebrow">KARIBU NICOO · DONHOLM, NAIROBI</p><h2>Good spaces start<br/>with a conversation<span>.</span></h2></div><div class="visit-info"><Icon name="pin" size={28}/><h3>Find us in Donholm.</h3><p>Nairobi, Kenya</p><a href="/visit">Plan your visit & talk to us ↗</a></div></div><div class="footer-links"><a href="/collection">Shop the collection</a><a href="/#offers">Demo offers</a><a href="/about">Our story</a><a href="/visit">Visit Donholm</a><a href={whatsapp} target="_blank" rel="noopener noreferrer">WhatsApp {phone}</a><a href={`tel:${phoneInternational}`}>Call the shop</a></div><div class="footer-bottom"><a class="brand" href="/">nicoo<span class="brand-dot">.</span><small>FURNITURE</small></a><p>Furniture for the way you work.</p><span>© {new Date().getFullYear()} Nicoo Furniture</span></div><p class="demo-note">Showroom preview · Product names are illustrative. Confirm prices and specifications with the shop. Marked discounts are illustrative demo offers. Lifestyle images are AI-generated inspiration.</p></footer>
+<footer id="visit"><div class="footer-top"><div><p class="eyebrow">KARIBU NICOO · DONHOLM, NAIROBI</p><h2>Good spaces start<br/>with a conversation<span>.</span></h2></div><div class="visit-info"><Icon name="pin" size={28}/><h3>Find us in Donholm.</h3><p>Nairobi, Kenya</p><a href="/visit">Plan your visit & talk to us ↗</a></div></div><div class="footer-links"><a href="/collection">Shop the collection</a><a href="/#offers">Furniture offers</a><a href="/about">Our story</a><a href="/visit">Visit Donholm</a><a href={whatsapp} target="_blank" rel="noopener noreferrer">WhatsApp {phone}</a><a href={`tel:${phoneInternational}`}>Call the shop</a></div><div class="footer-bottom"><a class="brand" href="/">nicoo<span class="brand-dot">.</span><small>FURNITURE</small></a><p>Furniture for the way you work.</p><span>© {new Date().getFullYear()} Nicoo Furniture</span></div><p class="demo-note">Furniture prices exclude delivery. Confirm dimensions, finishes and availability with the shop. Lifestyle images are AI-generated inspiration.</p></footer>
 <dialog id="cart-dialog" class="cart-dialog" aria-labelledby="cart-title"><div class="drawer-top"><h2 id="cart-title">Your bag <span data-cart-count>0</span></h2><button class="icon-button" data-close="cart-dialog" aria-label="Close shopping bag"><Icon name="close"/></button></div><div id="cart-items"></div><div id="cart-summary"></div></dialog>
 <dialog id="product-dialog" class="product-dialog" aria-labelledby="product-title"><button class="icon-button modal-close" data-close="product-dialog" aria-label="Close product details"><Icon name="close"/></button><div id="product-details"></div></dialog>
 <AIChatWidget />

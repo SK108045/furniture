@@ -9,7 +9,7 @@ export const POST: APIRoute = async ({request})=>{
     let payload:any;try{payload=JSON.parse(raw);}catch{throw new HttpError(400,'Invalid JSON.');}
     const event=payload?.event||payload?.event_type||payload?.type;
     if(!['payment.success','payment.failed','stk.timeout'].includes(event))return json({ok:true,status:'ignored'});
-    receiveCallback(normalizeCallback(payload));
+    await receiveCallback(normalizeCallback(payload));
     return json({ok:true,status:'processed'});
   }catch(error){return failure(error);}
 };

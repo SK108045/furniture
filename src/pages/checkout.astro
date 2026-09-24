@@ -11,6 +11,7 @@ import {whatsapp} from '../data/contact';
   <div class="checkout-grid">
     <div>
       <div id="checkout-auth" class="checkout-auth" role="status">Connecting your secure account…</div>
+      <div id="previous-payment-notice" class="checkout-auth" hidden><p data-previous-payment-message>An earlier order is awaiting confirmation. You can check it in your account while checking out this bag.</p><a class="text-link" href="/account#orders">View earlier payments ↗</a></div>
       <form id="checkout-form">
         <fieldset id="checkout-fields" disabled>
           <div class="form-heading"><span>01</span><h2>The person behind the space.</h2></div>
@@ -19,10 +20,13 @@ import {whatsapp} from '../data/contact';
           <div class="form-heading"><span>02</span><h2>From Donholm to your space.</h2></div>
           <div class="delivery-options"><label><input type="radio" name="delivery" value="delivery" checked/><span><strong>Nairobi delivery</strong><small>Delivery fee arranged separately</small></span></label><label><input type="radio" name="delivery" value="pickup"/><span><strong>Pick up in Donholm</strong><small>No pickup fee</small></span></label></div>
           <label id="address-label">Delivery address<textarea name="address" autocomplete="street-address" rows="3" required maxlength="400" placeholder="Estate, building, house number and nearest landmark"></textarea></label>
+          <label>Delivery contact number <small>(optional if the same as M-Pesa)</small><input name="contactPhone" type="tel" autocomplete="tel" maxlength="30" placeholder="0712 345 678"/></label>
+          <label>Delivery instructions <small>(optional)</small><textarea name="note" rows="2" maxlength="300" placeholder="Gate number, access instructions…"></textarea></label>
           <div class="form-heading"><span>03</span><h2>Pay the familiar way.</h2></div>
           <div class="mpesa-box"><div class="mpesa-heading"><img src="/images/mpesa.svg" alt="M-Pesa" width="152" height="43"/><span>STK PUSH</span></div><p>No till number to copy. We’ll send a payment prompt straight to your phone.</p><label>M-Pesa phone number<input type="tel" name="phone" autocomplete="tel" required placeholder="0712 345 678" maxlength="30"/></label><small>You can use a different number from your contact number.</small><ol class="mpesa-steps"><li><span>1</span> Keep your phone nearby</li><li><span>2</span> Check the amount on the prompt</li><li><span>3</span> Enter your M-Pesa PIN on your phone</li></ol></div>
           <label class="checkout-consent"><input type="checkbox" name="confirm" required/><span>I’ve checked my items and understand that any delivery fee is agreed with the shop separately.</span></label>
           <button id="checkout-submit" type="submit" class="button dark" disabled><Icon name="shield" size={18}/> <span data-pay-label>Pay with M-Pesa</span> <Icon/></button>
+          <button id="checkout-save-draft" type="button" class="auth-text-button">Not ready to pay? Save an editable draft →</button>
           <p class="checkout-privacy">Your PIN stays on your phone. We never ask for it here. Your order and delivery details are saved to your Nicoo account.</p>
         </fieldset>
         <div id="checkout-error" class="checkout-error" role="alert" hidden></div>

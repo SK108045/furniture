@@ -10,6 +10,11 @@ const catalogue = [
  {id:9,name:'Director’s Corner Desk',category:'Desks',price:36500,image:'9.jpg',tag:'Think bigger',description:'An expansive corner workspace with a rich wood-tone finish and room to spread out.'},
  {id:10,name:'Air Mesh Chair',category:'Seating',price:7500,image:'10.jpg',tag:'Lighten your workday',description:'A breathable mesh back, curved armrests and a wheeled base for an easy everyday seat.'},
 ];
-// Illustrative 10% promotion for the showroom demo; confirm before launch.
-export const products = catalogue.map(p => ({...p, originalPrice:p.price, demoOffer:[5,7,10].includes(p.id), price:[5,7,10].includes(p.id) ? p.price * 0.9 : p.price}));
+// Photo prices are the selling prices. Reference prices sit above them;
+// never apply another discount to the amounts supplied by the shop.
+export const products = catalogue.map(p => {
+  const originalPrice = Math.ceil(p.price / 0.9 / 500) * 500;
+  return {...p, originalPrice, onSale: true, featuredOffer: [5,7,10].includes(p.id),
+    savings: originalPrice - p.price, discountPercent: Math.floor((originalPrice - p.price) / originalPrice * 100)};
+});
 export const money = (amount:number) => `KSh ${amount.toLocaleString('en-KE')}`;

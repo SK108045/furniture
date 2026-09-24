@@ -33,7 +33,7 @@ export async function api(path: string, options: RequestInit = {}) {
   const clerk=await authReady;
   const token=await clerk.session?.getToken();
   if(!token) throw new Error('Please sign in to continue.');
-  const response=await fetch(path,{...options,headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`,...options.headers}});
+  const response=await fetch(path,{...options,signal:options.signal||AbortSignal.timeout(60000),headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`,...options.headers}});
   const data=await response.json();
   if(!response.ok) throw Object.assign(new Error(data.error || 'Could not complete your request.'),{status:response.status});
   return data;

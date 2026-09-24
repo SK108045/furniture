@@ -1,7 +1,12 @@
 import { safeDestination } from './auth-config.mjs';
-import {authReady, appearance, errorMessage} from './client';
+import {authReady, errorMessage} from './client';
 const page=document.querySelector<HTMLElement>('[data-auth-page]');
 const status=page?.querySelector<HTMLElement>('[data-auth-status]');
+const loader=page?.querySelector<HTMLElement>('[data-account-loader]');
+function loading(active:boolean,label='Making room for you…'){
+  if(loader){loader.hidden=!active;const text=loader.querySelector('[data-loader-label]');if(text)text.textContent=label;}
+  page?.setAttribute('aria-busy',String(active));
+}
 const destination=safeDestination(new URLSearchParams(location.search).get('next'));
 const switchLink=document.querySelector<HTMLAnchorElement>('[data-auth-switch]');
 if(switchLink) switchLink.href+=`?next=${encodeURIComponent(destination)}`;
@@ -22,19 +27,19 @@ async function init() {
     if(mode!=='account'&&clerk.isSignedIn){location.replace(destination);return;}
     if(mode==='account'){
       if(!clerk.isSignedIn)return;
-      page.querySelector('[data-account-content]')?.removeAttribute('hidden');
       const name=page.querySelector('[data-customer-name]');
       if(name)name.textContent=clerk.user?.firstName?`, ${clerk.user.firstName}`:'';
-      const widget=page.querySelector<HTMLElement>('[data-auth-widget]');
-      if(widget)clerk.mountUserProfile(widget,{routing:'hash',appearance});
       page.querySelector<HTMLButtonElement>('[data-sign-out]')?.addEventListener('click',async event=>{
         const button=event.currentTarget as HTMLButtonElement;button.disabled=true;
         try{await clerk.signOut({redirectUrl:'/'});}catch(error){button.disabled=false;if(status)status.textContent=errorMessage(error);}
       });
-      void import('./account');
+      const account=await import('./account');
+      await account.initAccount();
+      page.querySelector('[data-account-content]')?.removeAttribute('hidden');
+      loading(false);
     } else {
       const form=page.querySelector<HTMLFormElement>('[data-email-auth]')!;
-      form.hidden=false;
+      form.hidden=false;loading(false);
       const identity=form.querySelector<HTMLElement>('[data-identity-fields]')!;
       const verification=form.querySelector<HTMLElement>('[data-verification-fields]')!;
       const passwordLabel=form.querySelector<HTMLElement>('[data-password-field]')!;
@@ -72,10 +77,11 @@ async function init() {
         if(result.status!=='complete')throw new Error('An additional verification step is required. Please contact the shop for help with your account.');
         await clerk.setActive({session:result.createdSessionId});
         if(clerk.session?.currentTask)throw new Error('Your account needs an additional setup step. Please open your Clerk account portal to finish it.');
+        loading(true,'You’re in. Opening your space…');
         location.assign(destination);
       }
       form.addEventListener('submit',async event=>{
-        event.preventDefault();submit.disabled=true;if(status)status.textContent='Please wait…';
+        event.preventDefault();submit.disabled=true;loading(true,'Connecting your account…');if(status)status.textContent='Please wait…';
         try{
           if(verifying){
             const result=flow==='signup'?await clerk.client.signUp.attemptEmailAddressVerification({code:code.value.trim()}):await clerk.client.signIn.attemptFirstFactor({strategy:flow==='reset'?'reset_password_email_code':'email_code',code:code.value.trim(),...(flow==='reset'?{password:password.value}:{})});
@@ -98,7 +104,7 @@ async function init() {
             emailAddressId=factor.emailAddressId;await sendCode();
           }
           verifying=true;render();if(status)status.textContent=`We sent a verification code to ${email.value.trim()}.`;code.focus();
-        }catch(error){if(status)status.textContent=errorMessage(error);}finally{submit.disabled=false;}
+        }catch(error){if(status)status.textContent=errorMessage(error);}finally{submit.disabled=false;if(!clerk.isSignedIn)loading(false);}
       });
       resetButton?.addEventListener('click',()=>{flow='reset';render();if(status)status.textContent='Enter your email to reset your password.';});
       emailButton?.addEventListener('click',()=>{flow='email';render();if(status)status.textContent='We’ll email you a one-time sign-in code.';});
@@ -110,6 +116,6 @@ async function init() {
       render();
     }
     if(status)status.textContent='';
-  }catch(error){if(status)status.textContent=errorMessage(error);page?.querySelector('[data-auth-fallback]')?.removeAttribute('hidden');}
+  }catch(error){loading(false);if(status)status.textContent=errorMessage(error);page?.querySelector('[data-auth-fallback]')?.removeAttribute('hidden');}
 }
 void init();

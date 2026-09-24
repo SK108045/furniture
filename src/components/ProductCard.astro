@@ -4,7 +4,7 @@ import {money} from '../data/products';
 const {product:p}=Astro.props;
 ---
 <article class="product-card" data-category={p.category}>
- <button class="product-image" data-product={p.id} aria-label={`View ${p.name}`}><img src={`/images/${p.image}`} alt={p.name} loading="lazy" width="600" height="600"/>{p.demoOffer && <span class="sale-badge">DEMO OFFER −10%</span>}<span class="product-peek">Take a closer look <Icon name="plus" size={18}/></span></button>
+ <button class="product-image" data-product={p.id} aria-label={`View ${p.name}`}><img src={`/images/${p.image}`} alt={p.name} loading="lazy" width="600" height="600"/>{p.onSale && <span class="sale-badge">SAVE {money(p.savings)}</span>}<span class="product-peek">Take a closer look <Icon name="plus" size={18}/></span></button>
  <div class="product-meta"><span>{p.category}</span><span>{String(p.id).padStart(2,'0')}</span></div>
- <div class="product-bottom"><div><button class="product-name" data-product={p.id}>{p.name}</button><p class="product-price">{money(p.price)} {p.demoOffer && <del>{money(p.originalPrice)}</del>}</p></div><button class="add-button" data-add={p.id} aria-label={`Add ${p.name} to cart`}><Icon name="bag" size={17}/><span>Add to cart</span></button></div>
+ <div class="product-bottom"><div><button class="product-name" data-product={p.id}>{p.name}</button><p class="product-price">{money(p.price)} {p.onSale && <del aria-label={`Original price ${money(p.originalPrice)}`}>{money(p.originalPrice)}</del>}</p></div><button class="add-button" data-add={p.id} aria-label={`Add ${p.name} to cart`}><Icon name="bag" size={17}/><span>Add to cart</span></button></div>
 </article>

@@ -3,25 +3,31 @@
 An Astro storefront for Nicoo Furniture in Donholm, Nairobi, with Clerk accounts, a customer portal and Swifta M-Pesa STK checkout.
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
 Open `http://localhost:4321`. The supplied credentials are in the local `.env`; the example file documents all settings.
 
-For a production Node build:
+## Deploy to Vercel
+
+Use Node.js 22. Run [`supabase/schema.sql`](supabase/schema.sql) in your Supabase SQL Editor, then import this repository into Vercel with the Astro preset. The adapter and `vercel.json` configure the server functions; leave the output directory at its default. See [deployment steps](docs/deployment.md).
+
+The supplied credentials are in `.env`. Astro reads them during the build and includes server credentials only in the server bundle. This supports your committed `.env` workflow; changing credentials requires a redeploy. Vercel project environment settings can optionally override them. No local database or persistent Vercel disk is required.
 
 ```bash
+npm run db:check
+npm run check
 npm run build
-npm run serve
 ```
-
-This is now a server application, not a static-only site. Set `APP_ORIGIN` to the actual website origin. `DATABASE_PATH` must point to persistent storage for orders, delivery profiles and payment events. The `serve` command loads `.env` at runtime; the public Clerk key is embedded during the build.
 
 ## Features
 
 - Email sign-up/sign-in, email verification, password reset, email-code sign-in and sign-out through Clerk.
-- Customer portal with order history, payment status, downloadable summaries/receipts, saved delivery details and Clerk profile/security management.
+- Customer portal with order search, filters, sorting, payment activity, downloadable printable summaries/receipts, editable delivery details and Clerk profile/security management.
+- Save an editable order draft from checkout, revise failed orders, reorder past purchases, change draft quantities/products, cancel drafts, and pay a draft directly from the portal.
+- Saved delivery profiles persist in Supabase per Clerk account, with a saved-address card, edit/discard/delete controls and automatic checkout prefill.
+- Animated furniture loader during sign-in and account loading, with reduced-motion support and explicit loading/error states.
 - Shopping bag retained in the browser, delivery/pickup checkout and server-priced orders.
 - Swifta STK push with generated Nicoo order references, payment status updates and callback/webhook handlers.
 - M-Pesa checkout branding, step-by-step phone payment guidance, loading/error/retry states and account links.
@@ -41,6 +47,6 @@ See [accounts](docs/accounts.md) and [payments](docs/payments.md) for the integr
 - Visual styling: `src/styles/`
 - Homepage motion: `src/scripts/showroom.ts`
 
-Product names and descriptions remain illustrative; the existing marked 10% demo discounts are retained and used consistently across the catalogue, bag and checkout. Delivery is arranged separately with the shop. The map points to Donholm rather than an unverified shop entrance. The visit enquiry form remains a local preview; phone and WhatsApp links connect customers to the shop.
+The prices transcribed from the supplied photos are the selling prices. Higher original/reference prices are calculated above them (selling price divided by 0.9, rounded up to KSh 500); no further discount is subtracted at checkout. Savings badges are calculated from those two prices. Product names and descriptions remain illustrative. Delivery is arranged separately with the shop. The map points to Donholm rather than an unverified shop entrance. The visit enquiry form remains a local preview; phone and WhatsApp links connect customers to the shop.
 
 Original supplied photos remain in `Furniture_Images/`. Website copies are in `public/images/`; lifestyle image prompts are documented in [lifestyle assets](docs/lifestyle-assets.md).

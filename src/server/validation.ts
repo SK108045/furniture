@@ -15,8 +15,9 @@ export function customerDetails(input: any) {
   if (!['pickup', 'delivery'].includes(delivery)) throw new HttpError(400, 'Choose pickup or delivery.');
   return {
     firstName: clean(input.firstName, 'first name', 60), lastName: clean(input.lastName, 'last name', 60),
-    phone: phoneNumber(input.phone), delivery,
+    phone: phoneNumber(input.phone), contactPhone: phoneNumber(input.contactPhone || input.phone), delivery,
     address: delivery === 'pickup' ? '' : clean(input.address, 'delivery address', 400),
+    note: clean(input.note || '', 'delivery instructions', 300, true),
   };
 }
 export function orderInput(input: any) {

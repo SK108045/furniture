@@ -1,5 +1,6 @@
 node_modules/
 dist/
+.vercel/
 .astro/
 # Environment variables (tracked for private deployment per user request)
 # .env
@@ -11,4 +12,3 @@ test-results/
 
 /data/
 artifacts/
-
