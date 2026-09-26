@@ -114,6 +114,69 @@ const path=Astro.url.pathname;
     <a href="#main-content">Back to top ↑</a>
   </div>
 </footer>
+<style is:global id="nicoo-footer-styles">
+.site-footer.site-footer{background:#1d2b22!important;color:#f7f3ea!important;padding:0 5% 24px!important;overflow:hidden}
+.site-footer .footer-hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);gap:64px;align-items:end;padding:72px 0 56px;border-bottom:1px solid rgba(255,255,255,.14)}
+.site-footer .footer-kicker{margin:0;font-size:10px;font-weight:700;letter-spacing:2.2px;color:#bdc9bb}
+.site-footer .footer-hero h2{margin:16px 0 22px;font-size:clamp(48px,5.2vw,78px);line-height:.98;letter-spacing:-3.5px;font-weight:400;color:#fff}
+.site-footer .footer-hero h2 em{color:#efb289}
+.site-footer .footer-intro{max-width:560px;margin:0;font-size:15px;line-height:1.8;color:#c8d1c5}
+.site-footer .footer-whatsapp{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;background:#f8f4eb;color:#203027;padding:22px 24px;min-height:94px;box-shadow:0 16px 45px rgba(0,0,0,.18);transition:transform .2s ease,background .2s ease}
+.site-footer .footer-whatsapp:hover{transform:translateY(-4px);background:#fff}
+.site-footer .footer-whatsapp-icon{width:48px;height:48px;border-radius:50%;background:#188b48;color:#fff;display:grid;place-items:center}
+.site-footer .footer-whatsapp small{display:block;font-size:9px;letter-spacing:1.7px;color:#6d756e;margin-bottom:6px}
+.site-footer .footer-whatsapp strong{display:block;font-size:22px;font-weight:600;letter-spacing:-.7px}
+.site-footer .footer-cta-arrow{font-size:28px;color:#c34e23}
+.site-footer .footer-main{display:grid;grid-template-columns:minmax(300px,1.5fr) minmax(150px,.7fr) minmax(190px,.8fr);gap:64px;padding:52px 0 48px}
+.site-footer .footer-brand-block{min-width:0}
+.site-footer .footer-wordmark{display:inline-flex;flex-direction:column;width:max-content;color:#fff}
+.site-footer .footer-wordmark>span{font-size:64px;font-weight:800;letter-spacing:-4px;line-height:.84}
+.site-footer .footer-wordmark small{font-size:10px;font-weight:700;letter-spacing:3px;margin:11px 0 0 3px;color:#b9c4b7}
+.site-footer .footer-brand-block>p{margin:27px 0 18px;font-size:14px;line-height:1.75;color:#bcc7b9}
+.site-footer .footer-location{display:flex;align-items:center;gap:9px;font-size:12px;color:#edf0e9}
+.site-footer .footer-location svg{color:#efb289}
+.site-footer .footer-column{display:flex;flex-direction:column;align-items:flex-start;gap:11px}
+.site-footer .footer-column-title{font-size:9px;font-weight:700;letter-spacing:2px;color:#899a89;margin-bottom:9px}
+.site-footer .footer-column a{display:flex;align-items:center;justify-content:space-between;gap:18px;width:100%;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:14px;color:#edf0e9}
+.site-footer .footer-column a span{color:#d98258}
+.site-footer .footer-column a:hover{color:#efb289;border-color:rgba(255,255,255,.18)}
+.site-footer .footer-strip{margin:0;border-top:1px solid rgba(255,255,255,.14);border-bottom:1px solid rgba(255,255,255,.14);padding:18px 0;display:flex;align-items:center;justify-content:space-between;gap:20px;white-space:nowrap;overflow:hidden;font-size:10px;font-weight:700;letter-spacing:1.7px;color:#c5cec2}
+.site-footer .footer-strip i{font-style:normal;color:#d96b3f;font-size:18px}
+.site-footer .footer-bottom{display:grid!important;grid-template-columns:auto 1fr auto!important;align-items:center!important;gap:28px!important;padding:22px 0 0!important;margin:0!important}
+.site-footer .footer-bottom span,.site-footer .footer-bottom p,.site-footer .footer-bottom a{margin:0;font-size:10px;line-height:1.6;color:#8fa08e}
+.site-footer .footer-bottom p{text-align:center}
+.site-footer .footer-bottom a{color:#eef1eb;border-bottom:1px solid #667567;padding-bottom:3px}
+@media(max-width:900px){
+ .site-footer .footer-hero{grid-template-columns:1fr;gap:32px}
+ .site-footer .footer-whatsapp{max-width:520px}
+ .site-footer .footer-main{grid-template-columns:1fr 1fr;gap:40px}
+ .site-footer .footer-brand-block{grid-column:1/-1}
+ .site-footer .footer-strip{justify-content:flex-start;overflow-x:auto;scrollbar-width:none}
+}
+@media(max-width:760px){
+ .site-footer.site-footer{padding-left:6%!important;padding-right:6%!important}
+ .site-footer .footer-hero{padding:48px 0 40px}
+ .site-footer .footer-hero h2{font-size:48px;letter-spacing:-2.5px}
+ .site-footer .footer-intro{font-size:13px}
+ .site-footer .footer-whatsapp{padding:17px 18px;min-height:80px}
+ .site-footer .footer-whatsapp-icon{width:42px;height:42px}
+ .site-footer .footer-whatsapp strong{font-size:18px}
+ .site-footer .footer-main{grid-template-columns:1fr 1fr;gap:36px 24px;padding:40px 0}
+ .site-footer .footer-wordmark>span{font-size:52px}
+ .site-footer .footer-column a{font-size:13px}
+ .site-footer .footer-bottom{grid-template-columns:1fr auto!important;gap:12px 20px!important}
+ .site-footer .footer-bottom p{grid-column:1/-1;grid-row:2;text-align:left}
+ .site-footer .footer-strip{margin-left:-6.5%;margin-right:-6.5%;padding-left:6.5%;padding-right:6.5%}
+}
+@media(max-width:440px){
+ .site-footer .footer-main{grid-template-columns:1fr}
+ .site-footer .footer-brand-block{grid-column:auto}
+ .site-footer .footer-hero h2{font-size:42px}
+ .site-footer .footer-wordmark>span{font-size:48px}
+ .site-footer .footer-whatsapp{grid-template-columns:auto 1fr}
+ .site-footer .footer-cta-arrow{display:none}
+}
+</style>
 <dialog id="cart-dialog" class="cart-dialog" aria-labelledby="cart-title"><div class="drawer-top"><h2 id="cart-title">Your bag <span data-cart-count>0</span></h2><button class="icon-button" data-close="cart-dialog" aria-label="Close shopping bag"><Icon name="close"/></button></div><div id="cart-items"></div><div id="cart-summary"></div></dialog>
 <dialog id="product-dialog" class="product-dialog" aria-labelledby="product-title"><button class="icon-button modal-close" data-close="product-dialog" aria-label="Close product details"><Icon name="close"/></button><div id="product-details"></div></dialog>
 <AIChatWidget />
