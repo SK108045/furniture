@@ -54,3 +54,9 @@ export async function updatePayment(id:string,status:OrderStatus,providerId:stri
   await rpc('nicoo_payment_result',{p_id:id,p_status:status,p_provider_id:providerId,p_note:note});
   await deliverReceipts(id);
 }
+
+
+export async function reconcilePayment(id:string,status:'paid'|'failed',receipt:string|null=null){
+  await rpc('nicoo_reconcile_order',{p_id:id,p_status:status,p_receipt:receipt});
+  await deliverReceipts(id);
+}

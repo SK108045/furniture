@@ -52,3 +52,46 @@ export async function requestStk(order: {id: string; total: number; phone: strin
     return {status:'uncertain',providerId:null,note:'The connection timed out or was interrupted. An M-Pesa prompt may still arrive. Contact the shop before trying another payment.'};
   }
 }
+
+
+export type PollResult = {
+  status: 'pending' | 'success' | 'failed' | 'cancelled' | 'unknown';
+  receipt: string | null;
+  note: string;
+};
+
+// Swifta documents /poll/:checkoutRequestId as the lightweight source of truth
+// for checkout pages. It is public and does not require the app API key.
+export async function pollStk(providerId: string, fetcher: typeof fetch = fetch): Promise<PollResult> {
+  if (!providerId || providerId.length > 200) return {status:'unknown',receipt:null,note:'Missing payment reference.'};
+  try {
+    const response = await fetcher(`https://app.swifta.co.ke/poll/${encodeURIComponent(providerId)}`, {
+      headers: {Accept:'application/json'},
+      signal: AbortSignal.timeout(8000),
+      redirect: 'error',
+    });
+    if (!response.ok) return {status:'unknown',receipt:null,note:`Payment status is temporarily unavailable (HTTP ${response.status}).`};
+    const data:any = await response.json();
+    const transaction = data?.transaction || data?.data || data;
+    const rawStatus = String(transaction?.status || data?.status || '').toLowerCase();
+    const rawReceipt = transaction?.mpesaReceiptNumber || transaction?.MpesaReceiptNumber || data?.mpesaReceiptNumber || data?.MpesaReceiptNumber;
+    const receipt = typeof rawReceipt === 'string' && /^[A-Z0-9]{8,30}$/i.test(rawReceipt) ? rawReceipt.toUpperCase() : null;
+    const note = String(transaction?.resultDesc || data?.resultDesc || data?.message || '').slice(0,300);
+
+    if (rawStatus === 'success') {
+      // Never mark an order paid without a valid M-Pesa receipt.
+      return receipt
+        ? {status:'success',receipt,note:note || 'Your M-Pesa payment is confirmed.'}
+        : {status:'unknown',receipt:null,note:'Swifta reported success without a valid M-Pesa receipt.'};
+    }
+    if (rawStatus === 'failed') return {status:'failed',receipt:null,note:note || 'The M-Pesa payment failed.'};
+    if (rawStatus === 'cancelled' || rawStatus === 'canceled') return {status:'cancelled',receipt:null,note:note || 'The M-Pesa prompt was cancelled.'};
+    if (rawStatus === 'pending' || rawStatus === 'requesting' || rawStatus === 'queued' || !rawStatus) {
+      return {status:'pending',receipt:null,note:note || 'Awaiting M-Pesa confirmation.'};
+    }
+    return {status:'unknown',receipt:null,note:note || 'Payment status could not be confirmed yet.'};
+  } catch (error) {
+    console.warn('Swifta poll unavailable', {providerId, reason:error instanceof Error?error.name:'UnknownError'});
+    return {status:'unknown',receipt:null,note:'Payment status could not be checked yet.'};
+  }
+}

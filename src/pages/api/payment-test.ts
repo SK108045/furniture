@@ -2,9 +2,9 @@ import type {APIRoute,AstroCookies} from 'astro';
 import {createHmac,randomBytes,timingSafeEqual} from 'node:crypto';
 import {env,appOrigins} from '../../server/config';
 import {body,json,failure,HttpError} from '../../server/http';
-import {createOrder,getOrder,updatePayment} from '../../server/orders';
+import {createOrder,getOrder,reconcilePayment,updatePayment} from '../../server/orders';
 import {orderInput} from '../../server/validation';
-import {requestStk} from '../../server/swifta';
+import {pollStk,requestStk} from '../../server/swifta';
 import {deliverReceipts} from '../../server/receipt-emails';
 const owner='nicoo-public-payment-test'; // Shared database-backed limit: five requests per ten minutes.
 const cookieName='nicoo-payment-test';
@@ -20,8 +20,30 @@ export const GET:APIRoute=async({cookies,url})=>{
   try{
     const id=url.searchParams.get('id');const token=session(cookies,!id,url.protocol==='https:');
     if(!id)return json({ready:true});
-    const row=await getOrder(id,owner);
+    let row=await getOrder(id,owner);
     if(row.details.customer.note!==`Test session ${token}`)throw new HttpError(404,'Test payment not found in this browser.');
+
+    // The callback/webhook is still the fastest path, but a checkout page must not
+    // remain stuck when a callback is delayed or misconfigured. Reconcile the
+    // saved CheckoutRequestID against Swifta's documented public poll endpoint.
+    if(['requesting','pending','uncertain'].includes(row.status)&&row.provider_id){
+      const provider=await pollStk(row.provider_id);
+      if(provider.status==='success'&&provider.receipt){
+        try{await reconcilePayment(row.id,'paid',provider.receipt);}
+        catch(error){
+          const latest=await getOrder(id,owner);
+          if(latest.status!=='paid')throw error;
+        }
+        row=await getOrder(id,owner);
+      }else if(provider.status==='failed'||provider.status==='cancelled'){
+        try{await reconcilePayment(row.id,'failed');}
+        catch(error){
+          const latest=await getOrder(id,owner);
+          if(!['paid','failed'].includes(latest.status))throw error;
+        }
+        row=await getOrder(id,owner);
+      }
+    }
     if(row.status==='paid')await deliverReceipts(row.id);
     return json({order:summary(row)});
   }catch(error){return failure(error);}
