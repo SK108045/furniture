@@ -1,12 +1,12 @@
 import type { APIRoute } from 'astro';
 import { requireUser, clerkClient } from '../../../server/auth';
 import { body, failure, json, HttpError } from '../../../server/http';
-import { getOrder, publicOrder, editOrder, copyToDraft, cancelDraft, claimDraftPayment, updatePayment } from '../../../server/orders';
+import { getOrder, publicOrder, editOrder, copyToDraft, cancelDraft, claimDraftPayment, updatePayment, reconcileProviderPayment } from '../../../server/orders';
 import { requestStk } from '../../../server/swifta';
 import { env } from '../../../server/config';
 import {deliverReceipts} from '../../../server/receipt-emails';
 export const GET: APIRoute = async ({request,params}) => {
-  try { const row=await getOrder(params.id!,await requireUser(request));if(row.status==='paid')await deliverReceipts(row.id);return json({order:publicOrder(row)}); }
+  try { const userId=await requireUser(request);let row=await getOrder(params.id!,userId);row=await reconcileProviderPayment(row);if(row.status==='paid')await deliverReceipts(row.id,userId);return json({order:publicOrder(row)}); }
   catch (error) { return failure(error); }
 };
 export const PATCH: APIRoute = async ({request,params}) => {
