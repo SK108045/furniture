@@ -11,6 +11,17 @@ function toast(message:string){const el=$('#toast')!;el.textContent=message;el.c
 function open(id:string){const el=document.getElementById(id) as HTMLDialogElement;el.showModal();document.body.style.overflow='hidden';}
 function close(id:string){(document.getElementById(id) as HTMLDialogElement).close();}
 function total(){return products.reduce((sum,p)=>sum+p.price*(cart[p.id]||0),0)}
+function quoteInquiry(p:typeof products[number]){
+  const productUrl=new URL('/collection',location.origin);productUrl.searchParams.set('product',String(p.id));
+  const imageUrl=new URL(`/images/${p.image}`,location.origin);
+  const message=[
+    `Hi Nicoo, please quote ${p.name} (item ${p.id}).`,
+    '',
+    `Product: ${productUrl.toString()}`,
+    `Photo: ${imageUrl.toString()}`,
+  ].join('\n');
+  return `${whatsapp}?text=${encodeURIComponent(message)}`;
+}
 function render(){
  const count=Object.values(cart).reduce((a,b)=>a+b,0);document.querySelectorAll('[data-cart-count]').forEach(el=>el.textContent=String(count));
  const items=products.filter(p=>cart[p.id]);
@@ -25,7 +36,7 @@ document.addEventListener('click',event=>{const target=(event.target as Element)
  if(target.dataset.close)close(target.dataset.close);
  if(target.dataset.remove){delete cart[target.dataset.remove];save();}
  if(target.dataset.qty){const id=target.dataset.qty;const maximum=products.find(p=>String(p.id)===id)?.testOnly?1:20;cart[id]=Math.max(0,Math.min(maximum,(cart[id]||0)+Number(target.dataset.change)));if(!cart[id])delete cart[id];save();}
- if(target.dataset.product){const p=products.find(p=>p.id===Number(target.dataset.product));if(!p)return;$('#product-details')!.innerHTML=`<div class="product-detail-grid"><div class="product-gallery"><img class="detail-photo" src="/images/${p.image}" alt="${p.name}"/>${p.images.length>1?`<div class="gallery-controls"><button data-gallery-step="-1" aria-label="Previous photo">←</button><span data-gallery-status aria-live="polite">1 / ${p.images.length}</span><button data-gallery-step="1" aria-label="Next photo">→</button></div><div class="gallery-thumbs">${p.images.map((img,i)=>`<button data-gallery-index="${i}" aria-label="View photo ${i+1}" aria-pressed="${i===0}"><img src="/images/${img}" alt=""/></button>`).join('')}</div>`:''}</div><div class="detail-copy"><p class="eyebrow">${p.category.toUpperCase()}</p><h2 id="product-title">${p.name}</h2><p class="detail-price">${p.quoteOnly?'Ask for price':money(p.price)} ${p.onSale ? `<del>${money(p.originalPrice)}</del><small class="detail-offer">Save ${money(p.savings)} · ${p.discountPercent}% off</small>` : ''}</p><p class="detail-description">${p.description}</p>${p.quoteOnly?`<a class="button dark" target="_blank" rel="noopener noreferrer" href="${whatsapp}?text=${encodeURIComponent(`Hi Nicoo, please quote ${p.name} (item ${p.id}).`)}">Ask on WhatsApp ↗</a>`:`<button class="button dark" data-add="${p.id}">Add to bag <span>+</span></button>`}<small>Visit us in Donholm, Nairobi, to confirm dimensions, finishes and availability.</small></div></div>`;galleryProduct=p;galleryIndex=0;open('product-dialog');}
+ if(target.dataset.product){const p=products.find(p=>p.id===Number(target.dataset.product));if(!p)return;$('#product-details')!.innerHTML=`<div class="product-detail-grid"><div class="product-gallery"><img class="detail-photo" src="/images/${p.image}" alt="${p.name}"/>${p.images.length>1?`<div class="gallery-controls"><button data-gallery-step="-1" aria-label="Previous photo">←</button><span data-gallery-status aria-live="polite">1 / ${p.images.length}</span><button data-gallery-step="1" aria-label="Next photo">→</button></div><div class="gallery-thumbs">${p.images.map((img,i)=>`<button data-gallery-index="${i}" aria-label="View photo ${i+1}" aria-pressed="${i===0}"><img src="/images/${img}" alt=""/></button>`).join('')}</div>`:''}</div><div class="detail-copy"><p class="eyebrow">${p.category.toUpperCase()}</p><h2 id="product-title">${p.name}</h2><p class="detail-price">${p.quoteOnly?'Ask for price':money(p.price)} ${p.onSale ? `<del>${money(p.originalPrice)}</del><small class="detail-offer">Save ${money(p.savings)} · ${p.discountPercent}% off</small>` : ''}</p><p class="detail-description">${p.description}</p>${p.quoteOnly?`<a class="button dark" target="_blank" rel="noopener noreferrer" href="${quoteInquiry(p)}">Ask on WhatsApp ↗</a>`:`<button class="button dark" data-add="${p.id}">Add to bag <span>+</span></button>`}<small>Visit us in Donholm, Nairobi, to confirm dimensions, finishes and availability.</small></div></div>`;galleryProduct=p;galleryIndex=0;open('product-dialog');}
  if(target.dataset.galleryIndex!==undefined)showGallery(Number(target.dataset.galleryIndex));
  if(target.dataset.galleryStep)showGallery(galleryIndex+Number(target.dataset.galleryStep));
 });
@@ -36,6 +47,10 @@ document.getElementById('product-dialog')?.addEventListener('keydown',e=>{if(e.k
 document.querySelectorAll<HTMLDialogElement>('dialog:not(#order-editor)').forEach(dialog=>{dialog.addEventListener('close',()=>{if(!document.querySelector('dialog[open]'))document.body.style.overflow='';});dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});});
 window.addEventListener('storage',e=>{if(e.key===key){try{const next=JSON.parse(e.newValue||'{}');cart={};for(const p of products){if(!p.quoteOnly&&Number.isInteger(next?.[p.id])&&next[p.id]>0)cart[p.id]=Math.min(next[p.id],p.testOnly?1:20);}render();window.dispatchEvent(new Event('nicoo:cart'));}catch{}}});
 render();
+const requestedProduct=new URLSearchParams(location.search).get('product');
+if(requestedProduct&&products.some(p=>String(p.id)===requestedProduct)){
+  queueMicrotask(()=>document.querySelector<HTMLElement>(`[data-product="${requestedProduct}"]`)?.click());
+}
 if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){inView('.product-card, .story-copy, .section-heading',(el)=>{animate(el,{opacity:[0,1],y:[22,0]},{duration:.55,ease:'easeOut'});});}
 
 export function getCart(){return {...cart};}
