@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { requireUser, clerkClient } from '../../../server/auth';
 import { body, failure, HttpError, json } from '../../../server/http';
-import { createOrder, getOrder, publicOrder, updatePayment, listOrders } from '../../../server/orders';
+import { createOrder, getOrder, publicOrder, updatePayment, listOrders, reconcileProviderPayment } from '../../../server/orders';
 import { orderInput } from '../../../server/validation';
 import { requestStk } from '../../../server/swifta';
 import { env } from '../../../server/config';
@@ -9,8 +9,14 @@ import {deliverReceipts} from '../../../server/receipt-emails';
 export const GET: APIRoute = async ({request}) => {
   try {
     const userId = await requireUser(request);
-    const orders = await listOrders(userId);
-    if(orders.some(o=>o.status==='paid'))await deliverReceipts(null,userId,1);
+    let orders = await listOrders(userId);
+    const pending = orders.filter(o=>['requesting','pending','uncertain'].includes(o.status)&&o.provider_id).slice(0,3);
+    for(const row of pending){
+      try{await reconcileProviderPayment(row);}
+      catch(error){console.warn('Order reconciliation deferred',{orderId:row.id,error:error instanceof Error?error.message:'unknown'});}
+    }
+    if(pending.length)orders=await listOrders(userId);
+    if(orders.some(o=>o.status==='paid'))await deliverReceipts(null,userId,3);
     return json({orders: orders.map(publicOrder)});
   } catch (error) { return failure(error); }
 };
