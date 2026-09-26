@@ -4,13 +4,13 @@ import AccountLoader from '../components/AccountLoader.astro';
 import {products} from '../data/products';
 import {whatsapp} from '../data/contact';
 ---
-<Layout title="My Account — Nicoo Furniture">
+<Layout title="My Account — Nicoo Funiture Hub">
 <section class="account-page portal-v2" data-auth-page="account" aria-busy="true">
   <AccountLoader/>
   <div data-auth-status role="status" aria-live="polite"></div>
   <div data-auth-fallback hidden class="account-empty"><h2>Your space is waiting.</h2><p>We couldn’t connect to your account. Please sign in again.</p><a class="button dark" href="/sign-in">Sign in ↗</a></div>
   <div data-account-content hidden>
-    <div class="portal-welcome"><div><p class="eyebrow">KARIBU NICOO HARDWARE · YOUR ACCOUNT</p><h1>Good to have you back<span data-customer-name></span><em>.</em></h1><p>Your furniture, your details, your next move.</p><span class="portal-email" data-account-email></span></div><a class="button light" href="/collection">Find your next favourite ↗</a><span class="welcome-star" aria-hidden="true">✳</span></div>
+    <div class="portal-welcome"><div><p class="eyebrow">KARIBU NICOO FUNITURE HUB · YOUR ACCOUNT</p><h1>Good to have you back<span data-customer-name></span><em>.</em></h1><p>Your furniture, your details, your next move.</p><span class="portal-email" data-account-email></span></div><a class="button light" href="/collection">Find your next favourite ↗</a><span class="welcome-star" aria-hidden="true">✳</span></div>
     <div class="account-stats"><article><span>YOUR ORDERS</span><strong id="account-order-count">0</strong><p>placed with Nicoo</p></article><article><span>NEEDS YOUR ATTENTION</span><strong id="account-pending-count">0</strong><p>drafts or unconfirmed payments</p></article><article><span>YOUR SPACE, UPGRADED</span><strong id="account-spend">KSh 0</strong><p>confirmed furniture payments</p></article></div>
     <div class="portal-layout">
       <aside class="portal-sidebar"><p class="eyebrow">MAKE YOURSELF AT HOME</p><nav class="account-tabs" aria-label="Your account"><a href="#orders" data-portal-tab="orders" aria-current="page"><span>01</span> My orders <b>↗</b></a><a href="#delivery-details" data-portal-tab="delivery-details"><span>02</span> Delivery details <b>↗</b></a><a href="#profile" data-portal-tab="profile"><span>03</span> Profile & security <b>↗</b></a></nav><div class="portal-help"><p>A real person.<br/>A little help.</p><a href={whatsapp} target="_blank" rel="noopener noreferrer">Talk to Nicoo ↗</a><small>Have your order reference handy.</small></div><button type="button" class="auth-signout" data-sign-out>Sign out ↗</button></aside>
