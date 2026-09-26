@@ -57,7 +57,7 @@ function showOrder(order:any){
   retry.hidden=order.status!=='failed';
   if(order.status==='paid'){clearPurchased(order.id,order.items);try{localStorage.removeItem('nicoo-active-order');}catch{}attempt=null;saveAttempt();}
   clearTimeout(poll);
-  if(['pending','requesting','uncertain'].includes(order.status)&&polls<30)poll=setTimeout(()=>void refresh(),10000);
+  if(['pending','requesting','uncertain'].includes(order.status)&&polls<45)poll=setTimeout(()=>void refresh(),4000);
 }
 async function refresh(){
   if(!orderId)return;

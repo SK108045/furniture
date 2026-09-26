@@ -3,6 +3,7 @@ import {database, query, rpc} from './database';
 import {HttpError} from './http';
 import {deliverReceipts} from './receipt-emails';
 import {orderInput, customerDetails, phoneNumber} from './validation';
+import {pollStk} from './swifta';
 export type OrderStatus = 'draft'|'cancelled'|'requesting'|'pending'|'uncertain'|'failed'|'paid';
 export type OrderRow = {id:string;user_id:string;idempotency_key:string;fingerprint:string;created_at:string;updated_at:string;status:OrderStatus;total:number;details:any;provider_id:string|null;receipt:string|null;payment_note:string|null;version:number};
 export const publicOrder = (row:OrderRow) => ({...row.details,id:row.id,createdAt:row.created_at,updatedAt:row.updated_at,version:row.version,status:row.status,total:row.total,receipt:row.receipt,paymentNote:row.payment_note});
@@ -59,4 +60,29 @@ export async function updatePayment(id:string,status:OrderStatus,providerId:stri
 export async function reconcilePayment(id:string,status:'paid'|'failed',receipt:string|null=null){
   await rpc('nicoo_reconcile_order',{p_id:id,p_status:status,p_receipt:receipt});
   await deliverReceipts(id);
+}
+
+
+export async function reconcileProviderPayment(row:OrderRow){
+  if(!['requesting','pending','uncertain'].includes(row.status)||!row.provider_id)return row;
+  const provider=await pollStk(row.provider_id);
+  if(provider.status==='success'&&provider.receipt){
+    try{await reconcilePayment(row.id,'paid',provider.receipt);}
+    catch(error){
+      const latest=await getOrder(row.id,row.user_id);
+      if(latest.status!=='paid')throw error;
+      return latest;
+    }
+    return getOrder(row.id,row.user_id);
+  }
+  if(provider.status==='failed'||provider.status==='cancelled'){
+    try{await reconcilePayment(row.id,'failed');}
+    catch(error){
+      const latest=await getOrder(row.id,row.user_id);
+      if(!['paid','failed'].includes(latest.status))throw error;
+      return latest;
+    }
+    return getOrder(row.id,row.user_id);
+  }
+  return row;
 }
