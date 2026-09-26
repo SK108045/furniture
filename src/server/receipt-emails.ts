@@ -24,7 +24,7 @@ export function receiptMessage(order:any,from:string){
   const details=order.details||{},customer=details.customer||{};
   const customerName=[customer.firstName,customer.lastName].filter(Boolean).join(' ')||'Customer';
   const contact=customer.contactPhone||customer.phone||details.paymentPhone||'';
-  const delivery=customer.delivery==='pickup'?'Pickup from Nicoo Furniture, Donholm, Nairobi.':`Delivery to ${customer.address||'the address provided at checkout'}. Delivery charges are arranged separately with the shop.`;
+  const delivery=customer.delivery==='pickup'?'Pickup from Nicoo Funiture Hub, Donholm, Nairobi.':`Delivery to ${customer.address||'the address provided at checkout'}. Delivery charges are arranged separately with the shop.`;
   const paidAt=receiptDate(order);
   const lines=(details.items||[]).map((i:any)=>`${i.name} × ${i.quantity} — ${money(i.price*i.quantity)}`);
   const itemRows=(details.items||[]).map((i:any)=>{
@@ -43,7 +43,7 @@ export function receiptMessage(order:any,from:string){
     </tr>`;
   }).join('');
   const instructions=customer.note?`<div style="margin-top:6px"><strong>Instructions:</strong> ${escape(customer.note)}</div>`:'';
-  const text=`Nicoo Furniture — Payment Receipt
+  const text=`Nicoo Funiture Hub — Payment Receipt
 
 Asante, ${customerName}. Your M-Pesa payment is confirmed.
 
@@ -63,7 +63,7 @@ ${lines.join('\n')}
 
 TOTAL PAID: ${money(order.total)}
 
-Nicoo Furniture · Donholm, Nairobi
+Nicoo Funiture Hub · Donholm, Nairobi
 Questions? +254786387981
 This is a payment receipt, not an eTIMS tax invoice.`;
 
@@ -72,7 +72,7 @@ This is a payment receipt, not an eTIMS tax invoice.`;
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:680px;margin:0 auto;background:#fff;border-collapse:separate;border-spacing:0;border-radius:16px;overflow:hidden;border:1px solid #e5dfd5">
       <tr><td style="height:6px;background:#b8532d;font-size:0;line-height:0">&nbsp;</td></tr>
       <tr><td style="padding:30px 34px 18px">
-        <div style="font-size:30px;font-weight:800;letter-spacing:-1px;color:#21352a">Nicoo Furniture<span style="color:#b8532d">.</span></div>
+        <div style="font-size:30px;font-weight:800;letter-spacing:-1px;color:#21352a">Nicoo Funiture Hub<span style="color:#b8532d">.</span></div>
         <div style="margin-top:7px;font-size:10px;letter-spacing:2.1px;color:#7e8579">DONHOLM, NAIROBI · PAYMENT RECEIPT</div>
       </td></tr>
       <tr><td style="padding:8px 34px 30px">
@@ -111,18 +111,18 @@ This is a payment receipt, not an eTIMS tax invoice.`;
 
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:20px;border-top:2px solid #26352a">
           <tr><td style="padding:18px 0 5px;font-size:16px;font-weight:700">Total paid</td><td align="right" style="padding:18px 0 5px;font-size:24px;font-weight:800">${money(order.total)}</td></tr>
-          <tr><td colspan="2" style="padding-top:4px;font-size:11px;color:#777f73">Furniture subtotal only. Any delivery fee is arranged separately with Nicoo Furniture.</td></tr>
+          <tr><td colspan="2" style="padding-top:4px;font-size:11px;color:#777f73">Furniture subtotal only. Any delivery fee is arranged separately with Nicoo Funiture Hub.</td></tr>
         </table>
 
         <div style="margin-top:28px;background:#26352a;border-radius:12px;padding:18px 20px;color:#fff">
           <div style="font-size:15px;font-weight:700">Need anything before delivery or pickup?</div>
-          <div style="margin-top:7px;font-size:12px;line-height:1.7;color:#dce4dc">Contact Nicoo Furniture on <a href="tel:+254786387981" style="color:#fff">+254 786 387 981</a>. Keep your order reference handy and we’ll sort you out.</div>
+          <div style="margin-top:7px;font-size:12px;line-height:1.7;color:#dce4dc">Contact Nicoo Funiture Hub on <a href="tel:+254786387981" style="color:#fff">+254 786 387 981</a>. Keep your order reference handy and we’ll sort you out.</div>
         </div>
-        <div style="margin-top:18px;text-align:center;font-size:10px;line-height:1.6;color:#8a9087">Nicoo Furniture · Donholm, Nairobi<br/>This is a payment receipt, not an eTIMS tax invoice.</div>
+        <div style="margin-top:18px;text-align:center;font-size:10px;line-height:1.6;color:#8a9087">Nicoo Funiture Hub · Donholm, Nairobi<br/>This is a payment receipt, not an eTIMS tax invoice.</div>
       </td></tr>
     </table>
   </div></body></html>`;
-  return {from,to:[details.email],subject:`Nicoo Furniture receipt · ${order.id}`,html,text};
+  return {from,to:[details.email],subject:`Nicoo Funiture Hub receipt · ${order.id}`,html,text};
 }
 async function sendWithResend(order:any){
   if(order.status!=='paid'||!order.receipt||!order.details?.email)throw new Error('invalid_receipt_snapshot');
