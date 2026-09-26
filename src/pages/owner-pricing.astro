@@ -1,5 +1,20 @@
 ---
+import {createHmac} from 'node:crypto';
+import {env} from '../server/config';
+
 export const prerender=false;
+
+const ownerSecret=env('OWNER_PRICING_CODE');
+if(ownerSecret){
+  const token=createHmac('sha256',ownerSecret).update('owner-pricing-session').digest('hex');
+  Astro.cookies.set('nicoo-owner-pricing',token,{
+    httpOnly:true,
+    sameSite:'strict',
+    secure:Astro.url.protocol==='https:',
+    path:'/',
+    maxAge:60*60*24*30,
+  });
+}
 ---
 <!doctype html>
 <html lang="en">
@@ -47,16 +62,15 @@ export const prerender=false;
   <script is:inline>
     const api='/api/owner-pricing';
     const grid=document.querySelector('#price-grid'),statusLine=document.querySelector('#status-line'),progressText=document.querySelector('#progress-text'),progressBar=document.querySelector('#progress-bar'),saveButton=document.querySelector('#save-prices'),copyButton=document.querySelector('#copy-prices'),toast=document.querySelector('#toast');
-    const accessCode=new URLSearchParams(location.search).get('key')||'';
     let products=[], saved=new Map(), toastTimer;
     const money=n=>'KSh '+Number(n).toLocaleString('en-KE');
     const notify=message=>{toast.textContent=message;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),2600)};
-    const headers=()=>({'x-owner-pricing-code':accessCode,'Content-Type':'application/json'});
+    const headers=()=>({'Content-Type':'application/json'});
     function progress(){const done=products.filter(p=>saved.has(p.id)).length,total=products.length;progressText.textContent=`${done} / ${total}`;progressBar.style.width=total?`${Math.round(done/total*100)}%`:'0%';statusLine.textContent=done===total&&total?'All prices are captured. You can still edit and save corrections.':`${total-done} price${total-done===1?'':'s'} still missing.`;}
     function render(){grid.innerHTML=products.map(p=>{const entry=saved.get(p.id);return `<article class="card ${entry?'saved':''}" data-id="${p.id}"><div class="photo-wrap"><img src="/images/${p.image}" alt="${p.name}" loading="lazy"/><span class="item-id">ITEM ${p.id}</span>${p.views>1?`<span class="views">${p.views} PHOTOS</span>`:''}</div><div class="card-body"><span class="category">${p.category}</span><h2>${p.name}</h2><label class="price-label" for="price-${p.id}">SELLING PRICE</label><div class="price-box"><span>KSh</span><input id="price-${p.id}" data-price="${p.id}" inputmode="numeric" autocomplete="off" placeholder="e.g. 25,500" value="${entry?Number(entry.price).toLocaleString('en-KE'):''}"/></div><p class="saved-note">${entry?'✓ Saved '+money(entry.price):'Not saved yet'}</p></div></article>`}).join('');progress();}
-    async function load(){if(!accessCode){statusLine.textContent='This private link is incomplete. Ask John for the owner pricing link.';saveButton.disabled=true;copyButton.disabled=true;return;}try{const response=await fetch(api,{headers:headers()});const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not open price list.');products=data.products||[];saved=new Map((data.saved||[]).map(x=>[x.product_id,x]));render();}catch(error){statusLine.textContent=error.message;saveButton.disabled=true;copyButton.disabled=true;}}
+    async function load(){try{const response=await fetch(api,{headers:headers(),credentials:'same-origin'});const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not open price list.');products=data.products||[];saved=new Map((data.saved||[]).map(x=>[x.product_id,x]));render();}catch(error){statusLine.textContent=error.message;saveButton.disabled=true;copyButton.disabled=true;}}
     grid.addEventListener('blur',e=>{const input=e.target.closest('[data-price]');if(!input)return;const number=Number(input.value.replace(/[^0-9]/g,''));input.value=number?number.toLocaleString('en-KE'):'';},{capture:true});
-    saveButton.addEventListener('click',async()=>{const prices=[...grid.querySelectorAll('[data-price]')].map(input=>({id:Number(input.dataset.price),price:Number(input.value.replace(/[^0-9]/g,''))})).filter(x=>x.price>0);if(!prices.length){notify('Enter at least one price first.');return;}saveButton.disabled=true;saveButton.textContent='Saving…';try{const response=await fetch(api,{method:'POST',headers:headers(),body:JSON.stringify({prices})});const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not save prices.');saved=new Map((data.saved||[]).map(x=>[x.product_id,x]));render();notify(data.message||'Prices saved.');}catch(error){notify(error.message)}finally{saveButton.disabled=false;saveButton.textContent='Save prices';}});
+    saveButton.addEventListener('click',async()=>{const prices=[...grid.querySelectorAll('[data-price]')].map(input=>({id:Number(input.dataset.price),price:Number(input.value.replace(/[^0-9]/g,''))})).filter(x=>x.price>0);if(!prices.length){notify('Enter at least one price first.');return;}saveButton.disabled=true;saveButton.textContent='Saving…';try{const response=await fetch(api,{method:'POST',headers:headers(),credentials:'same-origin',body:JSON.stringify({prices})});const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not save prices.');saved=new Map((data.saved||[]).map(x=>[x.product_id,x]));render();notify(data.message||'Prices saved.');}catch(error){notify(error.message)}finally{saveButton.disabled=false;saveButton.textContent='Save prices';}});
     copyButton.addEventListener('click',async()=>{const lines=products.filter(p=>saved.has(p.id)).map(p=>`Item ${p.id} — ${p.name} — ${money(saved.get(p.id).price)}`);if(!lines.length){notify('No saved prices yet.');return;}try{await navigator.clipboard.writeText(lines.join('\n'));notify('Saved prices copied.');}catch{notify('Could not copy on this browser.');}});
     load();
   </script>
