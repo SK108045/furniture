@@ -4,8 +4,9 @@ import { body, failure, json, HttpError } from '../../../server/http';
 import { getOrder, publicOrder, editOrder, copyToDraft, cancelDraft, claimDraftPayment, updatePayment } from '../../../server/orders';
 import { requestStk } from '../../../server/swifta';
 import { env } from '../../../server/config';
+import {deliverReceipts} from '../../../server/receipt-emails';
 export const GET: APIRoute = async ({request,params}) => {
-  try { return json({order: publicOrder(await getOrder(params.id!, await requireUser(request)))}); }
+  try { const row=await getOrder(params.id!,await requireUser(request));if(row.status==='paid')await deliverReceipts(row.id);return json({order:publicOrder(row)}); }
   catch (error) { return failure(error); }
 };
 export const PATCH: APIRoute = async ({request,params}) => {

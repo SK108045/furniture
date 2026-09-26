@@ -33,9 +33,13 @@ export async function requestStk(order: {id: string; total: number; phone: strin
       return {status:rejected?'failed':'uncertain',providerId:null,note};
     }
     const result = data?.data || data;
-    const rawId = result?.CheckoutRequestID || result?.checkoutRequestId || result?.checkout_request_id;
+    // Swifta wraps Daraja's response in mpesaResponse and also exposes its ID
+    // under meta. Preserve it so callbacks can match the saved order.
+    const mpesa = result?.mpesaResponse || data?.mpesaResponse;
+    const meta = result?.meta || data?.meta;
+    const rawId = mpesa?.CheckoutRequestID || meta?.checkoutRequestId || result?.CheckoutRequestID || result?.checkoutRequestId || result?.checkout_request_id;
     const providerId = typeof rawId==='string'&&rawId.length<=200?rawId:null;
-    const code = result?.ResponseCode ?? result?.responseCode ?? result?.response_code;
+    const code = mpesa?.ResponseCode ?? result?.ResponseCode ?? result?.responseCode ?? result?.response_code;
     console.info('Swifta STK response',JSON.stringify({...diagnostic,responseFormat:'json',providerId,responseCode:typeof code==='string'||typeof code==='number'?String(code).slice(0,40):null,accepted:data?.success===true||result?.success===true}));
     if (response.status >= 500) return {status:'uncertain',providerId,note:'The payment service could not confirm the request. Check your phone and contact the shop before retrying.'};
     if (response.status===408) return {status:'uncertain',providerId,note:'The payment gateway timed out before confirming the request. Check your phone and contact the shop before retrying.'};

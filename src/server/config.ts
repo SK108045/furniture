@@ -11,6 +11,9 @@ const bundled: Record<string, string | undefined> = {
   SWIFTA_WEBHOOK_SECRET: import.meta.env?.SWIFTA_WEBHOOK_SECRET,
   SWIFTA_WEBHOOK_SIGNATURE_HEADER: import.meta.env?.SWIFTA_WEBHOOK_SIGNATURE_HEADER,
   GEMINI_API_KEY: import.meta.env?.GEMINI_API_KEY,
+  RESEND_API_KEY: import.meta.env?.RESEND_API_KEY,
+  RECEIPT_FROM: import.meta.env?.RECEIPT_FROM,
+  CRON_SECRET: import.meta.env?.CRON_SECRET,
   APP_ORIGIN: import.meta.env?.APP_ORIGIN,
 };
 export function env(name: string): string {

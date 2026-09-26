@@ -7,7 +7,7 @@ const url=new URL(address);
 if(url.protocol!=='https:'||url.username||url.password)throw new Error('Use the HTTPS address of your own deployment.');
 url.pathname='/api/swifta/diagnostic';url.search='';url.hash='';
 try {
-  const response=await fetch(url,{method:'POST',headers:{'x-webhook-secret':env('SWIFTA_CALLBACK_TOKEN')},redirect:'error',signal:AbortSignal.timeout(25000)});
+  const response=await fetch(url,{method:'POST',headers:{'x-webhook-secret':env('SWIFTA_CALLBACK_TOKEN'),'Content-Type':'application/json'},body:'{}',redirect:'error',signal:AbortSignal.timeout(25000)});
   if(!response.ok)throw new Error(`Diagnostic endpoint returned HTTP ${response.status}. Deploy the latest code and use its matching callback token.`);
   const report=await response.json();console.log(JSON.stringify(report,null,2));
   console.log(report.reachable?'Vercel reached the Swifta validation endpoint. No payment was requested.':'Swifta did not return its expected validation response. Use the status and gateway request ID above to investigate.');

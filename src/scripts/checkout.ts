@@ -29,7 +29,7 @@ function earlierPayment(message?:string){
 function returnToBag(){clearTimeout(poll);orderId='';activeOrder=null;attempt=null;saveAttempt();polls=0;form.hidden=false;result.hidden=true;updatePay();}
 function delivery(){const pickup=new FormData(form).get('delivery')==='pickup';const label=document.querySelector<HTMLElement>('#address-label')!;label.hidden=pickup;label.querySelector('textarea')!.required=!pickup;document.querySelector('#delivery-title')!.textContent=pickup?'Shop pickup':'Delivery';document.querySelector('#delivery-value')!.textContent=pickup?'Free':'Arranged separately';}
 form.addEventListener('change',delivery);
-function updatePay(){const cart=getCart();const total=products.reduce((sum,p)=>sum+p.price*(cart[p.id]||0),0);submit.querySelector('[data-pay-label]')!.textContent=busy?'Sending payment request…':total?`Pay ${money(total)} with M-Pesa`:'Pay with M-Pesa';submit.disabled=busy||!total;}
+function updatePay(){const cart=getCart();const total=products.reduce((sum,p)=>sum+p.price*(cart[p.id]||0),0);submit.querySelector('[data-pay-label]')!.textContent=busy?'Connecting securely…':total?`Pay ${money(total)} with M-Pesa`:'Pay with M-Pesa';submit.disabled=busy||!total;submit.setAttribute('data-busy',String(busy));form.setAttribute('aria-busy',String(busy));document.querySelector<HTMLElement>('#checkout-processing')!.hidden=!busy;}
 window.addEventListener('nicoo:cart',()=>{
   if(!busy&&activeOrder&&activeOrder.status!=='paid'&&(!sameItems(activeOrder.items)||activeOrder.total!==currentTotal())){
     earlierPayment('Your earlier payment is saved in your account. Checkout below is for the items currently in your bag.');returnToBag();
@@ -79,7 +79,7 @@ document.querySelector('#checkout-save-draft')!.addEventListener('click',async()
   if(attempt){error.textContent='A payment attempt is already saved. Review your account before creating a draft.';error.hidden=false;return;}
   const payload={action:'draft',items:Object.entries(getCart()).map(([id,quantity])=>({id:Number(id),quantity})),customer:Object.fromEntries(new FormData(form))};
   if(!draftAttempt||JSON.stringify(draftAttempt.payload)!==JSON.stringify(payload))draftAttempt={key:crypto.randomUUID(),payload};
-  busy=true;fields.disabled=true;error.hidden=true;
+  busy=true;fields.disabled=true;error.hidden=true;updatePay();
   try{
     await api('/api/orders',{method:'POST',headers:{'Idempotency-Key':draftAttempt.key},body:JSON.stringify(draftAttempt.payload)});
     location.assign('/account#orders');
@@ -102,10 +102,11 @@ form.addEventListener('submit',async event=>{
   try{
     const {order}=await api('/api/orders',{method:'POST',headers:{'Idempotency-Key':attempt.key},body:JSON.stringify(attempt.payload)});
     showOrder(order);result.focus();
-  }catch(e){if([400,403,415,429,503].includes((e as any)?.status)){attempt=null;saveAttempt();}error.textContent=`${errorMessage(e)} Your bag is saved. If a prompt arrived, check your account before trying again.`;error.hidden=false;}
+  }catch(e){if([400,403,415,429].includes((e as any)?.status)){attempt=null;saveAttempt();}error.textContent=`${errorMessage(e)} Your bag is saved. If a prompt arrived, check your account before trying again.`;error.hidden=false;}
   finally{busy=false;fields.disabled=false;updatePay();}
 });
 async function init(){
+  if(currentItems().length===1&&currentItems()[0].id===9001){location.replace('/payment-test');return;}
   try{
     const clerk=await authReady;
     if(!clerk.isSignedIn){auth.innerHTML='<strong>Your order deserves its own home.</strong><p>Sign in or create an account to save your details, pay and follow your orders.</p><a class="button dark" href="/sign-in?next=/checkout">Sign in to checkout ↗</a> <a class="text-link" href="/sign-up?next=/checkout">Create an account</a>';return;}

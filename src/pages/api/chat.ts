@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { env } from '../../server/config';
-import { products, money } from '../../data/products';
+import { shopProducts as products, money } from '../../data/products';
 import { phone, whatsapp } from '../../data/contact';
 
 const FALLBACK_KEY = 'AQ.Ab8RN6LDJO6RH9quRTsyVo2TfRAX18Ijam7oNcgA8sxkG4NDLw';
@@ -8,7 +8,7 @@ const FALLBACK_KEY = 'AQ.Ab8RN6LDJO6RH9quRTsyVo2TfRAX18Ijam7oNcgA8sxkG4NDLw';
 const productList = products
   .map(
     (p) =>
-      `• ${p.name} (${p.category}): ${money(p.price)}${
+      `• ${p.name} (${p.category}): ${p.quoteOnly?'Price on enquiry; contact the shop for a quote':money(p.price)}${
         p.onSale ? ` [Selling price; original ${money(p.originalPrice)}, save ${money(p.savings)}]` : ''
       } - ${p.description}`
   )

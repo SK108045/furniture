@@ -153,14 +153,14 @@ editor.addEventListener('submit',async event=>{
   const pay=(event.submitter as HTMLButtonElement)?.id==='editor-pay';
   if(editing.status==='draft'&&!draftItems.length){$('#editor-status').textContent='Add at least one piece to your draft.';return;}
   const customer={...editing.customer,...values(editor)};
-  editorBusy=true;editor.querySelector('fieldset')!.disabled=true;$('#editor-status').textContent=pay?'Saving your draft and requesting M-Pesa…':'Saving your changes…';
+  editorBusy=true;editor.setAttribute('aria-busy','true');editor.querySelectorAll('button[type="submit"]').forEach(b=>b.setAttribute('data-busy','true'));editor.querySelector('fieldset')!.disabled=true;$('#editor-status').textContent=pay?'Saving your draft and requesting M-Pesa…':'Saving your changes…';
   try{
     editing=await patch(editing,{action:'edit',customer,...(editing.status==='draft'?{items:draftItems}:{})});replaceOrder(editing);editorDirty=false;
     if(pay){editing=await patch(editing,{action:'pay',phone:customer.phone});replaceOrder(editing);feedback(editing.paymentNote||'Payment request saved. Check your phone, then refresh this order.');scheduleRefresh();}
     else feedback('Your order changes are saved.');
     dialog.close();
   }catch(error){$('#editor-status').textContent=errorMessage(error);}
-  finally{editorBusy=false;editor.querySelector('fieldset')!.disabled=false;}
+  finally{editorBusy=false;editor.setAttribute('aria-busy','false');editor.querySelectorAll('[data-busy]').forEach(b=>b.setAttribute('data-busy','false'));editor.querySelector('fieldset')!.disabled=false;}
 });
 dialog.addEventListener('cancel',event=>{event.preventDefault();requestClose();});
 dialog.addEventListener('close',()=>{if(!document.querySelector('dialog[open]'))document.body.style.overflow='';});

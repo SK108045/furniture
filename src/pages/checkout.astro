@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Icon from '../components/Icon.astro';
+import AccountLoader from '../components/AccountLoader.astro';
 import {whatsapp} from '../data/contact';
 ---
 <Layout title="Secure Checkout — Nicoo Furniture">
@@ -29,6 +30,7 @@ import {whatsapp} from '../data/contact';
           <button id="checkout-save-draft" type="button" class="auth-text-button">Not ready to pay? Save an editable draft →</button>
           <p class="checkout-privacy">Your PIN stays on your phone. We never ask for it here. Your order and delivery details are saved to your Nicoo account.</p>
         </fieldset>
+        <div id="checkout-processing" hidden><AccountLoader compact label="Connecting securely. Keep your phone nearby…"/></div>
         <div id="checkout-error" class="checkout-error" role="alert" hidden></div>
       </form>
       <section id="payment-result" class="payment-result" hidden aria-live="polite" tabindex="-1"><span class="payment-orbit" aria-hidden="true">↗</span><p class="eyebrow">YOUR NICOO ORDER</p><h2 data-payment-title>Check your phone.</h2><p data-payment-note></p><dl><div><dt>Order reference</dt><dd data-payment-reference></dd></div><div><dt>Amount</dt><dd data-payment-amount></dd></div><div data-receipt-row hidden><dt>M-Pesa receipt</dt><dd data-payment-receipt></dd></div></dl><p class="field-help">An STK prompt is a payment request. Your order will show as paid once payment has been verified.</p><div class="payment-result-actions"><a class="button dark" href="/account">View my orders ↗</a><button type="button" id="check-payment" class="button outline-button">Refresh status</button></div><a id="payment-help" class="text-link" href={whatsapp} target="_blank" rel="noopener noreferrer">Need a hand? Talk to Nicoo ↗</a><button id="retry-payment" type="button" class="auth-text-button" hidden>Check details & try again</button></section>

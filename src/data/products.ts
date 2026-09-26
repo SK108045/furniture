@@ -1,3 +1,4 @@
+import organized from './organized-products.json';
 const catalogue = [
  {id:1,name:'Ergo Executive Chair',category:'Seating',price:18499,image:'1.jpg',tag:'Everyday comfort',description:'A high-back office chair with a padded headrest, upholstered seat and polished base.'},
  {id:2,name:'Studio Desk',category:'Desks',price:16500,image:'2.jpg',tag:'A fresh perspective',description:'A clean white desktop with contrasting legs for a light, uncluttered workspace. Desk only; chair shown for styling.'},
@@ -12,9 +13,13 @@ const catalogue = [
 ];
 // Photo prices are the selling prices. Reference prices sit above them;
 // never apply another discount to the amounts supplied by the shop.
-export const products = catalogue.map(p => {
-  const originalPrice = Math.ceil(p.price / 0.9 / 500) * 500;
-  return {...p, originalPrice, onSale: true, featuredOffer: [5,7,10].includes(p.id),
-    savings: originalPrice - p.price, discountPercent: Math.floor((originalPrice - p.price) / originalPrice * 100)};
+const combined = [...catalogue.map(p=>({...p,images:[p.image],quoteOnly:false,testOnly:false})),...organized,
+  {id:9001,name:'M-Pesa checkout test',category:'Payment test',price:1,image:'mpesa.svg',images:['mpesa.svg'],tag:'Test transaction',description:'A real KSh 1 payment for checking the checkout and receipt flow. No furniture or delivery is included.',quoteOnly:false,testOnly:true}];
+export const products = combined.map(p => {
+  const originalPrice = p.quoteOnly || p.testOnly ? p.price : Math.ceil(p.price / 0.9 / 500) * 500;
+  return {...p, originalPrice, onSale: originalPrice>p.price, featuredOffer: [5,7,10].includes(p.id),
+    savings: originalPrice - p.price, discountPercent: originalPrice ? Math.floor((originalPrice - p.price) / originalPrice * 100) : 0};
 });
+export const shopProducts=products.filter(p=>!p.testOnly);
+export const categories=['Seating','Desks','Standing desks','Workspace sets','Conference tables','Reception desks','Accessories'];
 export const money = (amount:number) => `KSh ${amount.toLocaleString('en-KE')}`;

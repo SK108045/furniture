@@ -23,6 +23,8 @@ npm run build
 
 ## Features
 
+Latest catalogue and receipt setup: [September catalogue and checkout update](docs/catalog-and-receipts.md). The shop now has 40 listings in seven categories, with a separate `/payment-test` page for a real KSh 1 checkout check. Receipt emails require the additional Supabase migration and a configured email sender described in that guide.
+
 - Email sign-up/sign-in, email verification, password reset, email-code sign-in and sign-out through Clerk.
 - Customer portal with order search, filters, sorting, payment activity, downloadable printable summaries/receipts, editable delivery details and Clerk profile/security management.
 - Save an editable order draft from checkout, revise failed orders, reorder past purchases, change draft quantities/products, cancel drafts, and pay a draft directly from the portal.

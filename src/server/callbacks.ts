@@ -1,5 +1,6 @@
 import {createHash,createHmac,timingSafeEqual} from 'node:crypto';
-import {rpc} from './database';
+import {database,query,rpc} from './database';
+import {deliverReceipts} from './receipt-emails';
 import {env} from './config';
 import {HttpError} from './http';
 function equal(a:string,b:string){const left=Buffer.from(a),right=Buffer.from(b);return left.length===right.length&&timingSafeEqual(left,right);}
@@ -41,4 +42,11 @@ export async function applyCallbacks(providerId:string,reference='') {
 export async function receiveCallback(payload:Callback) {
   const id=createHash('sha256').update(JSON.stringify(payload)).digest('hex');
   await rpc('nicoo_receive_callback',{p_id:id,p_payload:payload});
+  if(env('RESEND_API_KEY')&&env('RECEIPT_FROM')){
+    // Daraja callbacks often contain only CheckoutRequestID, not our order ID.
+    try {
+      const orderId=payload.reference||(await database<{id:string}[]>(`nicoo_orders?${query({provider_id:`eq.${payload.providerId}`,select:'id',limit:'1'})}`))[0]?.id;
+      if(orderId)await deliverReceipts(orderId);
+    }catch(error){console.error('Receipt lookup deferred',error instanceof Error?error.name:'unknown');}
+  }
 }

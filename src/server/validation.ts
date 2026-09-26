@@ -25,7 +25,7 @@ export function orderInput(input: any) {
   const seen = new Set<number>();
   const items = input.items.map((item: any) => {
     const product = products.find(p => p.id === item?.id);
-    if (!product || seen.has(product.id) || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 20) throw new HttpError(400, 'Your bag contains an invalid item or quantity.');
+    if (!product || product.quoteOnly || seen.has(product.id) || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 20 || (product.testOnly && (item.quantity!==1 || input.items.length!==1))) throw new HttpError(400, 'Choose priced furniture, or check out the test item on its own with quantity one.');
     seen.add(product.id);
     return {id: product.id, name: product.name, image: product.image, price: product.price, quantity: item.quantity};
   }).sort((a: any,b: any) => a.id - b.id);

@@ -6,6 +6,7 @@ const loader=page?.querySelector<HTMLElement>('[data-account-loader]');
 function loading(active:boolean,label='Making room for you…'){
   if(loader){loader.hidden=!active;const text=loader.querySelector('[data-loader-label]');if(text)text.textContent=label;}
   page?.setAttribute('aria-busy',String(active));
+  page?.querySelector<HTMLButtonElement>('[type="submit"]')?.setAttribute('data-busy',String(active));
 }
 const destination=safeDestination(new URLSearchParams(location.search).get('next'));
 const switchLink=document.querySelector<HTMLAnchorElement>('[data-auth-switch]');

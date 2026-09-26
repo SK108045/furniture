@@ -1,6 +1,7 @@
 import {createHash, randomBytes, randomUUID} from 'node:crypto';
 import {database, query, rpc} from './database';
 import {HttpError} from './http';
+import {deliverReceipts} from './receipt-emails';
 import {orderInput, customerDetails, phoneNumber} from './validation';
 export type OrderStatus = 'draft'|'cancelled'|'requesting'|'pending'|'uncertain'|'failed'|'paid';
 export type OrderRow = {id:string;user_id:string;idempotency_key:string;fingerprint:string;created_at:string;updated_at:string;status:OrderStatus;total:number;details:any;provider_id:string|null;receipt:string|null;payment_note:string|null;version:number};
@@ -51,4 +52,5 @@ export async function claimDraftPayment(id:string,userId:string,version:unknown,
 }
 export async function updatePayment(id:string,status:OrderStatus,providerId:string|null,note:string){
   await rpc('nicoo_payment_result',{p_id:id,p_status:status,p_provider_id:providerId,p_note:note});
+  await deliverReceipts(id);
 }

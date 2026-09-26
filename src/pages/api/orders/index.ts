@@ -5,10 +5,12 @@ import { createOrder, getOrder, publicOrder, updatePayment, listOrders } from '.
 import { orderInput } from '../../../server/validation';
 import { requestStk } from '../../../server/swifta';
 import { env } from '../../../server/config';
+import {deliverReceipts} from '../../../server/receipt-emails';
 export const GET: APIRoute = async ({request}) => {
   try {
     const userId = await requireUser(request);
     const orders = await listOrders(userId);
+    if(orders.some(o=>o.status==='paid'))await deliverReceipts(null,userId,1);
     return json({orders: orders.map(publicOrder)});
   } catch (error) { return failure(error); }
 };

@@ -1,0 +1,425 @@
+[
+  {
+    "id": 101,
+    "name": "Leather Office Chair (High Back)",
+    "category": "Seating",
+    "price": 11500,
+    "image": "catalog/executive_leather_office_chair.webp",
+    "images": [
+      "catalog/executive_leather_office_chair.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "Leather Office Chair (High Back). Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 102,
+    "name": "Minimalist Black Visitor / Dining Chair",
+    "category": "Seating",
+    "price": 2500,
+    "image": "catalog/minimalist_black_metal_visitor_chair.webp",
+    "images": [
+      "catalog/minimalist_black_metal_visitor_chair.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "Minimalist Black Visitor / Dining Chair. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 103,
+    "name": "Mid Back Mesh Office Seat",
+    "category": "Seating",
+    "price": 13500,
+    "image": "catalog/mid_back_mesh_office_chair.webp",
+    "images": [
+      "catalog/mid_back_mesh_office_chair.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "Mid Back Mesh Office Seat. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 104,
+    "name": "Mesh Office Swivel Chair",
+    "category": "Seating",
+    "price": 5000,
+    "image": "catalog/mesh_swivel_office_chair_chrome_base.webp",
+    "images": [
+      "catalog/mesh_swivel_office_chair_chrome_base.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "Mesh Office Swivel Chair. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 105,
+    "name": "Ergonomic Computer Desk",
+    "category": "Desks",
+    "price": 18500,
+    "image": "catalog/ergonomic_computer_desk_wood_white_frame.webp",
+    "images": [
+      "catalog/ergonomic_computer_desk_wood_white_frame.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "Ergonomic Computer Desk. Confirm dimensions and included accessories with the shop before ordering. Chairs and styling accessories in photographs are not included unless confirmed.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 106,
+    "name": "4-Seater Workstation",
+    "category": "Workspace sets",
+    "price": 98000,
+    "image": "catalog/4_person_office_workstation_with_dividers.webp",
+    "images": [
+      "catalog/4_person_office_workstation_with_dividers.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "4-Seater Workstation. Confirm dimensions and included accessories with the shop before ordering. Chairs and styling accessories in photographs are not included unless confirmed.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 107,
+    "name": "Electric Standing Desk (White)",
+    "category": "Standing desks",
+    "price": 30000,
+    "image": "catalog/electric_height_adjustable_standing_desk_white.webp",
+    "images": [
+      "catalog/electric_height_adjustable_standing_desk_white.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "Electric Standing Desk (White). Confirm dimensions and included accessories with the shop before ordering. Chairs and styling accessories in photographs are not included unless confirmed.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 108,
+    "name": "1600mm Standing Desk (Black)",
+    "category": "Standing desks",
+    "price": 38500,
+    "image": "catalog/1600mm_electric_standing_desk_black.webp",
+    "images": [
+      "catalog/1600mm_electric_standing_desk_black.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "1600mm Standing Desk (Black). Confirm dimensions and included accessories with the shop before ordering. Chairs and styling accessories in photographs are not included unless confirmed.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 109,
+    "name": "1 Way Modular Workstation",
+    "category": "Workspace sets",
+    "price": 38500,
+    "image": "catalog/modular_1_person_cubicle_workstation.webp",
+    "images": [
+      "catalog/modular_1_person_cubicle_workstation.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "1 Way Modular Workstation. Confirm dimensions and included accessories with the shop before ordering. Chairs and styling accessories in photographs are not included unless confirmed.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 110,
+    "name": "Boardroom / Conference Table (2.4m)",
+    "category": "Conference tables",
+    "price": 30500,
+    "image": "catalog/boardroom_conference_meeting_table.webp",
+    "images": [
+      "catalog/boardroom_conference_meeting_table.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "Boardroom / Conference Table (2.4m). Confirm dimensions and included accessories with the shop before ordering. Chairs and styling accessories in photographs are not included unless confirmed.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 111,
+    "name": "Executive Coat Hanger",
+    "category": "Accessories",
+    "price": 9500,
+    "image": "catalog/executive_wooden_standing_coat_hanger.webp",
+    "images": [
+      "catalog/executive_wooden_standing_coat_hanger.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "Executive Coat Hanger. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 112,
+    "name": "Wood & White Reception Desk (1.0m)",
+    "category": "Reception desks",
+    "price": 18000,
+    "image": "catalog/reception_counter_wood_white_stripes_wrapped.webp",
+    "images": [
+      "catalog/reception_counter_wood_white_stripes_wrapped.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "Wood & White Reception Desk (1.0m). Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 113,
+    "name": "Grey & Wood Reception Desk",
+    "category": "Reception desks",
+    "price": 0,
+    "image": "catalog/reception_desk_grey_white_stripes_wood_top.webp",
+    "images": [
+      "catalog/reception_desk_grey_white_stripes_wood_top.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "Grey & Wood Reception Desk. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": true,
+    "testOnly": false
+  },
+  {
+    "id": 114,
+    "name": "Brown Wood Reception Desk with White Panel",
+    "category": "Reception desks",
+    "price": 0,
+    "image": "catalog/reception_desk_brown_wood_white_center_panel.webp",
+    "images": [
+      "catalog/reception_desk_brown_wood_white_center_panel.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "Brown Wood Reception Desk with White Panel. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": true,
+    "testOnly": false
+  },
+  {
+    "id": 115,
+    "name": "Church Pulpit / Reception Desk (White)",
+    "category": "Reception desks",
+    "price": 0,
+    "image": "catalog/church_pulpit_reception_counter_white_kitengela.webp",
+    "images": [
+      "catalog/church_pulpit_reception_counter_white_kitengela.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "Church Pulpit / Reception Desk (White). Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": true,
+    "testOnly": false
+  },
+  {
+    "id": 116,
+    "name": "All-White Reception Counter (1.2m)",
+    "category": "Reception desks",
+    "price": 22000,
+    "image": "catalog/reception_counter_all_white_raised_front_panel.webp",
+    "images": [
+      "catalog/reception_counter_all_white_raised_front_panel.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "All-White Reception Counter (1.2m). Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 118,
+    "name": "Grey & Wood Reception Desk with White Stripes",
+    "category": "Reception desks",
+    "price": 25500,
+    "image": "catalog/reception_desk_dark_grey_light_oak_top.webp",
+    "images": [
+      "catalog/reception_desk_dark_grey_light_oak_top.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "Grey & Wood Reception Desk with White Stripes. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 119,
+    "name": "White Reception Desk with Grey Center Panel",
+    "category": "Reception desks",
+    "price": 0,
+    "image": "catalog/reception_counter_white_charcoal_panel_black_stripes.webp",
+    "images": [
+      "catalog/reception_counter_white_charcoal_panel_black_stripes.webp",
+      "catalog/reception_counter_white_charcoal_panel_front_artisan.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "White Reception Desk with Grey Center Panel. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": true,
+    "testOnly": false
+  },
+  {
+    "id": 120,
+    "name": "White & Blue Reception Desk",
+    "category": "Reception desks",
+    "price": 0,
+    "image": "catalog/reception_desk_white_blue_stripes_wrapped.webp",
+    "images": [
+      "catalog/reception_desk_white_blue_stripes_wrapped.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "White & Blue Reception Desk. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": true,
+    "testOnly": false
+  },
+  {
+    "id": 121,
+    "name": "White Reception Desk with Wood Center Inlay",
+    "category": "Reception desks",
+    "price": 0,
+    "image": "catalog/reception_desk_white_with_wood_inlay_panel.webp",
+    "images": [
+      "catalog/reception_desk_white_with_wood_inlay_panel.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "White Reception Desk with Wood Center Inlay. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": true,
+    "testOnly": false
+  },
+  {
+    "id": 122,
+    "name": "Wood & White Reception Desk (1.6m, Horizontal Slats)",
+    "category": "Reception desks",
+    "price": 35500,
+    "image": "catalog/reception_counter_wood_white_slats_front_view.webp",
+    "images": [
+      "catalog/reception_counter_wood_white_slats_front_view.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "Wood & White Reception Desk (1.6m, Horizontal Slats). Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 124,
+    "name": "White Reception Desk with Angular Dark Center",
+    "category": "Reception desks",
+    "price": 0,
+    "image": "catalog/reception_counter_white_geometric_dark_panel_wrapped.webp",
+    "images": [
+      "catalog/reception_counter_white_geometric_dark_panel_wrapped.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "White Reception Desk with Angular Dark Center. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": true,
+    "testOnly": false
+  },
+  {
+    "id": 125,
+    "name": "White Reception Desk with Light Wood Center",
+    "category": "Reception desks",
+    "price": 0,
+    "image": "catalog/reception_counter_white_light_wood_center_panel.webp",
+    "images": [
+      "catalog/reception_counter_white_light_wood_center_panel.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "White Reception Desk with Light Wood Center. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": true,
+    "testOnly": false
+  },
+  {
+    "id": 126,
+    "name": "Geometric Blue & White Reception Desk",
+    "category": "Reception desks",
+    "price": 0,
+    "image": "catalog/reception_counter_geometric_blue_white_angular.webp",
+    "images": [
+      "catalog/reception_counter_geometric_blue_white_angular.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "Geometric Blue & White Reception Desk. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": true,
+    "testOnly": false
+  },
+  {
+    "id": 127,
+    "name": "White Reception Desk with Black Stripes",
+    "category": "Reception desks",
+    "price": 0,
+    "image": "catalog/reception_counter_white_black_stripes_side_profile.webp",
+    "images": [
+      "catalog/reception_counter_white_black_stripes_side_profile.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "White Reception Desk with Black Stripes. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": true,
+    "testOnly": false
+  },
+  {
+    "id": 128,
+    "name": "White Reception Desk with Black Accents",
+    "category": "Reception desks",
+    "price": 0,
+    "image": "catalog/reception_counter_white_black_stripes_front_panel.webp",
+    "images": [
+      "catalog/reception_counter_white_black_stripes_front_panel.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "White Reception Desk with Black Accents. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": true,
+    "testOnly": false
+  },
+  {
+    "id": 129,
+    "name": "White & Wood Reception Desk (1.4m, Wood Stripes)",
+    "category": "Reception desks",
+    "price": 25500,
+    "image": "catalog/reception_counter_white_honey_wood_top_and_stripes.webp",
+    "images": [
+      "catalog/reception_counter_white_honey_wood_top_and_stripes.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "White & Wood Reception Desk (1.4m, Wood Stripes). Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 130,
+    "name": "White & Blue Reception Desk",
+    "category": "Reception desks",
+    "price": 0,
+    "image": "catalog/reception_desk_white_blue_slatted_grille_wide_view.webp",
+    "images": [
+      "catalog/reception_desk_white_blue_slatted_grille_wide_view.webp",
+      "catalog/reception_desk_white_blue_slatted_grille_closeup.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "White & Blue Reception Desk. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": true,
+    "testOnly": false
+  },
+  {
+    "id": 131,
+    "name": "Modern Fluted Grey Reception Desk with White Fascia",
+    "category": "Reception desks",
+    "price": 0,
+    "image": "catalog/reception_desk_grey_fluted_slats_white_angular_fascia.webp",
+    "images": [
+      "catalog/reception_desk_grey_fluted_slats_white_angular_fascia.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "Modern Fluted Grey Reception Desk with White Fascia. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": true,
+    "testOnly": false
+  },
+  {
+    "id": 133,
+    "name": "Blue & White Reception Desk",
+    "category": "Reception desks",
+    "price": 0,
+    "image": "catalog/reception_work_desk_blue_white_rear_shelving_view.webp",
+    "images": [
+      "catalog/reception_work_desk_blue_white_rear_shelving_view.webp",
+      "catalog/reception_work_desk_blue_white_rear_artisan_view.webp"
+    ],
+    "tag": "Made for your space",
+    "description": "Blue & White Reception Desk. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
+    "quoteOnly": true,
+    "testOnly": false
+  }
+]
