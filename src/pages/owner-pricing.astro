@@ -1,20 +1,8 @@
 ---
-import {createHmac} from 'node:crypto';
-import {env} from '../server/config';
-
+import {products} from '../data/products';
+import {whatsapp} from '../data/contact';
 export const prerender=false;
-
-const ownerSecret=env('OWNER_PRICING_CODE');
-if(ownerSecret){
-  const token=createHmac('sha256',ownerSecret).update('owner-pricing-session').digest('hex');
-  Astro.cookies.set('nicoo-owner-pricing',token,{
-    httpOnly:true,
-    sameSite:'strict',
-    secure:Astro.url.protocol==='https:',
-    path:'/',
-    maxAge:60*60*24*30,
-  });
-}
+const missing=products.filter(p=>p.quoteOnly&&!p.testOnly);
 ---
 <!doctype html>
 <html lang="en">
@@ -30,49 +18,145 @@ if(ownerSecret){
     .shell{max-width:1180px;margin:auto;padding:38px 24px 80px}.top{display:flex;justify-content:space-between;align-items:flex-start;gap:30px;margin-bottom:34px}
     .brand{font-size:34px;font-weight:800;letter-spacing:-2px;line-height:.9}.brand i{font-style:normal;color:var(--orange)}.brand small{display:block;font-size:8px;letter-spacing:2.6px;margin:9px 0 0 2px;color:#6d756c}
     .private{font-size:10px;letter-spacing:1.5px;border:1px solid #cfc8bb;padding:8px 10px;color:#656c65;background:#faf8f2}
-    .lock{max-width:520px;margin:10vh auto 0;background:#fff;padding:38px;border:1px solid var(--line);box-shadow:0 18px 50px #1d2b2212}
-    .lock h1,.intro h1{font-weight:400;letter-spacing:-2px}.lock h1{font-size:38px;margin:0 0 12px}.lock p{color:#697168;line-height:1.7;font-size:14px}
-    .access-row{display:flex;gap:10px;margin-top:25px}.access-row input{flex:1;min-width:0;border:1px solid #bbbdb5;padding:15px;background:#faf9f6}.primary{border:0;background:var(--green);color:#fff;padding:14px 20px;font-weight:600}.primary:hover{background:#30463a}
-    .error{color:#a63726;font-size:13px;margin-top:14px}.workspace[hidden],.lock[hidden]{display:none}
-    .intro{display:grid;grid-template-columns:1fr auto;align-items:end;gap:30px;padding:18px 0 30px;border-bottom:1px solid #cbc8bf}.intro h1{font-size:52px;line-height:1.02;margin:12px 0}.intro p{color:#687066;max-width:670px;line-height:1.7}
+    .intro{display:grid;grid-template-columns:1fr auto;align-items:end;gap:30px;padding:18px 0 30px;border-bottom:1px solid #cbc8bf}.intro h1{font-size:52px;line-height:1.02;margin:12px 0;font-weight:400;letter-spacing:-2px}.intro p{color:#687066;max-width:670px;line-height:1.7}
     .progress-card{min-width:220px;background:var(--green);color:#fff;padding:20px}.progress-card span{font-size:10px;letter-spacing:1.5px;color:#bdc8bb}.progress-card strong{display:block;font-size:30px;font-weight:400;margin:8px 0}.bar{height:4px;background:#ffffff25}.bar i{display:block;height:100%;background:#e8aa82;width:0;transition:width .25s}
-    .toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:22px 0}.toolbar p{font-size:13px;color:#676f66}.toolbar-actions{display:flex;gap:9px}.secondary{border:1px solid #aeb4aa;background:transparent;padding:11px 14px;color:#344036}.secondary:hover{background:#e9e6de}
-    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.card{background:#fff;border:1px solid var(--line);overflow:hidden;transition:border-color .2s,box-shadow .2s}.card.saved{border-color:#83a080;box-shadow:0 0 0 1px #83a08025}
+    .toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:22px 0}.toolbar p{font-size:13px;color:#676f66}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.card{background:#fff;border:1px solid var(--line);overflow:hidden;transition:border-color .2s,box-shadow .2s}.card.filled{border-color:#83a080;box-shadow:0 0 0 1px #83a08025}
     .photo-wrap{aspect-ratio:4/3;background:#e9e7df;overflow:hidden;position:relative}.photo-wrap img{width:100%;height:100%;object-fit:cover}.item-id{position:absolute;left:12px;top:12px;background:#1f2d24;color:#fff;padding:6px 8px;font-size:9px;letter-spacing:1px}.views{position:absolute;right:12px;bottom:12px;background:#ffffffeb;padding:6px 8px;font-size:9px}
     .card-body{padding:18px}.category{font-size:9px;letter-spacing:1.4px;color:#81877e;text-transform:uppercase}.card h2{font-size:19px;line-height:1.25;font-weight:500;margin:8px 0 17px;min-height:48px}.price-label{display:block;font-size:11px;font-weight:700;letter-spacing:.7px;margin-bottom:8px}
     .price-box{display:flex;align-items:center;border:1px solid #babdb5;background:#faf9f6}.price-box span{padding-left:13px;font-size:13px;color:#626960}.price-box input{width:100%;border:0;background:transparent;padding:14px 12px;outline:0;font-size:17px}.price-box:focus-within{border-color:#566d59;box-shadow:0 0 0 2px #566d591c}
-    .saved-note{min-height:17px;margin-top:9px;font-size:11px;color:#668066}.card:not(.saved) .saved-note{color:#999}
-    .save-dock{position:sticky;bottom:18px;margin:34px auto 0;max-width:650px;background:#fff;border:1px solid #cbc7bd;box-shadow:0 14px 45px #1d2b2230;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:20px}.save-dock p{font-size:12px;color:#656d64}.save-dock strong{color:#26332a}.save-dock .primary{min-width:150px}
+    .saved-note{min-height:17px;margin-top:9px;font-size:11px;color:#888}.card.filled .saved-note{color:#668066}
+    .save-dock{position:sticky;bottom:18px;margin:34px auto 0;max-width:720px;background:#fff;border:1px solid #cbc7bd;box-shadow:0 14px 45px #1d2b2230;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:20px}.save-dock p{font-size:12px;color:#656d64}.save-dock strong{color:#26332a}.primary{border:0;background:#168b49;color:#fff;padding:14px 20px;font-weight:700;min-width:210px}.primary:hover{background:#11763d}.primary:disabled{opacity:.5;cursor:not-allowed}
     .toast{position:fixed;right:22px;bottom:22px;background:#203328;color:#fff;padding:14px 18px;font-size:13px;box-shadow:0 10px 30px #0002;transform:translateY(100px);opacity:0;transition:.2s;z-index:5}.toast.show{transform:none;opacity:1}
     @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.intro{grid-template-columns:1fr}.progress-card{width:100%;max-width:320px}}
-    @media(max-width:600px){.shell{padding:24px 14px 70px}.top{align-items:center}.brand{font-size:29px}.private{font-size:8px}.lock{margin-top:5vh;padding:28px 22px}.lock h1{font-size:32px}.access-row{flex-direction:column}.intro h1{font-size:41px}.grid{grid-template-columns:1fr}.toolbar{align-items:flex-start;flex-direction:column}.toolbar-actions{width:100%}.toolbar-actions button{flex:1}.card h2{min-height:0}.save-dock{bottom:10px;flex-direction:column;align-items:stretch}.save-dock .primary{width:100%}}
+    @media(max-width:600px){.shell{padding:24px 14px 70px}.top{align-items:center}.brand{font-size:29px}.private{font-size:8px}.intro h1{font-size:41px}.grid{grid-template-columns:1fr}.card h2{min-height:0}.save-dock{bottom:10px;flex-direction:column;align-items:stretch}.save-dock .primary{width:100%}}
   </style>
 </head>
 <body>
   <main class="shell">
-    <header class="top"><div class="brand">Nicoo<i>.</i><small>FUNITURE HUB</small></div><span class="private">OWNER PRICE CAPTURE</span></header>
-    <section class="workspace" id="workspace">
-      <div class="intro"><div><span class="private">MISSING PRICES ONLY</span><h1>Confirm the selling prices.</h1><p>Enter the current selling price for each item in Kenyan shillings. You can save part of the list and come back later — your progress will be kept.</p></div><div class="progress-card"><span>PRICE PROGRESS</span><strong id="progress-text">0 / 0</strong><div class="bar"><i id="progress-bar"></i></div></div></div>
-      <div class="toolbar"><p id="status-line">Loading furniture…</p><div class="toolbar-actions"><button class="secondary" id="copy-prices" type="button">Copy saved prices</button></div></div>
-      <div class="grid" id="price-grid"></div>
-      <div class="save-dock"><p><strong>Save as you go.</strong><br/>Only filled prices will be submitted.</p><button class="primary" id="save-prices" type="button">Save prices</button></div>
+    <header class="top">
+      <div class="brand">Nicoo<i>.</i><small>FUNITURE HUB</small></div>
+      <span class="private">OWNER PRICE CAPTURE</span>
+    </header>
+
+    <section class="workspace">
+      <div class="intro">
+        <div>
+          <span class="private">MISSING PRICES ONLY</span>
+          <h1>Confirm the selling prices.</h1>
+          <p>Enter the current selling price for each item in Kenyan shillings. When you’re done, tap the WhatsApp button and the full price list will be prepared automatically.</p>
+        </div>
+        <div class="progress-card">
+          <span>PRICE PROGRESS</span>
+          <strong id="progress-text">0 / {missing.length}</strong>
+          <div class="bar"><i id="progress-bar"></i></div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <p id="status-line">{missing.length} prices still missing.</p>
+      </div>
+
+      <div class="grid" id="price-grid">
+        {missing.map(p=>
+          <article class="card" data-card={p.id}>
+            <div class="photo-wrap">
+              <img src={`/images/${p.image}`} alt={p.name} loading="lazy"/>
+              <span class="item-id">ITEM {p.id}</span>
+              {(p.images?.length||1)>1 && <span class="views">{p.images?.length} PHOTOS</span>}
+            </div>
+            <div class="card-body">
+              <span class="category">{p.category}</span>
+              <h2>{p.name}</h2>
+              <label class="price-label" for={`price-${p.id}`}>SELLING PRICE</label>
+              <div class="price-box">
+                <span>KSh</span>
+                <input id={`price-${p.id}`} data-price={p.id} data-name={p.name} inputmode="numeric" autocomplete="off" placeholder="e.g. 25,500"/>
+              </div>
+              <p class="saved-note">Not entered yet</p>
+            </div>
+          </article>
+        )}
+      </div>
+
+      <div class="save-dock">
+        <p><strong>Done with the prices?</strong><br/>The list will be sent as a WhatsApp message.</p>
+        <button class="primary" id="send-prices" type="button">Send prices on WhatsApp</button>
+      </div>
     </section>
   </main>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script is:inline>
-    const api='/api/owner-pricing';
-    const grid=document.querySelector('#price-grid'),statusLine=document.querySelector('#status-line'),progressText=document.querySelector('#progress-text'),progressBar=document.querySelector('#progress-bar'),saveButton=document.querySelector('#save-prices'),copyButton=document.querySelector('#copy-prices'),toast=document.querySelector('#toast');
-    let products=[], saved=new Map(), toastTimer;
-    const money=n=>'KSh '+Number(n).toLocaleString('en-KE');
-    const notify=message=>{toast.textContent=message;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),2600)};
-    const headers=()=>({'Content-Type':'application/json'});
-    function progress(){const done=products.filter(p=>saved.has(p.id)).length,total=products.length;progressText.textContent=`${done} / ${total}`;progressBar.style.width=total?`${Math.round(done/total*100)}%`:'0%';statusLine.textContent=done===total&&total?'All prices are captured. You can still edit and save corrections.':`${total-done} price${total-done===1?'':'s'} still missing.`;}
-    function render(){grid.innerHTML=products.map(p=>{const entry=saved.get(p.id);return `<article class="card ${entry?'saved':''}" data-id="${p.id}"><div class="photo-wrap"><img src="/images/${p.image}" alt="${p.name}" loading="lazy"/><span class="item-id">ITEM ${p.id}</span>${p.views>1?`<span class="views">${p.views} PHOTOS</span>`:''}</div><div class="card-body"><span class="category">${p.category}</span><h2>${p.name}</h2><label class="price-label" for="price-${p.id}">SELLING PRICE</label><div class="price-box"><span>KSh</span><input id="price-${p.id}" data-price="${p.id}" inputmode="numeric" autocomplete="off" placeholder="e.g. 25,500" value="${entry?Number(entry.price).toLocaleString('en-KE'):''}"/></div><p class="saved-note">${entry?'✓ Saved '+money(entry.price):'Not saved yet'}</p></div></article>`}).join('');progress();}
-    async function load(){try{const response=await fetch(api,{headers:headers(),credentials:'same-origin'});const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not open price list.');products=data.products||[];saved=new Map((data.saved||[]).map(x=>[x.product_id,x]));render();}catch(error){statusLine.textContent=error.message;saveButton.disabled=true;copyButton.disabled=true;}}
-    grid.addEventListener('blur',e=>{const input=e.target.closest('[data-price]');if(!input)return;const number=Number(input.value.replace(/[^0-9]/g,''));input.value=number?number.toLocaleString('en-KE'):'';},{capture:true});
-    saveButton.addEventListener('click',async()=>{const prices=[...grid.querySelectorAll('[data-price]')].map(input=>({id:Number(input.dataset.price),price:Number(input.value.replace(/[^0-9]/g,''))})).filter(x=>x.price>0);if(!prices.length){notify('Enter at least one price first.');return;}saveButton.disabled=true;saveButton.textContent='Saving…';try{const response=await fetch(api,{method:'POST',headers:headers(),credentials:'same-origin',body:JSON.stringify({prices})});const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not save prices.');saved=new Map((data.saved||[]).map(x=>[x.product_id,x]));render();notify(data.message||'Prices saved.');}catch(error){notify(error.message)}finally{saveButton.disabled=false;saveButton.textContent='Save prices';}});
-    copyButton.addEventListener('click',async()=>{const lines=products.filter(p=>saved.has(p.id)).map(p=>`Item ${p.id} — ${p.name} — ${money(saved.get(p.id).price)}`);if(!lines.length){notify('No saved prices yet.');return;}try{await navigator.clipboard.writeText(lines.join('\n'));notify('Saved prices copied.');}catch{notify('Could not copy on this browser.');}});
-    load();
+
+  <script define:vars={{whatsapp}}>
+    const grid=document.querySelector('#price-grid');
+    const progressText=document.querySelector('#progress-text');
+    const progressBar=document.querySelector('#progress-bar');
+    const statusLine=document.querySelector('#status-line');
+    const sendButton=document.querySelector('#send-prices');
+    const toast=document.querySelector('#toast');
+    const inputs=[...document.querySelectorAll('[data-price]')];
+    let toastTimer;
+
+    const notify=message=>{
+      toast.textContent=message;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer=setTimeout(()=>toast.classList.remove('show'),2600);
+    };
+
+    function valueOf(input){
+      return Number(String(input.value||'').replace(/[^0-9]/g,''));
+    }
+
+    function update(){
+      const completed=inputs.filter(input=>valueOf(input)>0);
+      progressText.textContent=`${completed.length} / ${inputs.length}`;
+      progressBar.style.width=`${inputs.length?Math.round(completed.length/inputs.length*100):0}%`;
+      statusLine.textContent=completed.length===inputs.length
+        ? 'All prices entered — ready to send.'
+        : `${inputs.length-completed.length} price${inputs.length-completed.length===1?'':'s'} still missing.`;
+      inputs.forEach(input=>{
+        const card=input.closest('[data-card]');
+        const note=card.querySelector('.saved-note');
+        const filled=valueOf(input)>0;
+        card.classList.toggle('filled',filled);
+        note.textContent=filled?'✓ Price entered':'Not entered yet';
+      });
+    }
+
+    inputs.forEach(input=>{
+      input.addEventListener('input',update);
+      input.addEventListener('blur',()=>{
+        const value=valueOf(input);
+        input.value=value?value.toLocaleString('en-KE'):'';
+        update();
+      });
+    });
+
+    sendButton.addEventListener('click',()=>{
+      const rows=inputs.map(input=>({
+        id:Number(input.dataset.price),
+        name:input.dataset.name,
+        price:valueOf(input)
+      }));
+      const missingRows=rows.filter(row=>!row.price);
+      if(missingRows.length){
+        notify(`Please enter all ${inputs.length} prices first.`);
+        return;
+      }
+      const lines=[
+        'Hi, here are the confirmed Nicoo Funiture Hub prices:',
+        '',
+        ...rows.map(row=>`Item ${row.id} — ${row.name}: KSh ${row.price.toLocaleString('en-KE')}`),
+        '',
+        `Total items: ${rows.length}`
+      ];
+      const url=`${whatsapp}?text=${encodeURIComponent(lines.join('\n'))}`;
+      window.open(url,'_blank','noopener,noreferrer');
+    });
+
+    update();
   </script>
 </body>
 </html>
