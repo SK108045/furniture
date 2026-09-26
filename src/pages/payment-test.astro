@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import AccountLoader from '../components/AccountLoader.astro';
 ---
-<Layout title="KSh 1 payment test — Nicoo Furniture">
+<Layout title="KSh 1 payment test — Nicoo Funiture Hub">
 <section class="section payment-test-page"><p class="eyebrow">M-PESA · NO SIGN-IN NEEDED</p><h1>One bob.<br/><em>One simple test.</em></h1><p>Send a real KSh 1 M-Pesa prompt to your phone. This is a test payment only; no furniture or delivery is included.</p>
 <form id="guest-test-form" class="portal-form" style="margin-top:30px"><fieldset disabled><div class="field-grid"><label>First name<input name="firstName" autocomplete="given-name" required maxlength="60" placeholder="First name"/></label><label>Last name<input name="lastName" autocomplete="family-name" required maxlength="60" placeholder="Last name"/></label></div><label>M-Pesa number<input type="tel" name="phone" placeholder="0712 345 678" required maxlength="30" autocomplete="tel"/></label><label>Receipt email <small>(optional)</small><input type="email" name="email" maxlength="254" autocomplete="email" placeholder="you@example.com"/></label><label class="checkout-consent"><input type="checkbox" required/><span>I understand this sends a real KSh 1 payment request.</span></label><button type="submit" class="button dark">Send KSh 1 prompt →</button></fieldset></form>
 <div id="guest-test-loading" hidden><AccountLoader compact label="Sending your KSh 1 prompt…"/></div>
