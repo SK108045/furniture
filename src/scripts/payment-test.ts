@@ -17,7 +17,7 @@ function show(order:any){
  result.querySelector<HTMLElement>('[data-test-receipt-row]')!.hidden=!order.receipt;
  result.querySelector('[data-test-receipt]')!.textContent=order.receipt||'';
  document.querySelector<HTMLElement>('#guest-test-new')!.hidden=!['paid','failed'].includes(order.status);
- clearTimeout(timer);if(['requesting','pending','uncertain'].includes(order.status)&&polls<30)timer=setTimeout(()=>void check(),10000);
+ clearTimeout(timer);if(['requesting','pending','uncertain'].includes(order.status)&&polls<45)timer=setTimeout(()=>void check(),4000);
 }
 async function check(){if(!attempt?.orderId)return;refresh.disabled=true;polls++;try{show((await request(`?id=${encodeURIComponent(attempt.orderId)}`)).order);error.textContent='';}catch(e){error.textContent=(e as Error).message;}finally{refresh.disabled=false;}}
 form.addEventListener('submit',async e=>{
