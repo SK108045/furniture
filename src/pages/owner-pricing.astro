@@ -1,6 +1,5 @@
 ---
 import {products} from '../data/products';
-import {whatsapp} from '../data/contact';
 export const prerender=false;
 const missing=products.filter(p=>p.quoteOnly&&!p.testOnly);
 ---
@@ -88,7 +87,7 @@ const missing=products.filter(p=>p.quoteOnly&&!p.testOnly);
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script define:vars={{whatsapp}}>
+  <script>
     const grid=document.querySelector('#price-grid');
     const progressText=document.querySelector('#progress-text');
     const progressBar=document.querySelector('#progress-bar');
@@ -152,7 +151,7 @@ const missing=products.filter(p=>p.quoteOnly&&!p.testOnly);
         '',
         `Total items: ${rows.length}`
       ];
-      const url=`${whatsapp}?text=${encodeURIComponent(lines.join('\n'))}`;
+      const url=`https://wa.me/254713574168?text=${encodeURIComponent(lines.join('\n'))}`;
       window.open(url,'_blank','noopener,noreferrer');
     });
 
