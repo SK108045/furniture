@@ -64,7 +64,7 @@ ${lines.join('\n')}
 TOTAL PAID: ${money(order.total)}
 
 Nicoo Furniture · Donholm, Nairobi
-Questions? +254114551129
+Questions? +254786387981
 This is a payment receipt, not an eTIMS tax invoice.`;
 
   const html=`<!doctype html><html><body style="margin:0;background:#f2efe7;font-family:Arial,Helvetica,sans-serif;color:#26352a">
@@ -116,7 +116,7 @@ This is a payment receipt, not an eTIMS tax invoice.`;
 
         <div style="margin-top:28px;background:#26352a;border-radius:12px;padding:18px 20px;color:#fff">
           <div style="font-size:15px;font-weight:700">Need anything before delivery or pickup?</div>
-          <div style="margin-top:7px;font-size:12px;line-height:1.7;color:#dce4dc">Contact Nicoo Furniture on <a href="tel:+254114551129" style="color:#fff">+254 114 551 129</a>. Keep your order reference handy and we’ll sort you out.</div>
+          <div style="margin-top:7px;font-size:12px;line-height:1.7;color:#dce4dc">Contact Nicoo Furniture on <a href="tel:+254786387981" style="color:#fff">+254 786 387 981</a>. Keep your order reference handy and we’ll sort you out.</div>
         </div>
         <div style="margin-top:18px;text-align:center;font-size:10px;line-height:1.6;color:#8a9087">Nicoo Furniture · Donholm, Nairobi<br/>This is a payment receipt, not an eTIMS tax invoice.</div>
       </td></tr>
