@@ -3,13 +3,126 @@ import {env} from './config';
 import {money} from '../data/products';
 type Job={order_id:string;snapshot:any;lease:string;attempts:number;message:Record<string,unknown>|null};
 const escape=(value:unknown)=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
+function receiptOrigin(){
+  const vercelHost=process.env.VERCEL_PROJECT_PRODUCTION_URL||process.env.VERCEL_URL||'';
+  if(vercelHost)return `https://${vercelHost.replace(/^https?:\/\//,'').replace(/\/$/,'')}`;
+  const configured=env('APP_ORIGIN').trim().replace(/\/$/,'');
+  return /^https:\/\//i.test(configured)?configured:'';
+}
+function receiptImage(image:unknown){
+  const name=String(image||'').replace(/^\/+/, '');
+  if(!name||/\.svg(?:\?|$)/i.test(name))return '';
+  const origin=receiptOrigin();if(!origin)return '';
+  try{return new URL(`/images/${name}`,origin).toString();}catch{return '';}
+}
+function receiptDate(order:any){
+  const raw=order.updated_at||order.updatedAt||order.created_at||order.createdAt;
+  if(!raw)return '';
+  try{return new Date(raw).toLocaleString('en-KE',{timeZone:'Africa/Nairobi',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}catch{return '';}
+}
 export function receiptMessage(order:any,from:string){
-  const details=order.details,customer=details.customer;
-  const lines=details.items.map((i:any)=>`${i.name} × ${i.quantity} — ${money(i.price*i.quantity)}`);
-  const delivery=customer.delivery==='pickup'?'Pickup in Donholm, Nairobi.':`Delivery address: ${customer.address}. Delivery fees are arranged separately.`;
-  const text=`Nicoo Furniture — Payment receipt\n\nThank you, ${customer.firstName}. Your M-Pesa payment is confirmed.\nOrder: ${order.id}\nM-Pesa receipt: ${order.receipt}\n\n${lines.join('\n')}\n\nTotal paid: ${money(order.total)}\n${delivery}\n\nContact Nicoo: +254114551129\nThis is a payment receipt, not an eTIMS tax invoice.`;
-  const html=`<!doctype html><html><body style="margin:0;background:#f3f1e9;font-family:Arial,sans-serif;color:#26352a"><div style="max-width:600px;margin:32px auto;background:#fff;padding:36px;border-top:5px solid #b8532d"><h1 style="font-size:32px">nicoo<span style="color:#b8532d">.</span></h1><p style="letter-spacing:2px;font-size:11px">PAYMENT RECEIPT</p><h2>Asante, ${escape(customer.firstName)}.</h2><p>Your M-Pesa payment is confirmed.</p><p><strong>Order:</strong> ${escape(order.id)}<br/><strong>M-Pesa receipt:</strong> ${escape(order.receipt)}</p><table style="width:100%;border-collapse:collapse">${details.items.map((i:any)=>`<tr><td style="padding:14px 0;border-bottom:1px solid #ddd">${escape(i.name)} × ${i.quantity}</td><td style="text-align:right;border-bottom:1px solid #ddd">${money(i.price*i.quantity)}</td></tr>`).join('')}</table><h2>Total paid: ${money(order.total)}</h2><p>${escape(delivery)}</p><p>Questions? Contact Nicoo on +254114551129.</p><p style="font-size:11px;color:#73796e">This is a payment receipt, not an eTIMS tax invoice.</p></div></body></html>`;
-  return {from,to:[details.email],subject:`Nicoo payment receipt · ${order.id}`,html,text};
+  const details=order.details||{},customer=details.customer||{};
+  const customerName=[customer.firstName,customer.lastName].filter(Boolean).join(' ')||'Customer';
+  const contact=customer.contactPhone||customer.phone||details.paymentPhone||'';
+  const delivery=customer.delivery==='pickup'?'Pickup from Nicoo Furniture, Donholm, Nairobi.':`Delivery to ${customer.address||'the address provided at checkout'}. Delivery charges are arranged separately with the shop.`;
+  const paidAt=receiptDate(order);
+  const lines=(details.items||[]).map((i:any)=>`${i.name} × ${i.quantity} — ${money(i.price*i.quantity)}`);
+  const itemRows=(details.items||[]).map((i:any)=>{
+    const image=receiptImage(i.image);
+    return `<tr>
+      <td style="padding:18px 0;border-bottom:1px solid #e7e2d9;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+          <td width="82" valign="top">${image?`<img src="${escape(image)}" alt="${escape(i.name)}" width="68" height="68" style="display:block;width:68px;height:68px;object-fit:cover;border-radius:10px;border:1px solid #e6e0d6;background:#f5f2eb"/>`:''}</td>
+          <td valign="top" style="padding:${image?'2px 12px':'2px 0'} 0 0;">
+            <div style="font-size:15px;font-weight:700;color:#26352a;line-height:1.35">${escape(i.name)}</div>
+            <div style="font-size:12px;color:#72786d;margin-top:6px">Qty ${i.quantity} · ${money(i.price)} each</div>
+          </td>
+          <td valign="top" align="right" style="padding-top:2px;font-size:14px;font-weight:700;color:#26352a;white-space:nowrap">${money(i.price*i.quantity)}</td>
+        </tr></table>
+      </td>
+    </tr>`;
+  }).join('');
+  const instructions=customer.note?`<div style="margin-top:6px"><strong>Instructions:</strong> ${escape(customer.note)}</div>`:'';
+  const text=`Nicoo Furniture — Payment Receipt
+
+Asante, ${customerName}. Your M-Pesa payment is confirmed.
+
+Order reference: ${order.id}
+M-Pesa receipt: ${order.receipt}
+${paidAt?`Paid: ${paidAt}\n`:''}Payment method: M-Pesa
+Payment status: Confirmed
+
+CUSTOMER
+Name: ${customerName}
+Email: ${details.email||''}
+Phone: ${contact}
+Delivery: ${delivery}
+${customer.note?`Instructions: ${customer.note}\n`:''}
+ITEMS
+${lines.join('\n')}
+
+TOTAL PAID: ${money(order.total)}
+
+Nicoo Furniture · Donholm, Nairobi
+Questions? +254114551129
+This is a payment receipt, not an eTIMS tax invoice.`;
+
+  const html=`<!doctype html><html><body style="margin:0;background:#f2efe7;font-family:Arial,Helvetica,sans-serif;color:#26352a">
+  <div style="padding:28px 12px">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:680px;margin:0 auto;background:#fff;border-collapse:separate;border-spacing:0;border-radius:16px;overflow:hidden;border:1px solid #e5dfd5">
+      <tr><td style="height:6px;background:#b8532d;font-size:0;line-height:0">&nbsp;</td></tr>
+      <tr><td style="padding:30px 34px 18px">
+        <div style="font-size:30px;font-weight:800;letter-spacing:-1px;color:#21352a">Nicoo Furniture<span style="color:#b8532d">.</span></div>
+        <div style="margin-top:7px;font-size:10px;letter-spacing:2.1px;color:#7e8579">DONHOLM, NAIROBI · PAYMENT RECEIPT</div>
+      </td></tr>
+      <tr><td style="padding:8px 34px 30px">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+          <td valign="top">
+            <div style="font-size:25px;font-weight:700;line-height:1.2">Asante, ${escape(customerName)}.</div>
+            <div style="margin-top:9px;font-size:14px;color:#59645a;line-height:1.6">Your M-Pesa payment has been confirmed. Here’s your Nicoo receipt.</div>
+          </td>
+          <td align="right" valign="top" style="padding-left:18px">
+            <span style="display:inline-block;background:#e9f4e7;color:#315a36;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:700;white-space:nowrap">✓ PAID</span>
+          </td>
+        </tr></table>
+
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;background:#f8f6f0;border-radius:12px">
+          <tr><td style="padding:17px 18px">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr><td style="font-size:11px;color:#7c8278;padding:4px 0">ORDER REFERENCE</td><td align="right" style="font-size:13px;font-weight:700;padding:4px 0">${escape(order.id)}</td></tr>
+              <tr><td style="font-size:11px;color:#7c8278;padding:4px 0">M-PESA RECEIPT</td><td align="right" style="font-size:13px;font-weight:700;padding:4px 0">${escape(order.receipt)}</td></tr>
+              ${paidAt?`<tr><td style="font-size:11px;color:#7c8278;padding:4px 0">PAID</td><td align="right" style="font-size:13px;font-weight:700;padding:4px 0">${escape(paidAt)}</td></tr>`:''}
+              <tr><td style="font-size:11px;color:#7c8278;padding:4px 0">METHOD</td><td align="right" style="font-size:13px;font-weight:700;padding:4px 0">M-Pesa</td></tr>
+            </table>
+          </td></tr>
+        </table>
+
+        <div style="margin-top:28px;font-size:11px;letter-spacing:1.7px;color:#7d8478">CUSTOMER DETAILS</div>
+        <div style="margin-top:10px;border:1px solid #e8e2d8;border-radius:12px;padding:17px 18px;font-size:13px;line-height:1.75;color:#4d594f">
+          <div><strong style="color:#26352a">Name:</strong> ${escape(customerName)}</div>
+          <div><strong style="color:#26352a">Email:</strong> ${escape(details.email||'')}</div>
+          <div><strong style="color:#26352a">Phone:</strong> ${escape(contact)}</div>
+          <div><strong style="color:#26352a">Fulfilment:</strong> ${escape(delivery)}</div>
+          ${instructions}
+        </div>
+
+        <div style="margin-top:30px;font-size:11px;letter-spacing:1.7px;color:#7d8478">YOUR ITEMS</div>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">${itemRows}</table>
+
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:20px;border-top:2px solid #26352a">
+          <tr><td style="padding:18px 0 5px;font-size:16px;font-weight:700">Total paid</td><td align="right" style="padding:18px 0 5px;font-size:24px;font-weight:800">${money(order.total)}</td></tr>
+          <tr><td colspan="2" style="padding-top:4px;font-size:11px;color:#777f73">Furniture subtotal only. Any delivery fee is arranged separately with Nicoo Furniture.</td></tr>
+        </table>
+
+        <div style="margin-top:28px;background:#26352a;border-radius:12px;padding:18px 20px;color:#fff">
+          <div style="font-size:15px;font-weight:700">Need anything before delivery or pickup?</div>
+          <div style="margin-top:7px;font-size:12px;line-height:1.7;color:#dce4dc">Contact Nicoo Furniture on <a href="tel:+254114551129" style="color:#fff">+254 114 551 129</a>. Keep your order reference handy and we’ll sort you out.</div>
+        </div>
+        <div style="margin-top:18px;text-align:center;font-size:10px;line-height:1.6;color:#8a9087">Nicoo Furniture · Donholm, Nairobi<br/>This is a payment receipt, not an eTIMS tax invoice.</div>
+      </td></tr>
+    </table>
+  </div></body></html>`;
+  return {from,to:[details.email],subject:`Nicoo Furniture receipt · ${order.id}`,html,text};
 }
 async function sendWithResend(order:any){
   if(order.status!=='paid'||!order.receipt||!order.details?.email)throw new Error('invalid_receipt_snapshot');
@@ -36,7 +149,7 @@ async function sendWithResend(order:any){
 }
 
 async function directReceipt(orderId:string,userId:string|null=null){
-  const filters:Record<string,string>={id:`eq.${orderId}`,status:'eq.paid',select:'id,user_id,status,total,details,receipt',limit:'1'};
+  const filters:Record<string,string>={id:`eq.${orderId}`,status:'eq.paid',select:'id,user_id,status,total,details,receipt,created_at,updated_at',limit:'1'};
   if(userId)filters.user_id=`eq.${userId}`;
   const rows=await database<any[]>(`nicoo_orders?${query(filters)}`);
   const order=rows[0];
