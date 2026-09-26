@@ -56,7 +56,7 @@ export const POST:APIRoute=async({request,cookies,url})=>{
     const key=request.headers.get('Idempotency-Key')||'';if(!/^[a-f0-9-]{36}$/i.test(key))throw new HttpError(400,'A valid attempt ID is required.');
     const input=await body(request);const email=typeof input.email==='string'?input.email.trim():'';
     if(email&&(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.length>254))throw new HttpError(400,'Enter a valid receipt email or leave it empty.');
-    const priced=orderInput({items:[{id:9001,quantity:1}],customer:{firstName:'Payment',lastName:'Test',phone:input.phone,delivery:'pickup',note:`Test session ${token}`}});
+    const priced=orderInput({items:[{id:9001,quantity:1}],customer:{firstName:input.firstName,lastName:input.lastName,phone:input.phone,delivery:'pickup',note:`Test session ${token}`}});
     const {row,created}=await createOrder(owner,key,priced,email);
     if(row.details.customer.note!==`Test session ${token}`)throw new HttpError(409,'Start a new test from this browser.');
     if(created){const result=await requestStk({id:row.id,total:1,phone:priced.customer.phone});await updatePayment(row.id,result.status,result.providerId,result.note);}
