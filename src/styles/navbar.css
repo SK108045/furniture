@@ -8,7 +8,7 @@
   top: 0;
   z-index: 100;
   width: 100%;
-  height: 82px !important;
+  height: 94px !important;
   margin: 0 !important;
   background: rgba(250, 249, 246, 0.96);
   backdrop-filter: blur(16px);
@@ -51,11 +51,11 @@
 }
 
 .brand-text {
-  font-size: 34px !important;
+  font-size: 42px !important;
   font-weight: 800 !important;
-  letter-spacing: -2px !important;
+  letter-spacing: -2.5px !important;
   color: #242924 !important;
-  line-height: 0.88 !important;
+  line-height: 0.9 !important;
 }
 
 .brand-dot {
@@ -63,11 +63,11 @@
 }
 
 .brand-sub {
-  font-size: 8.5px !important;
-  letter-spacing: 3.2px !important;
+  font-size: 9.5px !important;
+  letter-spacing: 2.7px !important;
   font-weight: 600 !important;
   color: #71776c !important;
-  margin-top: 5px !important;
+  margin-top: 7px !important;
   margin-left: 2px !important;
 }
 
@@ -290,12 +290,12 @@
   }
 
   .brand-text {
-    font-size: 27px !important;
+    font-size: 30px !important;
   }
 
   .brand-sub {
-    font-size: 7.5px !important;
-    letter-spacing: 2.6px !important;
+    font-size: 7px !important;
+    letter-spacing: 1.9px !important;
   }
 
   .header-center {
