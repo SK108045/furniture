@@ -14,6 +14,7 @@ const bundled: Record<string, string | undefined> = {
   RESEND_API_KEY: import.meta.env?.RESEND_API_KEY,
   RECEIPT_FROM: import.meta.env?.RECEIPT_FROM,
   CRON_SECRET: import.meta.env?.CRON_SECRET,
+  OWNER_PRICING_CODE: import.meta.env?.OWNER_PRICING_CODE,
   APP_ORIGIN: import.meta.env?.APP_ORIGIN,
 };
 export function env(name: string): string {
