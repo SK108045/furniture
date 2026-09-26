@@ -9,6 +9,7 @@ import '../styles/navbar.css';
 import '../styles/catalog-update.css';
 import {phone,phoneInternational,whatsapp} from '../data/contact';
 import Icon from '../components/Icon.astro';
+import WhatsApp from '../components/WhatsApp.astro';
 import AIChatWidget from '../components/AIChatWidget.astro';
 import {env} from '../server/config';
 const {title='Nicoo Funiture Hub — Make room for better.'}=Astro.props;
@@ -62,7 +63,57 @@ const path=Astro.url.pathname;
   </nav>
 </header>
 <main id="main-content"><slot/></main>
-<footer id="visit"><div class="footer-top"><div><p class="eyebrow">KARIBU NICOO · DONHOLM, NAIROBI</p><h2>Good spaces start<br/>with a conversation<span>.</span></h2></div><div class="visit-info"><Icon name="pin" size={28}/><h3>Find us in Donholm.</h3><p>Nairobi, Kenya</p><a href="/visit">Plan your visit & talk to us ↗</a></div></div><div class="footer-links"><a href="/collection">Shop the collection</a><a href="/#offers">Furniture offers</a><a href="/about">Our story</a><a href="/visit">Visit Donholm</a><a href={whatsapp} target="_blank" rel="noopener noreferrer">WhatsApp {phone}</a><a href={`tel:${phoneInternational}`}>Call the shop</a></div><div class="footer-bottom"><a class="brand" href="/"><span class="brand-text">Nicoo<span class="brand-dot">.</span></span><small>FUNITURE HUB</small></a><p>Furniture for the way you work.</p><span>© {new Date().getFullYear()} Nicoo Funiture Hub</span></div><p class="demo-note">Furniture prices exclude delivery. Confirm dimensions, finishes and availability with the shop. Lifestyle images are AI-generated inspiration.</p></footer>
+<footer id="visit" class="site-footer">
+  <div class="footer-hero">
+    <div class="footer-hero-copy">
+      <p class="footer-kicker">DONHOLM, NAIROBI · KARIBU</p>
+      <h2>Make room for<br/><em>something better.</em></h2>
+      <p class="footer-intro">Office chairs, desks and workspaces for the way you live and work. See something you like? Talk to us directly.</p>
+    </div>
+    <a class="footer-whatsapp" href={whatsapp} target="_blank" rel="noopener noreferrer">
+      <span class="footer-whatsapp-icon"><WhatsApp size={26}/></span>
+      <span><small>CHAT WITH THE SHOP</small><strong>{phone}</strong></span>
+      <span class="footer-cta-arrow" aria-hidden="true">↗</span>
+    </a>
+  </div>
+
+  <div class="footer-main">
+    <div class="footer-brand-block">
+      <a class="footer-wordmark" href="/" aria-label="Nicoo Funiture Hub home">
+        <span>Nicoo<span class="brand-dot">.</span></span>
+        <small>FUNITURE HUB</small>
+      </a>
+      <p>Good furniture. Real possibilities.<br/>Right here in Donholm.</p>
+      <div class="footer-location"><Icon name="pin" size={17}/><span>Donholm, Nairobi, Kenya</span></div>
+    </div>
+
+    <nav class="footer-column" aria-label="Shop links">
+      <span class="footer-column-title">EXPLORE</span>
+      <a href="/collection">Shop furniture <span>↗</span></a>
+      <a href="/#offers">Fresh deals <span>↗</span></a>
+      <a href="/about">Our story <span>↗</span></a>
+      <a href="/visit">Visit us <span>↗</span></a>
+    </nav>
+
+    <div class="footer-column">
+      <span class="footer-column-title">TALK TO US</span>
+      <a href={whatsapp} target="_blank" rel="noopener noreferrer">WhatsApp <span>↗</span></a>
+      <a href={`tel:${phoneInternational}`}>Call {phone} <span>↗</span></a>
+      <a href="/visit#enquiry">Ask about delivery <span>↗</span></a>
+      <a href="/collection">Find your next piece <span>↗</span></a>
+    </div>
+  </div>
+
+  <div class="footer-strip" aria-label="What we sell">
+    <span>OFFICE CHAIRS</span><i>✳</i><span>DESKS</span><i>✳</i><span>WORKSTATIONS</span><i>✳</i><span>RECEPTION DESKS</span><i>✳</i><span>BETTER SPACES</span>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© {new Date().getFullYear()} Nicoo Funiture Hub</span>
+    <p>Furniture prices exclude delivery. Confirm dimensions, finishes and availability with the shop.</p>
+    <a href="#main-content">Back to top ↑</a>
+  </div>
+</footer>
 <dialog id="cart-dialog" class="cart-dialog" aria-labelledby="cart-title"><div class="drawer-top"><h2 id="cart-title">Your bag <span data-cart-count>0</span></h2><button class="icon-button" data-close="cart-dialog" aria-label="Close shopping bag"><Icon name="close"/></button></div><div id="cart-items"></div><div id="cart-summary"></div></dialog>
 <dialog id="product-dialog" class="product-dialog" aria-labelledby="product-title"><button class="icon-button modal-close" data-close="product-dialog" aria-label="Close product details"><Icon name="close"/></button><div id="product-details"></div></dialog>
 <AIChatWidget />
