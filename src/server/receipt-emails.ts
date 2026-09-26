@@ -32,7 +32,7 @@ export function receiptMessage(order:any,from:string){
     return `<tr>
       <td style="padding:18px 0;border-bottom:1px solid #e7e2d9;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-          <td width="82" valign="top">${image?`<img src="${escape(image)}" alt="${escape(i.name)}" width="68" height="68" style="display:block;width:68px;height:68px;object-fit:cover;border-radius:10px;border:1px solid #e6e0d6;background:#f5f2eb"/>`:''}</td>
+          ${image?`<td width="82" valign="top"><img src="${escape(image)}" alt="${escape(i.name)}" width="68" height="68" style="display:block;width:68px;height:68px;object-fit:cover;border-radius:10px;border:1px solid #e6e0d6;background:#f5f2eb"/></td>`:''}
           <td valign="top" style="padding:${image?'2px 12px':'2px 0'} 0 0;">
             <div style="font-size:15px;font-weight:700;color:#26352a;line-height:1.35">${escape(i.name)}</div>
             <div style="font-size:12px;color:#72786d;margin-top:6px">Qty ${i.quantity} · ${money(i.price)} each</div>
