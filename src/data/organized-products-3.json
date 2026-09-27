@@ -46,15 +46,15 @@
     "id": 305,
     "name": "Grey Wood Desk & Mesh Chair Set",
     "category": "Workspace sets",
-    "price": 0,
+    "price": 10999,
     "image": "catalog/grey_office_desk_with_mesh_chair_set_front_view.webp",
     "images": [
       "catalog/grey_office_desk_with_mesh_chair_set_front_view.webp",
       "catalog/grey_office_desk_with_mesh_chair_set_side_view.webp"
     ],
     "tag": "A place for everything",
-    "description": "A grey wood-look desk with three locking drawers and a black mesh swivel chair, shown from two angles. Price coming soon—contact Nicoo for a quote. The desk and chair form the set; the laptop and styling accessories are not included.",
-    "quoteOnly": true,
+    "description": "A grey wood-look desk with three locking drawers and a black mesh swivel chair, shown from two angles. The desk and chair form the set; the laptop and styling accessories are not included.",
+    "quoteOnly": false,
     "testOnly": false
   },
   {
