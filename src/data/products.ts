@@ -1,4 +1,6 @@
 import organized from './organized-products.json';
+import organized2 from './organized-products-2.json';
+import organized3 from './organized-products-3.json';
 const catalogue = [
  {id:1,name:'Ergo Executive Chair',category:'Seating',price:18499,image:'1.jpg',tag:'Everyday comfort',description:'A high-back office chair with a padded headrest, upholstered seat and polished base.'},
  {id:2,name:'Studio Desk',category:'Desks',price:16500,image:'2.jpg',tag:'A fresh perspective',description:'A clean white desktop with contrasting legs for a light, uncluttered workspace. Desk only; chair shown for styling.'},
@@ -13,7 +15,7 @@ const catalogue = [
 ];
 // Photo prices are the selling prices. Reference prices sit above them;
 // never apply another discount to the amounts supplied by the shop.
-const combined = [...catalogue.map(p=>({...p,images:[p.image],quoteOnly:false,testOnly:false})),...organized,
+const combined = [...catalogue.map(p=>({...p,images:[p.image],quoteOnly:false,testOnly:false})),...organized,...organized2,...organized3,
   {id:9001,name:'M-Pesa checkout test',category:'Payment test',price:1,image:'mpesa.svg',images:['mpesa.svg'],tag:'Test transaction',description:'A real KSh 1 payment for checking the checkout and receipt flow. No furniture or delivery is included.',quoteOnly:false,testOnly:true}];
 export const products = combined.map(p => {
   const originalPrice = p.quoteOnly || p.testOnly ? p.price : Math.ceil(p.price / 0.9 / 500) * 500;

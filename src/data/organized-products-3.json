@@ -1,0 +1,74 @@
+[
+  {
+    "id": 301,
+    "name": "Blue Padded Waiting Bench (3-Seater)",
+    "category": "Seating",
+    "price": 17500,
+    "image": "catalog/3_link_padded_waiting_bench_blue.webp",
+    "images": [
+      "catalog/3_link_padded_waiting_bench_blue.webp"
+    ],
+    "tag": "A comfortable welcome",
+    "description": "A three-seat waiting bench with blue padded seats and backs, chrome armrests and a beam frame. For reception areas, clinics and shared waiting spaces.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 302,
+    "name": "Black Metal Waiting Bench (3-Seater)",
+    "category": "Seating",
+    "price": 13499,
+    "image": "catalog/3_seater_perforated_metal_waiting_bench_black.webp",
+    "images": [
+      "catalog/3_seater_perforated_metal_waiting_bench_black.webp",
+      "catalog/hospital_clinic_metal_waiting_benches_blue.webp"
+    ],
+    "tag": "Room to wait",
+    "description": "A three-seat perforated metal waiting bench with a chrome frame. The price is for the black 3-seater bench. The gallery also shows blue benches in an installation setting; contact Nicoo for alternative colours and seating configurations.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 304,
+    "name": "Cherry Wood Desk & Mesh Chair Set",
+    "category": "Workspace sets",
+    "price": 10999,
+    "image": "catalog/cherry_wood_office_desk_with_mesh_chair_set.webp",
+    "images": [
+      "catalog/cherry_wood_office_desk_with_mesh_chair_set.webp"
+    ],
+    "tag": "Warm up your workspace",
+    "description": "A cherry wood-look office desk with three locking drawers, paired with a mesh swivel chair. The desk and chair are included; the laptop and styling accessories are not included.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 305,
+    "name": "Grey Wood Desk & Mesh Chair Set",
+    "category": "Workspace sets",
+    "price": 0,
+    "image": "catalog/grey_office_desk_with_mesh_chair_set_front_view.webp",
+    "images": [
+      "catalog/grey_office_desk_with_mesh_chair_set_front_view.webp",
+      "catalog/grey_office_desk_with_mesh_chair_set_side_view.webp"
+    ],
+    "tag": "A place for everything",
+    "description": "A grey wood-look desk with three locking drawers and a black mesh swivel chair, shown from two angles. Price coming soon—contact Nicoo for a quote. The desk and chair form the set; the laptop and styling accessories are not included.",
+    "quoteOnly": true,
+    "testOnly": false
+  },
+  {
+    "id": 307,
+    "name": "Walnut Desk & Headrest Chair Set",
+    "category": "Workspace sets",
+    "price": 12999,
+    "image": "catalog/walnut_office_desk_with_high_back_mesh_chair_set.webp",
+    "images": [
+      "catalog/walnut_office_desk_with_high_back_mesh_chair_set.webp"
+    ],
+    "tag": "Your workday, together",
+    "description": "A walnut wood-look desk with three drawers, paired with a high-back mesh chair with a headrest. The desk and chair are included; the laptop and styling accessories are not included.",
+    "quoteOnly": false,
+    "testOnly": false
+  }
+]

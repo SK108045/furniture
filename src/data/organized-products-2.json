@@ -1,0 +1,100 @@
+[
+  {
+    "id": 201,
+    "name": "Mesh High-Back Chair with Headrest",
+    "category": "Seating",
+    "price": 14499,
+    "image": "catalog/ergonomic_mesh_high_back_office_chair.webp",
+    "images": [
+      "catalog/ergonomic_mesh_high_back_office_chair.webp"
+    ],
+    "tag": "Support for your workday",
+    "description": "A black mesh office chair with a headrest, lumbar support and a chrome wheeled base.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 202,
+    "name": "Red & Black Gaming Chair",
+    "category": "Seating",
+    "price": 22000,
+    "image": "catalog/gaming_racing_chair_red_black.webp",
+    "images": [
+      "catalog/gaming_racing_chair_red_black.webp"
+    ],
+    "tag": "A bolder seat",
+    "description": "A red and black racing-style chair with a tall back, armrests and lumbar support.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 203,
+    "name": "Blue & Black Gaming Chair",
+    "category": "Seating",
+    "price": 17500,
+    "image": "catalog/gaming_racing_chair_blue_black.webp",
+    "images": [
+      "catalog/gaming_racing_chair_blue_black.webp"
+    ],
+    "tag": "Settle into your setup",
+    "description": "A blue and black gaming chair with a tall back, headrest pillow and lumbar cushion.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 204,
+    "name": "Yellow Stacking Chair",
+    "category": "Seating",
+    "price": 3500,
+    "image": "catalog/yellow_stacking_training_chairs.webp",
+    "images": [
+      "catalog/yellow_stacking_training_chairs.webp"
+    ],
+    "tag": "A little colour, a lot of uses",
+    "description": "A yellow seat and back on a black steel frame. Stackable seating for training rooms, classrooms or dining spaces.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 205,
+    "name": "L-Shaped Desk & Mesh Chair Set",
+    "category": "Workspace sets",
+    "price": 14500,
+    "image": "catalog/l_shaped_office_desk_with_mesh_chair_set.webp",
+    "images": [
+      "catalog/l_shaped_office_desk_with_mesh_chair_set.webp"
+    ],
+    "tag": "Your corner, complete",
+    "description": "An L-shaped wood-look office desk paired with a mesh office chair. The desk and chair are included in the set price; styling accessories are not included.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 206,
+    "name": "Z-Frame Desk & Mesh Chair Set",
+    "category": "Workspace sets",
+    "price": 15000,
+    "image": "catalog/z_frame_computer_desk_with_mesh_chair_set.webp",
+    "images": [
+      "catalog/z_frame_computer_desk_with_mesh_chair_set.webp"
+    ],
+    "tag": "A workspace that fits",
+    "description": "A wood-top desk with a white geometric Z-frame, paired with a mesh office chair. The desk and chair are included in the set price; other furniture in the photo is not included.",
+    "quoteOnly": false,
+    "testOnly": false
+  },
+  {
+    "id": 207,
+    "name": "Z-Frame Desk & Leather Chair Set",
+    "category": "Workspace sets",
+    "price": 18500,
+    "image": "catalog/z_frame_computer_desk_with_leather_chair_set.webp",
+    "images": [
+      "catalog/z_frame_computer_desk_with_leather_chair_set.webp"
+    ],
+    "tag": "A little more comfort",
+    "description": "A wood-top desk with a white geometric Z-frame, paired with a high-back leather executive chair. The desk and chair are included in the set price; other furniture in the photo is not included.",
+    "quoteOnly": false,
+    "testOnly": false
+  }
+]

@@ -4,6 +4,36 @@ The shop retains the original ten product IDs and adds 30 products from `Furnitu
 
 Seven categories cover seating, desks, standing desks, workspace sets, conference tables, reception desks and accessories. CSV amounts are the selling prices. Fourteen products with no indicated price use “Ask for price” and a product-specific WhatsApp enquiry; the server rejects these items at checkout. The generated catalogue is `src/data/organized-products.json`. Prices for those products can be added there by setting `price` and changing `quoteOnly` to false.
 
+## Second photo batch — 27 September
+
+`Furniture_2_Organized/furniture_2_catalog.csv` adds seven listings, with stable IDs 201–207, in `src/data/organized-products-2.json`. The shared product catalogue imports this file, so the collection, product dialogs, shopping bag and server-side checkout use the same prices. There are now 47 furniture listings. Existing product IDs and prices are unchanged.
+
+| ID | Product | Category | Selling price (KSh) |
+| --- | --- | --- | ---: |
+| 201 | Mesh High-Back Chair with Headrest | Seating | 14,499 |
+| 202 | Red & Black Gaming Chair | Seating | 22,000 |
+| 203 | Blue & Black Gaming Chair | Seating | 17,500 |
+| 204 | Yellow Stacking Chair | Seating | 3,500 |
+| 205 | L-Shaped Desk & Mesh Chair Set | Workspace sets | 14,500 |
+| 206 | Z-Frame Desk & Mesh Chair Set | Workspace sets | 15,000 |
+| 207 | Z-Frame Desk & Leather Chair Set | Workspace sets | 18,500 |
+
+All seven photos are distinct listings. The two Z-frame bundles include different chairs and have different CSV prices; neither is merged with the existing desk-only listing. Original photos remain untouched; the shop uses WebP copies in `public/images/catalog`, capped at 1200px on the longest side (about 852 KB combined). CSV prices remain the selling prices, with reference prices calculated by the existing catalogue rule. No database migration is needed.
+
+## Third photo batch — 27 September
+
+`Furniture_3_Organized/furniture_3_catalog.csv` adds five listings in `src/data/organized-products-3.json`, bringing the shop to 52 furniture listings. Seven optimized WebP images support these listings; the grey desk's two views share a gallery. The CSV groups the perforated metal benches: the black 3-seater is the priced product, and its description identifies the blue installation photo as a reference for alternative colours and configurations.
+
+| ID | Product | Category | Selling price (KSh) |
+| --- | --- | --- | ---: |
+| 301 | Blue Padded Waiting Bench (3-Seater) | Seating | 17,500 |
+| 302 | Black Metal Waiting Bench (3-Seater) | Seating | 13,499 |
+| 304 | Cherry Wood Desk & Mesh Chair Set | Workspace sets | 10,999 |
+| 305 | Grey Wood Desk & Mesh Chair Set | Workspace sets | Ask for price |
+| 307 | Walnut Desk & Headrest Chair Set | Workspace sets | 12,999 |
+
+The grey desk is marked “Coming Soon” in the CSV without a price, so it uses the existing quote-only enquiry flow and cannot be purchased for zero. The repeated Z-frame leather-chair set is already item 207 at KSh 18,500 and is not duplicated. No existing IDs or selling prices change, and no database migration is required.
+
 ## KSh 1 checkout check
 
 Visit `/payment-test`. Its standalone form does not require sign-in or a shopping bag. Enter a phone number and optionally a receipt email; the server fixes the amount at KSh 1. A signed HttpOnly browser cookie protects test status access. Test attempts share a database-backed limit of five per ten minutes. This sends a real M-Pesa request; confirm the KSh 1 amount on your phone. No furniture is included. Existing bags containing only the old test item redirect here from checkout. Normal furniture purchases still require sign-in.
