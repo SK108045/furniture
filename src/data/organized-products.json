@@ -171,42 +171,42 @@
     "id": 113,
     "name": "Grey & Wood Reception Desk",
     "category": "Reception desks",
-    "price": 0,
+    "price": 22500,
     "image": "catalog/reception_desk_grey_white_stripes_wood_top.webp",
     "images": [
       "catalog/reception_desk_grey_white_stripes_wood_top.webp"
     ],
     "tag": "Made for your space",
     "description": "Grey & Wood Reception Desk. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
-    "quoteOnly": true,
+    "quoteOnly": false,
     "testOnly": false
   },
   {
     "id": 114,
     "name": "Brown Wood Reception Desk with White Panel",
     "category": "Reception desks",
-    "price": 0,
+    "price": 32000,
     "image": "catalog/reception_desk_brown_wood_white_center_panel.webp",
     "images": [
       "catalog/reception_desk_brown_wood_white_center_panel.webp"
     ],
     "tag": "Made for your space",
     "description": "Brown Wood Reception Desk with White Panel. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
-    "quoteOnly": true,
+    "quoteOnly": false,
     "testOnly": false
   },
   {
     "id": 115,
     "name": "Church Pulpit / Reception Desk (White)",
     "category": "Reception desks",
-    "price": 0,
+    "price": 35000,
     "image": "catalog/church_pulpit_reception_counter_white_kitengela.webp",
     "images": [
       "catalog/church_pulpit_reception_counter_white_kitengela.webp"
     ],
     "tag": "Made for your space",
     "description": "Church Pulpit / Reception Desk (White). Speak to Nicoo about dimensions, available finishes and delivery to your space.",
-    "quoteOnly": true,
+    "quoteOnly": false,
     "testOnly": false
   },
   {
@@ -241,7 +241,7 @@
     "id": 119,
     "name": "White Reception Desk with Grey Center Panel",
     "category": "Reception desks",
-    "price": 0,
+    "price": 22500,
     "image": "catalog/reception_counter_white_charcoal_panel_black_stripes.webp",
     "images": [
       "catalog/reception_counter_white_charcoal_panel_black_stripes.webp",
@@ -249,35 +249,35 @@
     ],
     "tag": "Made for your space",
     "description": "White Reception Desk with Grey Center Panel. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
-    "quoteOnly": true,
+    "quoteOnly": false,
     "testOnly": false
   },
   {
     "id": 120,
     "name": "White & Blue Reception Desk",
     "category": "Reception desks",
-    "price": 0,
+    "price": 22500,
     "image": "catalog/reception_desk_white_blue_stripes_wrapped.webp",
     "images": [
       "catalog/reception_desk_white_blue_stripes_wrapped.webp"
     ],
     "tag": "Made for your space",
     "description": "White & Blue Reception Desk. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
-    "quoteOnly": true,
+    "quoteOnly": false,
     "testOnly": false
   },
   {
     "id": 121,
     "name": "White Reception Desk with Wood Center Inlay",
     "category": "Reception desks",
-    "price": 0,
+    "price": 24500,
     "image": "catalog/reception_desk_white_with_wood_inlay_panel.webp",
     "images": [
       "catalog/reception_desk_white_with_wood_inlay_panel.webp"
     ],
     "tag": "Made for your space",
     "description": "White Reception Desk with Wood Center Inlay. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
-    "quoteOnly": true,
+    "quoteOnly": false,
     "testOnly": false
   },
   {
@@ -298,70 +298,70 @@
     "id": 124,
     "name": "White Reception Desk with Angular Dark Center",
     "category": "Reception desks",
-    "price": 0,
+    "price": 18500,
     "image": "catalog/reception_counter_white_geometric_dark_panel_wrapped.webp",
     "images": [
       "catalog/reception_counter_white_geometric_dark_panel_wrapped.webp"
     ],
     "tag": "Made for your space",
     "description": "White Reception Desk with Angular Dark Center. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
-    "quoteOnly": true,
+    "quoteOnly": false,
     "testOnly": false
   },
   {
     "id": 125,
     "name": "White Reception Desk with Light Wood Center",
     "category": "Reception desks",
-    "price": 0,
+    "price": 19000,
     "image": "catalog/reception_counter_white_light_wood_center_panel.webp",
     "images": [
       "catalog/reception_counter_white_light_wood_center_panel.webp"
     ],
     "tag": "Made for your space",
     "description": "White Reception Desk with Light Wood Center. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
-    "quoteOnly": true,
+    "quoteOnly": false,
     "testOnly": false
   },
   {
     "id": 126,
     "name": "Geometric Blue & White Reception Desk",
     "category": "Reception desks",
-    "price": 0,
+    "price": 25500,
     "image": "catalog/reception_counter_geometric_blue_white_angular.webp",
     "images": [
       "catalog/reception_counter_geometric_blue_white_angular.webp"
     ],
     "tag": "Made for your space",
     "description": "Geometric Blue & White Reception Desk. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
-    "quoteOnly": true,
+    "quoteOnly": false,
     "testOnly": false
   },
   {
     "id": 127,
     "name": "White Reception Desk with Black Stripes",
     "category": "Reception desks",
-    "price": 0,
+    "price": 28500,
     "image": "catalog/reception_counter_white_black_stripes_side_profile.webp",
     "images": [
       "catalog/reception_counter_white_black_stripes_side_profile.webp"
     ],
     "tag": "Made for your space",
     "description": "White Reception Desk with Black Stripes. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
-    "quoteOnly": true,
+    "quoteOnly": false,
     "testOnly": false
   },
   {
     "id": 128,
     "name": "White Reception Desk with Black Accents",
     "category": "Reception desks",
-    "price": 0,
+    "price": 19999,
     "image": "catalog/reception_counter_white_black_stripes_front_panel.webp",
     "images": [
       "catalog/reception_counter_white_black_stripes_front_panel.webp"
     ],
     "tag": "Made for your space",
     "description": "White Reception Desk with Black Accents. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
-    "quoteOnly": true,
+    "quoteOnly": false,
     "testOnly": false
   },
   {
@@ -382,7 +382,7 @@
     "id": 130,
     "name": "White & Blue Reception Desk",
     "category": "Reception desks",
-    "price": 0,
+    "price": 28500,
     "image": "catalog/reception_desk_white_blue_slatted_grille_wide_view.webp",
     "images": [
       "catalog/reception_desk_white_blue_slatted_grille_wide_view.webp",
@@ -390,28 +390,28 @@
     ],
     "tag": "Made for your space",
     "description": "White & Blue Reception Desk. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
-    "quoteOnly": true,
+    "quoteOnly": false,
     "testOnly": false
   },
   {
     "id": 131,
     "name": "Modern Fluted Grey Reception Desk with White Fascia",
     "category": "Reception desks",
-    "price": 0,
+    "price": 18500,
     "image": "catalog/reception_desk_grey_fluted_slats_white_angular_fascia.webp",
     "images": [
       "catalog/reception_desk_grey_fluted_slats_white_angular_fascia.webp"
     ],
     "tag": "Made for your space",
     "description": "Modern Fluted Grey Reception Desk with White Fascia. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
-    "quoteOnly": true,
+    "quoteOnly": false,
     "testOnly": false
   },
   {
     "id": 133,
     "name": "Blue & White Reception Desk",
     "category": "Reception desks",
-    "price": 0,
+    "price": 25500,
     "image": "catalog/reception_work_desk_blue_white_rear_shelving_view.webp",
     "images": [
       "catalog/reception_work_desk_blue_white_rear_shelving_view.webp",
@@ -419,7 +419,7 @@
     ],
     "tag": "Made for your space",
     "description": "Blue & White Reception Desk. Speak to Nicoo about dimensions, available finishes and delivery to your space.",
-    "quoteOnly": true,
+    "quoteOnly": false,
     "testOnly": false
   }
 ]
