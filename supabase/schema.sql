@@ -11,6 +11,18 @@ create table if not exists public.nicoo_orders (
 );
 create index if not exists nicoo_orders_user_date on public.nicoo_orders(user_id,created_at desc);
 create table if not exists public.nicoo_profiles(user_id text primary key,details jsonb not null);
+create table if not exists public.nicoo_enquiries(
+ id text primary key,
+ name text not null,
+ phone text not null,
+ email text,
+ topic text not null,
+ product_id integer,
+ product_name text,
+ message text not null,
+ created_at timestamptz not null default now()
+);
+create index if not exists nicoo_enquiries_created_at on public.nicoo_enquiries(created_at desc);
 create table if not exists public.nicoo_owner_prices(
  product_id integer primary key,
  product_name text not null,
@@ -30,11 +42,12 @@ create table if not exists public.nicoo_checkout_attempts(
 );
 alter table public.nicoo_orders enable row level security;
 alter table public.nicoo_profiles enable row level security;
+alter table public.nicoo_enquiries enable row level security;
 alter table public.nicoo_owner_prices enable row level security;
 alter table public.nicoo_payment_callbacks enable row level security;
 alter table public.nicoo_checkout_attempts enable row level security;
-revoke all on public.nicoo_orders,public.nicoo_profiles,public.nicoo_owner_prices,public.nicoo_payment_callbacks,public.nicoo_checkout_attempts from public,anon,authenticated;
-grant all on public.nicoo_orders,public.nicoo_profiles,public.nicoo_owner_prices,public.nicoo_payment_callbacks,public.nicoo_checkout_attempts to service_role;
+revoke all on public.nicoo_orders,public.nicoo_profiles,public.nicoo_owner_prices,public.nicoo_enquiries,public.nicoo_payment_callbacks,public.nicoo_checkout_attempts from public,anon,authenticated;
+grant all on public.nicoo_orders,public.nicoo_profiles,public.nicoo_owner_prices,public.nicoo_enquiries,public.nicoo_payment_callbacks,public.nicoo_checkout_attempts to service_role;
 
 create or replace function public.nicoo_mutate_order(p_action text,p_user_id text,p_id text,p_version integer,p_data jsonb)
 returns jsonb language plpgsql security invoker set search_path=public,pg_temp as $$
