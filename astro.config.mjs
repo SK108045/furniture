@@ -23,7 +23,14 @@ if(!setting('SUPABASE_SECRET_KEY')&&!setting('SUPABASE_SERVICE_ROLE_KEY'))throw 
 // Blank overrides must not mask file values in Astro's server environment loader.
 for(const name of Object.keys(files))if(!process.env[name]?.trim())delete process.env[name];
 process.env.PUBLIC_CLERK_PUBLISHABLE_KEY=publishableKey;
+// Astro's Node adapter discards Host/forwarded Host unless it matches this
+// list. Keep the public URL intact for form-origin checks behind Vercel.
+const allowedHostnames=new Set(['furniture-chi-eight.vercel.app','localhost','127.0.0.1']);
+for(const value of [setting('APP_ORIGIN'),process.env.VERCEL_URL,process.env.VERCEL_PROJECT_PRODUCTION_URL]) {
+  if(value)allowedHostnames.add(new URL(value.includes('://')?value:`https://${value}`).hostname);
+}
 export default defineConfig({
   output:'server',adapter:vercel({maxDuration:60}),
+  security:{allowedDomains:[...allowedHostnames].map(hostname=>({hostname}))},
   vite:{plugins:[tailwindcss()],define:{'import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY':JSON.stringify(publishableKey)}},
 });
