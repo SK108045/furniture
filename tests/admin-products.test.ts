@@ -1,8 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import sharp from 'sharp';
-import {checkAdminPassword,createAdminSession,validAdminSession,requireAdmin,sameOrigin,adminCookie,ADMIN_COOKIE} from '../src/server/admin';
-import {POST as login,DELETE as logout} from '../src/pages/api/admin/session';
+import {sameOrigin} from '../src/server/admin';
 import {GET,POST} from '../src/pages/api/admin/products';
 import {listingFields,modelListing,photoBytes,identifyProduct,publishProduct,uploadForm} from '../src/server/product-upload';
 import {loadCatalogue,uploadedProduct} from '../src/server/catalogue';
@@ -20,56 +19,30 @@ async function mocked(fn:(url:string,options?:RequestInit)=>Promise<Response>,ru
   globalThis.fetch=((url:any,options?:RequestInit)=>fn(String(url),options)) as typeof fetch;
   try {await run();}finally {globalThis.fetch=previous;names.forEach((n,i)=>{if(saved[i]===undefined)delete process.env[n];else process.env[n]=saved[i];});}
 }
-test('standalone shop login validates password, signs sessions and blocks forged/expired cookies',async()=>{
-  const old=process.env.ADMIN_UPLOAD_PASSWORD;process.env.ADMIN_UPLOAD_PASSWORD='test-upload-password';
-  try {
-    assert.equal(checkAdminPassword('admin','test-upload-password'),true);
-    assert.equal(checkAdminPassword('customer','test-upload-password'),false);
-    assert.equal(checkAdminPassword('admin','wrong'),false);
-    const now=Date.now(),token=createAdminSession(now);
-    assert.equal(validAdminSession(token,now),true);
-    assert.equal(validAdminSession(token,now+8*60*60*1000),false);
-    assert.equal(validAdminSession(token.slice(0,-1)+(token.at(-1)==='0'?'1':'0'),now),false);
-    assert.equal(await requireAdmin(new Request('https://shop.example/api/admin/products',{headers:{cookie:ADMIN_COOKIE+'='+token}})),'shop_admin');
-    await assert.rejects(requireAdmin(new Request('https://shop.example/api/admin/products',{method:'POST',headers:{cookie:ADMIN_COOKIE+'='+token,origin:'https://other.example'}})));
-    const headers={'Content-Type':'application/json',origin:'https://shop.example'};
-    const bad=await login({request:new Request('https://shop.example/api/admin/session',{method:'POST',headers,body:JSON.stringify({username:'admin',password:'wrong'})})} as any);assert.equal(bad.status,401);
-    const good=await login({request:new Request('https://shop.example/api/admin/session',{method:'POST',headers,body:JSON.stringify({username:'admin',password:'test-upload-password'})})} as any);assert.equal(good.status,200);
-    assert.match(good.headers.get('Set-Cookie')!,/HttpOnly; SameSite=Strict;.*Secure/);
-    const ended=await logout({request:new Request('https://shop.example/api/admin/session',{method:'DELETE',headers:{origin:'https://shop.example'}})} as any);assert.match(ended.headers.get('Set-Cookie')!,/Max-Age=0/);
-  }finally {if(old===undefined)delete process.env.ADMIN_UPLOAD_PASSWORD;else process.env.ADMIN_UPLOAD_PASSWORD=old;}
+test('anonymous visitors can read uploads and publish furniture without a session',async()=>{
+  let committed=false;
+  await mocked(async(url,options)=>{
+    if(url.includes('generativelanguage'))return json({},503);
+    if(url.includes('/storage/v1/'))return json({});
+    if(options?.method==='POST'){committed=true;return json([{...row,...JSON.parse(options.body as string)}]);}
+    return json(url.includes('upload_key=')?[]:[row]);
+  },async()=>{
+    const listed=await GET({request:new Request('https://shop.example/api/admin/products')} as any);assert.equal(listed.status,200);
+    assert.equal((await listed.json()).products[0].id,10000);
+    const form=new FormData();form.set('photo',await photo());form.set('uploadKey',key);form.set('price','14500');form.set('name',row.name);form.set('category',row.category);
+    const published=await POST({request:new Request('https://shop.example/api/admin/products',{method:'POST',headers:{origin:'https://shop.example'},body:form})} as any);
+    assert.equal(published.status,201);assert.equal(committed,true);assert.equal((await published.json()).product.price,14500);
+    const denied=await POST({request:new Request('https://shop.example/api/admin/products',{method:'POST',headers:{origin:'https://other.example'}})} as any);assert.equal(denied.status,403);
+  });
 });
-test('Vercel HTTPS login, uploads and logout accept proxy requests and keep secure cookies',async()=>{
-  const names=['VERCEL','VERCEL_URL','VERCEL_PROJECT_PRODUCTION_URL','APP_ORIGIN','ADMIN_UPLOAD_PASSWORD'];
-  const saved=names.map(name=>process.env[name]);
-  process.env.VERCEL='1';process.env.VERCEL_URL='shop-preview.vercel.app';process.env.VERCEL_PROJECT_PRODUCTION_URL='furniture-chi-eight.vercel.app';process.env.APP_ORIGIN='http://localhost:4321';process.env.ADMIN_UPLOAD_PASSWORD='test-upload-password';
+test('website origin validation supports Vercel public URLs without a session',()=>{
+  const names=['VERCEL','VERCEL_PROJECT_PRODUCTION_URL','APP_ORIGIN'];const saved=names.map(name=>process.env[name]);
+  process.env.VERCEL='1';process.env.VERCEL_PROJECT_PRODUCTION_URL='furniture-chi-eight.vercel.app';process.env.APP_ORIGIN='http://localhost:4321';
   try {
     const origin='https://furniture-chi-eight.vercel.app';
-    const request=new Request('http://furniture-chi-eight.vercel.app/api/admin/session',{method:'POST',headers:{origin,'Content-Type':'application/json'},body:JSON.stringify({username:'admin',password:'test-upload-password'})});
-    const response=await login({request} as any);assert.equal(response.status,200);assert.match(response.headers.get('Set-Cookie')!,/; Secure$/);
-    const cookie=response.headers.get('Set-Cookie')!.split(';')[0];
-    assert.equal(await requireAdmin(new Request('http://furniture-chi-eight.vercel.app/api/admin/products',{method:'POST',headers:{origin,cookie}})),'shop_admin');
-    const ended=await logout({request:new Request('http://furniture-chi-eight.vercel.app/api/admin/session',{method:'DELETE',headers:{origin,cookie}})} as any);assert.equal(ended.status,200);assert.match(ended.headers.get('Set-Cookie')!,/Max-Age=0; Secure$/);
-    // The adapter may expose an internal host. Only deployment/configured
-    // origins are accepted in that case; arbitrary forwarded hosts are ignored.
-    assert.doesNotThrow(()=>sameOrigin(new Request('http://localhost/api/admin/session',{method:'POST',headers:{origin}})));
-    assert.doesNotThrow(()=>sameOrigin(new Request('http://shop-preview.vercel.app/api/admin/session',{method:'POST',headers:{origin:'https://shop-preview.vercel.app'}})));
-    assert.doesNotThrow(()=>sameOrigin(new Request('http://shop.example/api/admin/session',{method:'POST',headers:{origin:'https://shop.example'}})));
-    for(const badOrigin of ['https://other.example','http://furniture-chi-eight.vercel.app','null','']) {
-      const denied=await login({request:new Request('http://furniture-chi-eight.vercel.app/api/admin/session',{method:'POST',headers:{origin:badOrigin,'x-forwarded-host':'other.example'}})} as any);assert.equal(denied.status,403);
-    }
-    delete process.env.VERCEL;
-    const local=new Request('http://localhost:4321/api/admin/session',{method:'POST',headers:{origin:'http://localhost:4321'}});assert.doesNotThrow(()=>sameOrigin(local));assert.doesNotMatch(adminCookie(local,'token'),/Secure/);
-    assert.throws(()=>sameOrigin(new Request('http://localhost:4321/api/admin/session',{method:'POST',headers:{origin,'x-forwarded-host':'furniture-chi-eight.vercel.app'}})));
+    assert.doesNotThrow(()=>sameOrigin(new Request('http://localhost/api/admin/products',{method:'POST',headers:{origin}})));
+    assert.throws(()=>sameOrigin(new Request('http://localhost/api/admin/products',{method:'POST',headers:{origin:'https://other.example'}})));
   }finally {names.forEach((name,index)=>{if(saved[index]===undefined)delete process.env[name];else process.env[name]=saved[index];});}
-});
-test('admin read and write endpoints deny anonymous requests before body or network access',async()=>{
-  await mocked(async()=>{throw new Error('Unexpected network call');},async()=>{
-    for(const route of [GET,POST]) {
-      const response=await route({request:new Request('http://localhost:4321/api/admin/products')} as any);
-      assert.equal(response.status,401);
-    }
-  });
 });
 test('prices remain exact whole shillings and metadata is bounded',()=>{
   assert.deepEqual(listingFields('14500','',''),{price:14500,name:'',category:''});

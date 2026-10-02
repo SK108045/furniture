@@ -16,8 +16,6 @@ const bundled: Record<string, string | undefined> = {
   CRON_SECRET: import.meta.env?.CRON_SECRET,
   OWNER_PRICING_CODE: import.meta.env?.OWNER_PRICING_CODE,
   APP_ORIGIN: import.meta.env?.APP_ORIGIN,
-  ADMIN_UPLOAD_PASSWORD: import.meta.env?.ADMIN_UPLOAD_PASSWORD,
-  ADMIN_UPLOAD_SESSION_SECRET: import.meta.env?.ADMIN_UPLOAD_SESSION_SECRET,
 };
 export function env(name: string): string {
   return process.env[name] || bundled[name] || '';

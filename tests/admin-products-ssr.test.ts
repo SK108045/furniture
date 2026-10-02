@@ -32,7 +32,8 @@ test('server-rendered catalogue, checkout and admin routes work with uploaded fu
       if(path==='/account'||path==='/visit')assert.ok(html.includes('value="10000"'));
     }
     const admin=await fetch(origin+'/admin/products');assert.equal(admin.status,200);assert.equal(admin.headers.get('X-Robots-Tag'),'noindex, nofollow');
-    const html=await admin.text();assert.ok(html.includes('id="admin-workspace" hidden'));assert.ok(html.includes('Publish to the shop'));
-    for(const method of ['GET','POST'])assert.equal((await fetch(origin+'/api/admin/products',{method})).status,401);
+    const html=await admin.text();assert.ok(html.includes('id="admin-workspace"'));assert.ok(html.includes('Publish to the shop'));assert.ok(!html.includes('admin-login-form'));assert.ok(!html.includes('id="admin-workspace" hidden'));
+    assert.equal((await fetch(origin+'/api/admin/products')).status,200);
+    assert.equal((await fetch(origin+'/api/admin/products',{method:'POST',headers:{origin,'Content-Type':'application/json'},body:'{}'})).status,415);
   }finally {server.kill('SIGTERM');await new Promise<void>(resolve=>db.close(()=>resolve()));}
 });

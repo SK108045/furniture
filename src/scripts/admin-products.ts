@@ -55,7 +55,6 @@ form.addEventListener('submit',async event=>{
   setBusy(true);message('Checking the name and category, then adding your piece to the shop…','working');
   try {
     const response=await fetch('/api/admin/products',{method:'POST',credentials:'same-origin',body:data,signal:AbortSignal.timeout(60000)});
-    if(response.status===401)showLogin();
     const result=await response.json();if(!response.ok)throw new Error(result.error||'The upload could not be completed.');
     const product=result.product as Product;
     published=[product,...published.filter(p=>p.id!==product.id)];renderPublished();
@@ -64,34 +63,12 @@ form.addEventListener('submit',async event=>{
   }catch(error){message(`${errorMessage(error)} Your details are still here; retry to check the same upload.`,'error');status.focus();}
   finally {setBusy(false);}
 });
-const login=$<HTMLFormElement>('admin-login-form');
-function showLogin() {fields.disabled=true;$('admin-workspace').hidden=true;login.hidden=false;$('admin-access').hidden=true;}
-async function adminApi(path:string,options:RequestInit={}) {
-  const response=await fetch(path,{...options,credentials:'same-origin',signal:AbortSignal.timeout(60000)});
-  const data=await response.json();
-  if(!response.ok)throw Object.assign(new Error(data.error||'Please try again.'),{status:response.status});
-  return data;
-}
-async function openWorkspace() {
-  login.hidden=true;$('admin-access').hidden=true;$('admin-workspace').hidden=false;fields.disabled=false;
-  try {const result=await adminApi('/api/admin/products');published=result.products;renderPublished();}
-  catch(error:any){if(error.status===401)showLogin();else message(errorMessage(error),'error');}
-}
-login.addEventListener('submit',async event=>{
-  event.preventDefault();const submit=$<HTMLButtonElement>('admin-login-button');submit.disabled=true;submit.textContent='Logging in…';$('admin-login-error').hidden=true;
+async function loadPublished() {
   try {
-    await adminApi('/api/admin/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:$<HTMLInputElement>('admin-username').value,password:$<HTMLInputElement>('admin-password').value})});
-    $<HTMLInputElement>('admin-password').value='';await openWorkspace();
-  }catch(error){$('admin-login-error').textContent=errorMessage(error);$('admin-login-error').hidden=false;}
-  finally {submit.disabled=false;submit.textContent='Log in ↗';}
-});
-$('admin-logout').addEventListener('click',async()=>{
-  try {await adminApi('/api/admin/session',{method:'DELETE'});showLogin();}
-  catch(error){message(errorMessage(error),'error');}
-});
-async function init() {
-  fields.disabled=true;
-  try {const result=await adminApi('/api/admin/session');if(result.authenticated)await openWorkspace();else showLogin();}
-  catch(error){showLogin();$('admin-login-error').textContent=errorMessage(error);$('admin-login-error').hidden=false;}
+    const response=await fetch('/api/admin/products',{signal:AbortSignal.timeout(60000)});
+    const result=await response.json();
+    if(!response.ok)throw new Error(result.error||'The latest uploads could not be loaded.');
+    published=result.products;renderPublished();
+  }catch(error){message(errorMessage(error),'error');}
 }
-void init();
+void loadPublished();
