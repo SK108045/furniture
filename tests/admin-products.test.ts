@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import sharp from 'sharp';
-import {checkAdminPassword,createAdminSession,validAdminSession,requireAdmin,ADMIN_COOKIE} from '../src/server/admin';
+import {checkAdminPassword,createAdminSession,validAdminSession,requireAdmin,sameOrigin,adminCookie,ADMIN_COOKIE} from '../src/server/admin';
 import {POST as login,DELETE as logout} from '../src/pages/api/admin/session';
 import {GET,POST} from '../src/pages/api/admin/products';
 import {listingFields,modelListing,photoBytes,identifyProduct,publishProduct,uploadForm} from '../src/server/product-upload';
@@ -38,6 +38,30 @@ test('standalone shop login validates password, signs sessions and blocks forged
     assert.match(good.headers.get('Set-Cookie')!,/HttpOnly; SameSite=Strict;.*Secure/);
     const ended=await logout({request:new Request('https://shop.example/api/admin/session',{method:'DELETE',headers:{origin:'https://shop.example'}})} as any);assert.match(ended.headers.get('Set-Cookie')!,/Max-Age=0/);
   }finally {if(old===undefined)delete process.env.ADMIN_UPLOAD_PASSWORD;else process.env.ADMIN_UPLOAD_PASSWORD=old;}
+});
+test('Vercel HTTPS login, uploads and logout accept proxy requests and keep secure cookies',async()=>{
+  const names=['VERCEL','VERCEL_URL','VERCEL_PROJECT_PRODUCTION_URL','APP_ORIGIN','ADMIN_UPLOAD_PASSWORD'];
+  const saved=names.map(name=>process.env[name]);
+  process.env.VERCEL='1';process.env.VERCEL_URL='shop-preview.vercel.app';process.env.VERCEL_PROJECT_PRODUCTION_URL='furniture-chi-eight.vercel.app';process.env.APP_ORIGIN='http://localhost:4321';process.env.ADMIN_UPLOAD_PASSWORD='test-upload-password';
+  try {
+    const origin='https://furniture-chi-eight.vercel.app';
+    const request=new Request('http://furniture-chi-eight.vercel.app/api/admin/session',{method:'POST',headers:{origin,'Content-Type':'application/json'},body:JSON.stringify({username:'admin',password:'test-upload-password'})});
+    const response=await login({request} as any);assert.equal(response.status,200);assert.match(response.headers.get('Set-Cookie')!,/; Secure$/);
+    const cookie=response.headers.get('Set-Cookie')!.split(';')[0];
+    assert.equal(await requireAdmin(new Request('http://furniture-chi-eight.vercel.app/api/admin/products',{method:'POST',headers:{origin,cookie}})),'shop_admin');
+    const ended=await logout({request:new Request('http://furniture-chi-eight.vercel.app/api/admin/session',{method:'DELETE',headers:{origin,cookie}})} as any);assert.equal(ended.status,200);assert.match(ended.headers.get('Set-Cookie')!,/Max-Age=0; Secure$/);
+    // The adapter may expose an internal host. Only deployment/configured
+    // origins are accepted in that case; arbitrary forwarded hosts are ignored.
+    assert.doesNotThrow(()=>sameOrigin(new Request('http://localhost/api/admin/session',{method:'POST',headers:{origin}})));
+    assert.doesNotThrow(()=>sameOrigin(new Request('http://shop-preview.vercel.app/api/admin/session',{method:'POST',headers:{origin:'https://shop-preview.vercel.app'}})));
+    assert.doesNotThrow(()=>sameOrigin(new Request('http://shop.example/api/admin/session',{method:'POST',headers:{origin:'https://shop.example'}})));
+    for(const badOrigin of ['https://other.example','http://furniture-chi-eight.vercel.app','null','']) {
+      const denied=await login({request:new Request('http://furniture-chi-eight.vercel.app/api/admin/session',{method:'POST',headers:{origin:badOrigin,'x-forwarded-host':'other.example'}})} as any);assert.equal(denied.status,403);
+    }
+    delete process.env.VERCEL;
+    const local=new Request('http://localhost:4321/api/admin/session',{method:'POST',headers:{origin:'http://localhost:4321'}});assert.doesNotThrow(()=>sameOrigin(local));assert.doesNotMatch(adminCookie(local,'token'),/Secure/);
+    assert.throws(()=>sameOrigin(new Request('http://localhost:4321/api/admin/session',{method:'POST',headers:{origin,'x-forwarded-host':'furniture-chi-eight.vercel.app'}})));
+  }finally {names.forEach((name,index)=>{if(saved[index]===undefined)delete process.env[name];else process.env[name]=saved[index];});}
 });
 test('admin read and write endpoints deny anonymous requests before body or network access',async()=>{
   await mocked(async()=>{throw new Error('Unexpected network call');},async()=>{

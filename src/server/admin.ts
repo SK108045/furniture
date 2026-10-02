@@ -1,5 +1,5 @@
 import {createHash,createHmac,randomBytes,timingSafeEqual} from 'node:crypto';
-import {env} from './config';
+import {appOrigins,env} from './config';
 import {HttpError} from './http';
 export const ADMIN_COOKIE='nicoo-upload-session';
 const lifetime=8*60*60;
@@ -26,8 +26,17 @@ export function validAdminSession(token:string,now=Date.now()) {
   if(Number(expires)<=Math.floor(now/1000))return false;
   return timingSafeEqual(Buffer.from(mac,'hex'),Buffer.from(signature(`${expires}.${nonce}`),'hex'));
 }
+function publicOrigin(request:Request) {
+  const url=new URL(request.url);
+  // Vercel terminates HTTPS before invoking the Node server. Its internal
+  // request URL can therefore use HTTP even though the browser uses HTTPS.
+  if(process.env.VERCEL==='1')url.protocol='https:';
+  return url.origin;
+}
 export function sameOrigin(request:Request) {
-  if(request.headers.get('origin')!==new URL(request.url).origin)throw new HttpError(403,'Please submit from the shop website.');
+  const origins=new Set([publicOrigin(request)]);
+  if(process.env.VERCEL==='1')for(const origin of appOrigins(request))if(origin.startsWith('https://'))origins.add(origin);
+  if(!origins.has(request.headers.get('origin')||''))throw new HttpError(403,'Please submit from the shop website.');
 }
 export function authenticatedAdmin(request:Request) {
   const token=request.headers.get('cookie')?.split(';').map(c=>c.trim()).find(c=>c.startsWith(ADMIN_COOKIE+'='))?.slice(ADMIN_COOKIE.length+1)||'';
@@ -39,5 +48,5 @@ export async function requireAdmin(request:Request) {
   return 'shop_admin';
 }
 export function adminCookie(request:Request,token:string) {
-  return `${ADMIN_COOKIE}=${token}; Path=/api/admin; HttpOnly; SameSite=Strict; Max-Age=${token?lifetime:0}${new URL(request.url).protocol==='https:'?'; Secure':''}`;
+  return `${ADMIN_COOKIE}=${token}; Path=/api/admin; HttpOnly; SameSite=Strict; Max-Age=${token?lifetime:0}${publicOrigin(request).startsWith('https://')?'; Secure':''}`;
 }
