@@ -1,7 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Icon from '../components/Icon.astro';
-import {products} from '../data/products';
+import {pageCatalogue} from '../server/catalogue';
+const products=await pageCatalogue(Astro.locals);
 import {whatsapp,phone,phoneInternational} from '../data/contact';
 ---
 <Layout title="Visit Us in Donholm — Nicoo Funiture Hub">

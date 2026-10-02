@@ -12,6 +12,8 @@ import Icon from '../components/Icon.astro';
 import WhatsApp from '../components/WhatsApp.astro';
 import AIChatWidget from '../components/AIChatWidget.astro';
 import {env} from '../server/config';
+import {pageCatalogue} from '../server/catalogue';
+const catalogue=await pageCatalogue(Astro.locals);
 const {title='Nicoo Funiture Hub — Make room for better.'}=Astro.props;
 const path=Astro.url.pathname;
 ---
@@ -62,6 +64,7 @@ const path=Astro.url.pathname;
     </div>
   </nav>
 </header>
+<script type="application/json" id="nicoo-catalogue" set:html={JSON.stringify(catalogue).replaceAll('<','\\u003c')}/>
 <main id="main-content"><slot/></main>
 <footer id="visit" class="site-footer">
   <div class="footer-hero">

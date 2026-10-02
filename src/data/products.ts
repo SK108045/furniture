@@ -25,3 +25,5 @@ export const products = combined.map(p => {
 export const shopProducts=products.filter(p=>!p.testOnly);
 export const categories=['Seating','Desks','Standing desks','Workspace sets','Conference tables','Reception desks','Accessories'];
 export const money = (amount:number) => `KSh ${amount.toLocaleString('en-KE')}`;
+export type Product = typeof products[number];
+export const productImage = (image:string) => image.startsWith('https://') ? image : `/images/${image}`;

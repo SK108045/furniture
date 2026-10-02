@@ -1,6 +1,6 @@
 import {api,authReady,errorMessage} from './client';
 import {getCart,clearPurchased} from './store';
-import {money,products} from '../data/products';
+import {money,products} from './catalogue';
 import {whatsapp} from '../data/contact';
 const form=document.querySelector<HTMLFormElement>('#checkout-form')!;
 const fields=document.querySelector<HTMLFieldSetElement>('#checkout-fields')!;
@@ -132,3 +132,4 @@ async function init(){
   }catch(e){auth.textContent=errorMessage(e);}
 }
 void init();
+

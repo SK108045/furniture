@@ -1,5 +1,5 @@
 export function safeDestination(value) {
-  return ['/account', '/checkout', '/collection'].includes(value) ? value : '/account';
+  return ['/account', '/checkout', '/collection', '/admin/products'].includes(value) ? value : '/account';
 }
 
 export function clerkHost(key) {

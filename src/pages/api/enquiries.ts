@@ -1,6 +1,6 @@
 import type {APIRoute} from 'astro';
 import {randomUUID} from 'node:crypto';
-import {products} from '../../data/products';
+import {loadCatalogue} from '../../server/catalogue';
 import {database} from '../../server/database';
 import {body,failure,HttpError,json} from '../../server/http';
 import {clean,phoneNumber} from '../../server/validation';
@@ -31,7 +31,7 @@ export const POST:APIRoute=async({request})=>{
     let productId:number|null=null,productName:string|null=null;
     if(input.product!==''&&input.product!==null&&input.product!==undefined){
       productId=Number(input.product);
-      const product=products.find(p=>p.id===productId&&!p.testOnly);
+      const product=(await loadCatalogue()).find(p=>p.id===productId&&!p.testOnly);
       if(!product)throw new HttpError(400,'Choose a valid product.');
       productName=product.name;
     }

@@ -1,9 +1,12 @@
 import type { APIRoute } from 'astro';
 import { env } from '../../server/config';
-import { shopProducts as products, money } from '../../data/products';
+import { money } from '../../data/products';
+import {loadCatalogue} from '../../server/catalogue';
+import {GEMINI_MODEL} from '../../server/gemini';
 import { phone, whatsapp } from '../../data/contact';
 
-const productList = products
+function systemInstruction(products:Awaited<ReturnType<typeof loadCatalogue>>) {
+const productList = products.filter(p=>!p.testOnly)
   .map(
     (p) =>
       `• Item ${p.id} — ${p.name} [${p.category}]: ${
@@ -16,7 +19,7 @@ const productList = products
   )
   .join('\n');
 
-const SYSTEM_INSTRUCTION = `You are Nicoo, the virtual shopping assistant for Nicoo Funiture Hub in Donholm, Nairobi, Kenya.
+return `You are Nicoo, the virtual shopping assistant for Nicoo Funiture Hub in Donholm, Nairobi, Kenya.
 
 YOUR JOB
 Help customers understand the furniture currently listed on this website, compare suitable options, understand checkout/delivery basics, and know when they need confirmation from the shop.
@@ -58,6 +61,7 @@ GOOD RESPONSE PATTERNS
 - "How much is delivery to Rongai?" -> Say the delivery charge depends on location and must be confirmed with the shop; do not guess a fee.
 - "Do you have a 2 metre desk?" -> Confirm that only if a product description explicitly states that size; otherwise say the dimensions need confirmation.
 `;
+}
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -83,7 +87,7 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
     const contents: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> = [];
     const recentHistory = history.slice(-6);
@@ -107,7 +111,7 @@ export const POST: APIRoute = async ({ request }) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         systemInstruction: {
-          parts: [{ text: SYSTEM_INSTRUCTION }],
+          parts: [{ text: systemInstruction(await loadCatalogue()) }],
         },
         contents,
         generationConfig: {

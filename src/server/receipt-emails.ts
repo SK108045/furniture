@@ -1,3 +1,4 @@
+import {productImage} from '../data/products';
 import {database,query,rpc} from './database';
 import {env} from './config';
 import {money} from '../data/products';
@@ -13,7 +14,7 @@ function receiptImage(image:unknown){
   const name=String(image||'').replace(/^\/+/, '');
   if(!name||/\.svg(?:\?|$)/i.test(name))return '';
   const origin=receiptOrigin();if(!origin)return '';
-  try{return new URL(`/images/${name}`,origin).toString();}catch{return '';}
+  try{return new URL(productImage(name),origin).toString();}catch{return '';}
 }
 function receiptDate(order:any){
   const raw=order.updated_at||order.updatedAt||order.created_at||order.createdAt;
@@ -191,3 +192,4 @@ export async function deliverReceipts(orderId:string|null=null,userId:string|nul
     return {configured:true,sent};
   }
 }
+

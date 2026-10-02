@@ -1,4 +1,4 @@
-import {products} from '../data/products';
+import {products} from './catalogue';
 const filters=document.querySelectorAll<HTMLButtonElement>('[data-filter]');
 const grid=document.querySelector('#catalog-grid')!;
 const cards=Array.from(grid.querySelectorAll<HTMLElement>('.product-card'));
@@ -25,3 +25,4 @@ document.querySelectorAll<HTMLAnchorElement>('[data-category-jump]').forEach(lin
 search.addEventListener('input',update);budget.addEventListener('change',update);sort.addEventListener('change',update);
 document.querySelector('#reset-filters')!.addEventListener('click',()=>{active='All pieces';budget.value='all';sort.value='featured';search.value='';update();filters[0].focus();});
 update();
+

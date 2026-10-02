@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {safeDestination, clerkHost} from '../src/scripts/auth-config.mjs';
 test('return destinations stay on approved store pages', () => {
-  for (const path of ['/account','/checkout','/collection']) assert.equal(safeDestination(path),path);
+  for (const path of ['/account','/checkout','/collection','/admin/products']) assert.equal(safeDestination(path),path);
   for (const path of [null,'https://evil.example','//evil.example','/%2f%2fevil.example','/checkout?redirect=evil','javascript:alert(1)']) assert.equal(safeDestination(path),'/account');
 });
 test('valid Clerk keys resolve their frontend domain', () => {

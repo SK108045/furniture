@@ -1,7 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import AccountLoader from '../components/AccountLoader.astro';
-import {products} from '../data/products';
+import {pageCatalogue} from '../server/catalogue';
+const products=await pageCatalogue(Astro.locals);
 import {whatsapp} from '../data/contact';
 ---
 <Layout title="My Account — Nicoo Funiture Hub">

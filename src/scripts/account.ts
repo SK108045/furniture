@@ -1,6 +1,6 @@
 import {api,authReady,appearance,errorMessage} from './client';
 import {clearPurchased} from './store';
-import {money,products} from '../data/products';
+import {money,products,productImage} from './catalogue';
 import {whatsapp} from '../data/contact';
 
 const $ = <T extends HTMLElement=HTMLElement>(selector:string) => document.querySelector<T>(selector)!;
@@ -42,7 +42,7 @@ function orderCard(order:any) {
   return `<article class="portal-order" data-order="${esc(order.id)}">
     <header><div><span>${esc(date(order.createdAt))}</span><h3>${esc(order.id)}</h3></div><span class="order-status status-${esc(order.status)}">${esc(labels[order.status])}</span></header>
     <div class="order-progress">${steps.map((step:string,i:number)=>`<span class="${i===0||order.status==='paid'?'complete':''}"><i>${i===0||order.status==='paid'?'✓':'·'}</i>${esc(step)}</span>`).join('')}</div>
-    <div class="portal-order-items">${order.items.map((item:any)=>`<div><img src="/images/${esc(item.image)}" alt="${esc(item.name)}" width="65" height="65"/><p><strong>${esc(item.name)}</strong><span>Qty ${item.quantity} · ${money(item.price)} each</span></p><strong>${money(item.quantity*item.price)}</strong></div>`).join('')}</div>
+    <div class="portal-order-items">${order.items.map((item:any)=>`<div><img src="${esc(productImage(item.image))}" alt="${esc(item.name)}" width="65" height="65"/><p><strong>${esc(item.name)}</strong><span>Qty ${item.quantity} · ${money(item.price)} each</span></p><strong>${money(item.quantity*item.price)}</strong></div>`).join('')}</div>
     <div class="portal-order-meta"><p>${order.customer.delivery==='pickup'?'Pickup in Donholm':esc(order.customer.address)}<br/>${esc(order.customer.firstName)} ${esc(order.customer.lastName)} · ${esc(order.customer.contactPhone||order.customer.phone)}</p><strong>${money(order.total)}</strong></div>
     <p class="order-payment-note">${esc(order.paymentNote || (draft?'Saved to your account. Edit your pieces and pay when you’re ready.':order.status==='cancelled'?'This draft was cancelled. No payment was requested.':'Your payment request is being processed.'))}</p>
     <details class="order-detail"><summary>Order details & activity <span>＋</span></summary><dl><div><dt>Account email</dt><dd>${esc(order.email)}</dd></div><div><dt>M-Pesa number</dt><dd>${esc(order.paymentPhone||order.customer.phone)}</dd></div><div><dt>M-Pesa receipt</dt><dd>${esc(order.receipt||'Not yet confirmed')}</dd></div><div><dt>Delivery instructions</dt><dd>${esc(order.customer.note||'None added')}</dd></div>${order.sourceOrderId?`<div><dt>Based on order</dt><dd>${esc(order.sourceOrderId)}</dd></div>`:''}</dl><ol class="order-activity">${(order.history?.length?order.history:[{at:order.createdAt,label:'Order placed'}]).map((event:any)=>`<li><span>${esc(event.label)}</span><time>${esc(date(event.at))}</time></li>`).join('')}<li><span>${esc(labels[order.status])}</span><time>${esc(date(order.updatedAt))}</time></li></ol></details>
@@ -105,7 +105,7 @@ async function loadProfile(){
 }
 function editorTotal(){return draftItems.reduce((sum,item)=>sum+(products.find(p=>p.id===item.id)?.price||0)*item.quantity,0);}
 function renderEditorItems(){
-  $('#editor-products').innerHTML=draftItems.map(item=>{const p=products.find(p=>p.id===item.id)!;return `<div class="editor-product"><img src="/images/${p.image}" alt="${esc(p.name)}" width="60" height="60"/><div><strong>${esc(p.name)}</strong><span>${money(p.price)} each</span><button type="button" data-remove-item="${p.id}">Remove</button></div><label>Qty<input type="number" min="1" max="20" step="1" required value="${item.quantity}" data-item-quantity="${p.id}" aria-label="Quantity for ${esc(p.name)}"/></label></div>`;}).join('');
+  $('#editor-products').innerHTML=draftItems.map(item=>{const p=products.find(p=>p.id===item.id)!;return `<div class="editor-product"><img src="${esc(productImage(p.image))}" alt="${esc(p.name)}" width="60" height="60"/><div><strong>${esc(p.name)}</strong><span>${money(p.price)} each</span><button type="button" data-remove-item="${p.id}">Remove</button></div><label>Qty<input type="number" min="1" max="20" step="1" required value="${item.quantity}" data-item-quantity="${p.id}" aria-label="Quantity for ${esc(p.name)}"/></label></div>`;}).join('');
   updateEditorTotal();
 }
 function updateEditorTotal(){$('#editor-total').textContent=money(editorTotal());$('#editor-pay').textContent=`Save & pay ${money(editorTotal())}`;}
@@ -195,3 +195,4 @@ export async function initAccount(){
   await Promise.allSettled([loadOrders(),loadProfile()]);
   await showTab(['orders','delivery-details','profile'].includes(location.hash.slice(1))?location.hash.slice(1):'orders');
 }
+

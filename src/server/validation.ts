@@ -1,5 +1,5 @@
-import { products } from '../data/products';
 import { HttpError } from './http';
+import {loadCatalogue} from './catalogue';
 export function clean(value: unknown, label: string, max: number, optional = false) {
   if (typeof value !== 'string' || value.trim().length > max || (!optional && !value.trim())) throw new HttpError(400, `Please enter a valid ${label}.`);
   return value.trim();
@@ -20,7 +20,8 @@ export function customerDetails(input: any) {
     note: clean(input.note || '', 'delivery instructions', 300, true),
   };
 }
-export function orderInput(input: any) {
+export async function orderInput(input: any) {
+  const products=await loadCatalogue();
   if (!input || !Array.isArray(input.items) || input.items.length < 1 || input.items.length > products.length) throw new HttpError(400, 'Add a piece to your bag first.');
   const seen = new Set<number>();
   const items = input.items.map((item: any) => {

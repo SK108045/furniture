@@ -1,0 +1,37 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import {categories} from '../../data/products';
+import '../../styles/admin-products.css';
+Astro.response.headers.set('Cache-Control','private, no-store');
+Astro.response.headers.set('X-Robots-Tag','noindex, nofollow');
+---
+<Layout title="Add furniture — Nicoo admin">
+  <section class="admin-products" aria-labelledby="admin-title">
+    <div class="admin-heading"><div><p class="eyebrow">NICOO · SHOP ADMIN</p><h1 id="admin-title">Make room for<br/><em>your next arrival.</em></h1><p>Add a photo and price. We’ll help with the name and category.</p></div><a href="/collection" class="admin-shop-link">View the shop ↗</a></div>
+    <div id="admin-access" class="admin-access" role="status">Checking your admin access…</div>
+    <div id="admin-workspace" hidden>
+      <form id="admin-product-form">
+        <fieldset id="admin-fields" class="admin-editor">
+          <div class="admin-photo-panel">
+            <div class="admin-step"><span>01</span><h2>The photograph</h2></div>
+            <label class="admin-photo-picker" for="admin-photo"><img id="admin-photo-preview" alt="Furniture photo preview" hidden/><span id="admin-photo-empty"><b aria-hidden="true">+</b><strong>Show us the piece.</strong><span>Choose a photo from your phone or computer</span><small>JPG, PNG or WebP · up to 20 MB</small></span></label>
+            <input id="admin-photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required/>
+            <p class="admin-photo-tip">Use a clear photo of the furniture you’re selling. You can change it before publishing.</p>
+          </div>
+          <div class="admin-details-panel">
+            <div class="admin-step"><span>02</span><h2>The details</h2></div>
+            <label for="admin-price">Selling price <span>REQUIRED</span></label>
+            <div class="admin-price-field"><span>KSh</span><input id="admin-price" name="price" type="number" inputmode="numeric" min="1" max="150000" step="1" required placeholder="14,500"/></div>
+            <label for="admin-name">Furniture name <span>OPTIONAL</span></label><input id="admin-name" name="name" type="text" maxlength="100" placeholder="e.g. Grey office desk"/>
+            <label for="admin-category">Category</label><select id="admin-category" name="category"><option value="">Choose for me from the photo</option>{categories.map(category=><option value={category}>{category}</option>)}</select>
+            <div class="admin-assistant-note"><span aria-hidden="true">✳</span><p>Leave the name or category blank if you’re unsure. Our photo assistant will fill them in and check for obvious mismatches.</p></div>
+            <button id="admin-publish" type="submit" class="admin-publish"><span data-publish-label>Publish to the shop</span><span data-publish-icon aria-hidden="true">↗</span></button><p class="admin-publish-note">The piece will appear in the collection at the price you enter.</p>
+          </div>
+        </fieldset>
+      </form>
+      <div id="admin-upload-status" class="admin-upload-status" role="status" aria-live="polite" tabindex="-1" hidden></div>
+      <section id="admin-published" class="admin-published" aria-labelledby="admin-published-title" hidden><div><p class="eyebrow">LIVE IN THE SHOP</p><h2 id="admin-published-title">Your latest uploads<span>.</span></h2></div><div id="admin-published-list" class="admin-published-list"></div></section>
+    </div>
+  </section>
+  <script>import '../../scripts/admin-products';</script>
+</Layout>

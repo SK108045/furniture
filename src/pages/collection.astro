@@ -2,7 +2,9 @@
 import Layout from '../layouts/Layout.astro';
 import ProductCard from '../components/ProductCard.astro';
 import Icon from '../components/Icon.astro';
-import {shopProducts as products,categories,money} from '../data/products';
+import {categories,money} from '../data/products';
+import {pageCatalogue} from '../server/catalogue';
+const products=(await pageCatalogue(Astro.locals)).filter(p=>!p.testOnly);
 import {whatsapp} from '../data/contact';
 import '../styles/collection-redesign.css';
 const standing=products.find(p=>p.image.includes('electric_height_adjustable_standing_desk_white'))!;

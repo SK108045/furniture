@@ -28,7 +28,7 @@ export const POST: APIRoute = async ({request}) => {
     const payload = await body(request);
     const draft = payload?.action === 'draft';
     if (!draft && !env('SWIFTA_API_KEY')) throw new HttpError(503, 'M-Pesa payments are temporarily unavailable.');
-    const input = orderInput(payload);
+    const input = await orderInput(payload);
     const user = await clerkClient().users.getUser(userId);
     const email = user.emailAddresses.find(e => e.id === user.primaryEmailAddressId && e.verification?.status === 'verified')?.emailAddress;
     if (!email) throw new HttpError(403, 'Please verify your email before checking out.');
