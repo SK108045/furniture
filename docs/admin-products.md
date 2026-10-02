@@ -5,10 +5,10 @@ The new page is `/admin/products`. It adds new furniture to the live collection,
 ## One-time setup
 
 1. Run `supabase/admin-products.sql` in this project's Supabase SQL Editor. This creates only the new `nicoo_products` table and the public-read `nicoo-products` photo bucket. Existing tables and data stay intact. Product rows and photo writes are server-only.
-2. In the Clerk dashboard, open the shop owner's user and set **private metadata** to `{"role":"admin"}` (merge with any existing metadata). Ordinary customer accounts cannot publish. Alternatively set `ADMIN_CLERK_USER_IDS` to a comma-separated list of approved Clerk user IDs in the server environment and redeploy. There is no self-registration or “first user becomes admin” shortcut.
-3. Sign into the website with that account and open `/admin/products`. No public navigation link is added.
+2. Open `/admin/products` and use the standalone shop login: username `admin`, password from `ADMIN_UPLOAD_PASSWORD` in the server `.env`. The generated password is already configured for this deployment.
+3. No Clerk account, admin role or customer sign-in is needed. The session lasts eight hours and the page has its own Log out button.
 
-The existing Supabase URL/server key, Clerk keys and Gemini key are reused. No existing `.env` value is changed. Private metadata works without adding a new environment setting.
+The existing Supabase and Gemini settings are reused. Only `ADMIN_UPLOAD_PASSWORD` and `ADMIN_UPLOAD_SESSION_SECRET` are added to `.env`; existing values stay intact. Change the password and redeploy to invalidate existing sessions. The password never goes into the public browser bundle; the server sets a signed HttpOnly session cookie after login. Uploads require that session.
 
 ## Using the page
 
@@ -22,6 +22,6 @@ Existing pages continue to serve their original catalogue if the new table is no
 
 ## Validation
 
-Run `npm run check`, `npm run build`, and `node --import tsx --test tests/admin-products.test.ts tests/admin-products-ssr.test.ts tests/auth-config.test.mjs`. With a Playwright Chromium installation, also run `node --import tsx --test tests/admin-products-browser.test.ts` (or provide `CHROMIUM_EXECUTABLE_PATH`). The browser test checks the form at desktop, 390px and 320px widths, photo submission, the category assignment confirmation and the public bag/checkout using local fixtures. Live upload verification requires the migration and an approved admin account. No fake product or payment is sent to production.
+Run `npm run check`, `npm run build`, and `node --import tsx --test tests/admin-products.test.ts tests/admin-products-ssr.test.ts tests/auth-config.test.mjs`. With a Playwright Chromium installation, also run `node --import tsx --test tests/admin-products-browser.test.ts` (or provide `CHROMIUM_EXECUTABLE_PATH`). The browser test checks the form at desktop, 390px and 320px widths, photo submission, the category assignment confirmation and the public bag/checkout using local fixtures. Live upload verification requires the migration and the shop password. No fake product or payment is sent to production.
 
-The production build and all 17 tests pass. `astro check` reports the same 18 pre-existing errors in the unchanged `src/pages/owner-pricing.astro` as the baseline; the new feature adds no diagnostics.
+The production build and the login/upload tests pass. `astro check` reports the same 18 pre-existing errors in the unchanged `src/pages/owner-pricing.astro` as the baseline; the new feature adds no diagnostics.

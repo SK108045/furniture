@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import sharp from 'sharp';
-import {isAdmin} from '../src/server/admin';
+import {checkAdminPassword,createAdminSession,validAdminSession,requireAdmin,ADMIN_COOKIE} from '../src/server/admin';
+import {POST as login,DELETE as logout} from '../src/pages/api/admin/session';
 import {GET,POST} from '../src/pages/api/admin/products';
 import {listingFields,modelListing,photoBytes,identifyProduct,publishProduct,uploadForm} from '../src/server/product-upload';
 import {loadCatalogue,uploadedProduct} from '../src/server/catalogue';
@@ -19,12 +20,24 @@ async function mocked(fn:(url:string,options?:RequestInit)=>Promise<Response>,ru
   globalThis.fetch=((url:any,options?:RequestInit)=>fn(String(url),options)) as typeof fetch;
   try {await run();}finally {globalThis.fetch=previous;names.forEach((n,i)=>{if(saved[i]===undefined)delete process.env[n];else process.env[n]=saved[i];});}
 }
-test('only explicit private admin metadata or exact allowlisted IDs grant access',()=>{
-  assert.equal(isAdmin('user_customer',{},''),false);
-  assert.equal(isAdmin('user_customer',{role:'customer'},'user_admin'),false);
-  assert.equal(isAdmin('user_customer',{role:'admin'},''),true);
-  assert.equal(isAdmin('user_admin',{},' user_admin , user_other '),true);
-  assert.equal(isAdmin('user_ad',{},'user_admin'),false);
+test('standalone shop login validates password, signs sessions and blocks forged/expired cookies',async()=>{
+  const old=process.env.ADMIN_UPLOAD_PASSWORD;process.env.ADMIN_UPLOAD_PASSWORD='test-upload-password';
+  try {
+    assert.equal(checkAdminPassword('admin','test-upload-password'),true);
+    assert.equal(checkAdminPassword('customer','test-upload-password'),false);
+    assert.equal(checkAdminPassword('admin','wrong'),false);
+    const now=Date.now(),token=createAdminSession(now);
+    assert.equal(validAdminSession(token,now),true);
+    assert.equal(validAdminSession(token,now+8*60*60*1000),false);
+    assert.equal(validAdminSession(token.slice(0,-1)+(token.at(-1)==='0'?'1':'0'),now),false);
+    assert.equal(await requireAdmin(new Request('https://shop.example/api/admin/products',{headers:{cookie:ADMIN_COOKIE+'='+token}})),'shop_admin');
+    await assert.rejects(requireAdmin(new Request('https://shop.example/api/admin/products',{method:'POST',headers:{cookie:ADMIN_COOKIE+'='+token,origin:'https://other.example'}})));
+    const headers={'Content-Type':'application/json',origin:'https://shop.example'};
+    const bad=await login({request:new Request('https://shop.example/api/admin/session',{method:'POST',headers,body:JSON.stringify({username:'admin',password:'wrong'})})} as any);assert.equal(bad.status,401);
+    const good=await login({request:new Request('https://shop.example/api/admin/session',{method:'POST',headers,body:JSON.stringify({username:'admin',password:'test-upload-password'})})} as any);assert.equal(good.status,200);
+    assert.match(good.headers.get('Set-Cookie')!,/HttpOnly; SameSite=Strict;.*Secure/);
+    const ended=await logout({request:new Request('https://shop.example/api/admin/session',{method:'DELETE',headers:{origin:'https://shop.example'}})} as any);assert.match(ended.headers.get('Set-Cookie')!,/Max-Age=0/);
+  }finally {if(old===undefined)delete process.env.ADMIN_UPLOAD_PASSWORD;else process.env.ADMIN_UPLOAD_PASSWORD=old;}
 });
 test('admin read and write endpoints deny anonymous requests before body or network access',async()=>{
   await mocked(async()=>{throw new Error('Unexpected network call');},async()=>{

@@ -13,27 +13,28 @@ test('admin upload UI works on desktop/mobile and uploaded items reach the exist
   const photo=await sharp({create:{width:600,height:600,channels:3,background:'#d9ded2'}}).jpeg().toBuffer();
   const db=createServer((_request,response)=>{response.setHeader('Content-Type','application/json');response.end(JSON.stringify([row]));});
   await new Promise<void>(resolve=>db.listen(0,'127.0.0.1',resolve));
-  const server=spawn(process.execPath,['node_modules/astro/astro.js','dev','--host','127.0.0.1','--port','4328'],{env:{...process.env,SUPABASE_URL:`http://127.0.0.1:${(db.address() as any).port}`},stdio:'ignore'});
+  const server=spawn(process.execPath,['node_modules/astro/astro.js','dev','--host','127.0.0.1','--port','4328'],{env:{...process.env,ADMIN_UPLOAD_PASSWORD:'test-upload-password',ADMIN_UPLOAD_SESSION_SECRET:'test-only-session-secret',SUPABASE_URL:`http://127.0.0.1:${(db.address() as any).port}`},stdio:'ignore'});
   const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_EXECUTABLE_PATH||undefined,args:['--no-sandbox','--no-zygote','--single-process','--use-gl=angle','--use-angle=swiftshader','--in-process-gpu','--ignore-gpu-blocklist']});
   try {
     for(let i=0;i<100;i++){try{if((await fetch('http://127.0.0.1:4328')).ok)break;}catch{}await pause(100);}
     const page=await browser.newPage({viewport:{width:1440,height:1100}});
     const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
-    await page.addInitScript({content:`
-      window.__internal_ClerkUICtor={};
-      window.Clerk={isSignedIn:true,user:{firstName:'Shop admin'},session:{getToken:async function(){return 'test-session';}},load:async function(){},addListener:function(){},signOut:async function(){},client:{}};
-    `});
-    await page.route(/\/npm\/@clerk\//,route=>route.fulfill({contentType:'application/javascript',headers:{'Access-Control-Allow-Origin':'*'},body:''}));
+    await page.route(/\/npm\/@clerk\//,route=>route.abort());
     await page.route(/\/images\/|example\.supabase\.co\/storage/,route=>route.fulfill({contentType:'image/jpeg',body:photo}));
     let uploads=0;
     await page.route('**/api/admin/products',async route=>{
       if(route.request().method()==='POST') {
-        uploads++;const body=route.request().postDataBuffer()!.toString();assert.ok(body.includes('14500'));assert.ok(body.includes('name="photo"'));
+        uploads++;assert.ok(route.request().headers().cookie?.includes('nicoo-upload-session='));assert.equal(route.request().headers().authorization,undefined);const body=route.request().postDataBuffer()!.toString();assert.ok(body.includes('14500'));assert.ok(body.includes('name="photo"'));
         await route.fulfill({status:201,json:{product:uploadedProduct(row),assisted:true,replayed:false}});
-      }else await route.fulfill({json:{products:[]}});
+      }else await route.continue();
     });
     await page.goto('http://127.0.0.1:4328/admin/products');
-    try {await page.locator('#admin-workspace').waitFor({state:'visible',timeout:10000});}catch(error){console.error('Admin UI state:',await page.locator('#admin-access').innerText(),errors);throw error;}
+    await page.locator('#admin-login-form').waitFor({state:'visible'});
+    await page.locator('#admin-password').fill('wrong-password');await page.locator('#admin-login-button').click();
+    await page.locator('#admin-login-error').waitFor({state:'visible'});assert.match(await page.locator('#admin-login-error').innerText(),/incorrect/);
+    await page.locator('#admin-password').fill('test-upload-password');await page.locator('#admin-login-button').click();
+    await page.locator('#admin-workspace').waitFor({state:'visible'});
+    await page.reload();await page.locator('#admin-workspace').waitFor({state:'visible'});
     await mkdir('/tmp/furniture-ui',{recursive:true});
     await page.screenshot({path:'/tmp/furniture-ui/admin-desktop.png',fullPage:true});
     for(const width of [390,320]) {
@@ -51,6 +52,7 @@ test('admin upload UI works on desktop/mobile and uploaded items reach the exist
     assert.equal(uploads,1);assert.match(await page.locator('#admin-upload-status').innerText(),/Grey office desk · Desks · KSh 14,500/);
     assert.equal(await page.locator('#admin-published-list a').count(),1);
     await page.goto('http://127.0.0.1:4328/collection?category=Desks#all-products');
+    await page.locator('#cart-items .empty-cart').waitFor({state:'attached'});
     await page.locator('[data-add="10000"]').click();
     await page.locator('[data-cart-open]').click();
     assert.match(await page.locator('#cart-items').innerText(),/Grey office desk/);
@@ -59,6 +61,9 @@ test('admin upload UI works on desktop/mobile and uploaded items reach the exist
     await page.waitForURL('**/checkout');
     assert.match(await page.locator('#checkout-items').innerText(),/Grey office desk/);
     assert.match(await page.locator('#checkout-total').innerText(),/14,500/);
+    await page.goto('http://127.0.0.1:4328/admin/products');await page.locator('#admin-workspace').waitFor({state:'visible'});
+    await page.locator('#admin-logout').click();await page.locator('#admin-login-form').waitFor({state:'visible'});
+    assert.equal((await page.request.get('http://127.0.0.1:4328/api/admin/products')).status(),401);
     assert.deepEqual(errors,[]);
     await page.close();
   }finally {await browser.close();server.kill('SIGTERM');await new Promise<void>(resolve=>db.close(()=>resolve()));}

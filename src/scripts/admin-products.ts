@@ -1,4 +1,4 @@
-import {authReady,api,errorMessage} from './client';
+const errorMessage=(error:any)=>error?.message||'Please try again.';
 import {money,productImage,type Product} from '../data/products';
 const $=<T extends HTMLElement>(id:string)=>document.getElementById(id) as T;
 const form=$<HTMLFormElement>('admin-product-form');
@@ -54,8 +54,8 @@ form.addEventListener('submit',async event=>{
   data.append('price',$<HTMLInputElement>('admin-price').value);data.append('name',$<HTMLInputElement>('admin-name').value);data.append('category',$<HTMLSelectElement>('admin-category').value);
   setBusy(true);message('Checking the name and category, then adding your piece to the shop…','working');
   try {
-    const clerk=await authReady;const token=await clerk.session?.getToken();if(!token)throw new Error('Please sign in again to publish.');
-    const response=await fetch('/api/admin/products',{method:'POST',headers:{Authorization:`Bearer ${token}`},body:data,signal:AbortSignal.timeout(60000)});
+    const response=await fetch('/api/admin/products',{method:'POST',credentials:'same-origin',body:data,signal:AbortSignal.timeout(60000)});
+    if(response.status===401)showLogin();
     const result=await response.json();if(!response.ok)throw new Error(result.error||'The upload could not be completed.');
     const product=result.product as Product;
     published=[product,...published.filter(p=>p.id!==product.id)];renderPublished();
@@ -64,14 +64,34 @@ form.addEventListener('submit',async event=>{
   }catch(error){message(`${errorMessage(error)} Your details are still here; retry to check the same upload.`,'error');status.focus();}
   finally {setBusy(false);}
 });
+const login=$<HTMLFormElement>('admin-login-form');
+function showLogin() {fields.disabled=true;$('admin-workspace').hidden=true;login.hidden=false;$('admin-access').hidden=true;}
+async function adminApi(path:string,options:RequestInit={}) {
+  const response=await fetch(path,{...options,credentials:'same-origin',signal:AbortSignal.timeout(60000)});
+  const data=await response.json();
+  if(!response.ok)throw Object.assign(new Error(data.error||'Please try again.'),{status:response.status});
+  return data;
+}
+async function openWorkspace() {
+  login.hidden=true;$('admin-access').hidden=true;$('admin-workspace').hidden=false;fields.disabled=false;
+  try {const result=await adminApi('/api/admin/products');published=result.products;renderPublished();}
+  catch(error:any){if(error.status===401)showLogin();else message(errorMessage(error),'error');}
+}
+login.addEventListener('submit',async event=>{
+  event.preventDefault();const submit=$<HTMLButtonElement>('admin-login-button');submit.disabled=true;submit.textContent='Logging in…';$('admin-login-error').hidden=true;
+  try {
+    await adminApi('/api/admin/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:$<HTMLInputElement>('admin-username').value,password:$<HTMLInputElement>('admin-password').value})});
+    $<HTMLInputElement>('admin-password').value='';await openWorkspace();
+  }catch(error){$('admin-login-error').textContent=errorMessage(error);$('admin-login-error').hidden=false;}
+  finally {submit.disabled=false;submit.textContent='Log in ↗';}
+});
+$('admin-logout').addEventListener('click',async()=>{
+  try {await adminApi('/api/admin/session',{method:'DELETE'});showLogin();}
+  catch(error){message(errorMessage(error),'error');}
+});
 async function init() {
   fields.disabled=true;
-  try {
-    const clerk=await authReady;
-    if(!clerk.isSignedIn){location.replace('/sign-in?next=/admin/products');return;}
-    const result=await api('/api/admin/products');published=result.products;renderPublished();
-    $('admin-access').hidden=true;$('admin-workspace').hidden=false;fields.disabled=false;
-    clerk.addListener(()=>{if(!clerk.isSignedIn){fields.disabled=true;$('admin-workspace').hidden=true;location.replace('/sign-in?next=/admin/products');}});
-  }catch(error){$('admin-access').textContent=errorMessage(error);$('admin-access').dataset.state='error';}
+  try {const result=await adminApi('/api/admin/session');if(result.authenticated)await openWorkspace();else showLogin();}
+  catch(error){showLogin();$('admin-login-error').textContent=errorMessage(error);$('admin-login-error').hidden=false;}
 }
 void init();

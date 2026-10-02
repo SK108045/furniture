@@ -8,8 +8,16 @@ Astro.response.headers.set('X-Robots-Tag','noindex, nofollow');
 <Layout title="Add furniture — Nicoo admin">
   <section class="admin-products" aria-labelledby="admin-title">
     <div class="admin-heading"><div><p class="eyebrow">NICOO · SHOP ADMIN</p><h1 id="admin-title">Make room for<br/><em>your next arrival.</em></h1><p>Add a photo and price. We’ll help with the name and category.</p></div><a href="/collection" class="admin-shop-link">View the shop ↗</a></div>
-    <div id="admin-access" class="admin-access" role="status">Checking your admin access…</div>
+    <div id="admin-access" class="admin-access" role="status">Opening the shop login…</div>
+    <form id="admin-login-form" class="admin-login-form" hidden>
+      <p class="eyebrow">SHOP LOGIN</p><h2>Add your next piece.</h2><p>Log in to upload furniture to the shop.</p>
+      <label for="admin-username">Username</label><input id="admin-username" name="username" autocomplete="username" value="admin" required/>
+      <label for="admin-password">Password</label><input id="admin-password" name="password" type="password" autocomplete="current-password" required/>
+      <button type="submit" class="admin-publish" id="admin-login-button">Log in <span aria-hidden="true">↗</span></button>
+      <p id="admin-login-error" role="status" hidden></p>
+    </form>
     <div id="admin-workspace" hidden>
+      <div class="admin-session-bar"><span>Logged in as shop admin</span><button id="admin-logout" type="button">Log out ↗</button></div>
       <form id="admin-product-form">
         <fieldset id="admin-fields" class="admin-editor">
           <div class="admin-photo-panel">
