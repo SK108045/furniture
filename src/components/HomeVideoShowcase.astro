@@ -1,0 +1,104 @@
+---
+import Icon from './Icon.astro';
+
+const videoUrl = 'https://res.cloudinary.com/rp5aydlk/video/upload/v1791389921/merged_transitions_text_nigy_boy_web.mp4';
+const posterUrl = 'https://res.cloudinary.com/rp5aydlk/video/upload/so_1,f_jpg,q_auto:good,w_900/v1791389921/merged_transitions_text_nigy_boy_web.jpg';
+---
+
+<section class="home-film" aria-labelledby="home-film-title" data-reveal>
+  <div class="home-film-copy">
+    <div class="home-film-kicker">
+      <p class="eyebrow">NICOO, IN MOTION</p>
+      <span>02 / THE SHOWROOM FILM</span>
+    </div>
+
+    <h2 id="home-film-title">See the pieces.<br/><em>Feel the space.</em></h2>
+    <p class="home-film-lede">
+      A quick look at the furniture, finishes and atmosphere behind Nicoo.
+      Press play and picture your next setup before you even step into the showroom.
+    </p>
+
+    <div class="home-film-meta" aria-label="Video details">
+      <div><strong>28</strong><span>SECONDS</span></div>
+      <div><strong>9:16</strong><span>PORTRAIT FILM</span></div>
+      <div><strong>Donholm</strong><span>NAIROBI</span></div>
+    </div>
+
+    <a class="text-link home-film-link" href="/collection">
+      Explore the collection <Icon size={20}/>
+    </a>
+  </div>
+
+  <div class="home-film-stage">
+    <span class="home-film-accent" aria-hidden="true"></span>
+    <figure class="home-film-figure">
+      <div class="home-film-player" data-film-player>
+        <video
+          data-film-video
+          src={videoUrl}
+          poster={posterUrl}
+          preload="metadata"
+          playsinline
+          controls
+          controlslist="nodownload noplaybackrate"
+          disablepictureinpicture
+          aria-label="Nicoo Furniture showroom film"
+        >
+          Your browser does not support embedded video.
+        </video>
+
+        <button class="home-film-play" type="button" data-film-play aria-label="Play the Nicoo showroom film">
+          <span class="home-film-play-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M9 7.5v9l7-4.5-7-4.5Z"/></svg>
+          </span>
+          <span>PLAY THE FILM</span>
+        </button>
+
+        <div class="home-film-corner home-film-corner--top" aria-hidden="true">
+          <span>NICOO.</span><span>PORTRAIT EDIT</span>
+        </div>
+        <div class="home-film-corner home-film-corner--bottom" aria-hidden="true">
+          <span>00:28</span><span>DONHOLM / NAIROBI</span>
+        </div>
+      </div>
+
+      <figcaption>
+        <span>A little closer to the details.</span>
+        <span>Tap play · sound on</span>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-film-player]').forEach((player) => {
+    const video = player.querySelector<HTMLVideoElement>('[data-film-video]');
+    const playButton = player.querySelector<HTMLButtonElement>('[data-film-play]');
+    if (!video || !playButton) return;
+
+    const syncState = () => {
+      player.classList.toggle('is-playing', !video.paused && !video.ended);
+      playButton.setAttribute(
+        'aria-label',
+        video.paused || video.ended ? 'Play the Nicoo showroom film' : 'Pause the Nicoo showroom film'
+      );
+    };
+
+    playButton.addEventListener('click', async () => {
+      if (video.paused || video.ended) {
+        try {
+          await video.play();
+        } catch {
+          // Native controls remain available if browser playback is blocked.
+        }
+      } else {
+        video.pause();
+      }
+      syncState();
+    });
+
+    video.addEventListener('play', syncState);
+    video.addEventListener('pause', syncState);
+    video.addEventListener('ended', syncState);
+  });
+</script>
