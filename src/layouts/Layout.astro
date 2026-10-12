@@ -14,16 +14,16 @@ import AIChatWidget from '../components/AIChatWidget.astro';
 import {env} from '../server/config';
 import {pageCatalogue} from '../server/catalogue';
 const catalogue=await pageCatalogue(Astro.locals);
-const {title='Nicoo Funiture Hub — Make room for better.'}=Astro.props;
+const {title='Nicoo Furniture Hub | Quality Furniture in Nairobi, Kenya'}=Astro.props;
 const path=Astro.url.pathname;
 ---
-<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="clerk-publishable-key" content={env('PUBLIC_CLERK_PUBLISHABLE_KEY')}/><meta name="description" content="Discover office chairs, desks and workspaces at Nicoo Funiture Hub, Donholm, Nairobi. Make room for a better working day."/><meta name="theme-color" content="#242924"/><link rel="icon" type="image/svg+xml" href="/favicon.svg"/><title>{title}</title></head><body>
+<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="clerk-publishable-key" content={env('PUBLIC_CLERK_PUBLISHABLE_KEY')}/><meta name="description" content="Shop quality office chairs, desks, workstations and home furniture at Nicoo Furniture Hub. Explore affordable furniture in Nairobi, Kenya. Visit us in Donholm."/><meta name="theme-color" content="#242924"/><link rel="icon" type="image/svg+xml" href="/favicon.svg"/><title>{title}</title></head><body>
 <div class="announcement"><a href={whatsapp} target="_blank" rel="noopener noreferrer">CALL / WHATSAPP {phone} · LET’S TALK FURNITURE</a><span><Icon name="pin" size={13}/> DONHOLM, NAIROBI</span></div>
 <header class="header site-header" id="site-header">
   <div class="header-left">
-    <a class="brand" href="/" aria-label="Nicoo Funiture Hub home">
+    <a class="brand" href="/" aria-label="Nicoo Furniture Hub home">
       <span class="brand-text">Nicoo<span class="brand-dot">.</span></span>
-      <span class="brand-sub">FUNITURE HUB</span>
+      <span class="brand-sub">FURNITURE HUB</span>
     </a>
   </div>
   <nav class="header-center" aria-label="Main navigation">
@@ -98,9 +98,9 @@ const path=Astro.url.pathname;
 
   <div class="footer-main">
     <div class="footer-brand-block">
-      <a class="footer-wordmark" href="/" aria-label="Nicoo Funiture Hub home">
+      <a class="footer-wordmark" href="/" aria-label="Nicoo Furniture Hub home">
         <span>Nicoo<span class="brand-dot">.</span></span>
-        <small>FUNITURE HUB</small>
+        <small>FURNITURE HUB</small>
       </a>
       <p>Good furniture. Real possibilities.<br/>Right here in Donholm.</p>
       <div class="footer-location"><Icon name="pin" size={17}/><span>Donholm, Nairobi, Kenya</span></div>
@@ -132,7 +132,7 @@ const path=Astro.url.pathname;
   </div>
 
   <div class="footer-bottom">
-    <span>© {new Date().getFullYear()} Nicoo Funiture Hub</span>
+    <span>© {new Date().getFullYear()} Nicoo Furniture Hub</span>
     <p>Furniture prices exclude delivery. Confirm dimensions, finishes and availability with the shop.</p>
     <a href="#main-content">Back to top ↑</a>
   </div>
