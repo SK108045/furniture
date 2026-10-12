@@ -34,7 +34,7 @@ const missing=products.filter(p=>p.quoteOnly&&!p.testOnly);
 <body>
   <main class="shell">
     <header class="top">
-      <div class="brand">Nicoo<i>.</i><small>FUNITURE HUB</small></div>
+      <div class="brand">Nicoo<i>.</i><small>FURNITURE HUB</small></div>
       <span class="private">OWNER PRICE CAPTURE</span>
     </header>
 
@@ -145,7 +145,7 @@ const missing=products.filter(p=>p.quoteOnly&&!p.testOnly);
         return;
       }
       const lines=[
-        'Hi, here are the confirmed Nicoo Funiture Hub prices:',
+        'Hi, here are the confirmed Nicoo Furniture Hub prices:',
         '',
         ...rows.map(row=>`Item ${row.id} — ${row.name}: KSh ${row.price.toLocaleString('en-KE')}`),
         '',
