@@ -1,6 +1,6 @@
 import {animate,inView} from 'motion';
 import {products,money,productImage} from './catalogue';
-import {whatsapp} from '../data/contact';
+import {productWhatsapp} from '../data/contact';
 const esc=(value:unknown)=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
 type Cart=Record<string,number>;
 const key='nicoo-bag-v1';
@@ -12,16 +12,16 @@ function toast(message:string){const el=$('#toast')!;el.textContent=message;el.c
 function open(id:string){const el=document.getElementById(id) as HTMLDialogElement;el.showModal();document.body.style.overflow='hidden';}
 function close(id:string){(document.getElementById(id) as HTMLDialogElement).close();}
 function total(){return products.reduce((sum,p)=>sum+p.price*(cart[p.id]||0),0)}
-function quoteInquiry(p:typeof products[number]){
+function productInquiry(p:typeof products[number]){
   const productUrl=new URL('/collection',location.origin);productUrl.searchParams.set('product',String(p.id));
   const imageUrl=new URL(productImage(p.image),location.origin);
   const message=[
-    `Hi Nicoo, please quote ${p.name} (item ${p.id}).`,
+    `Hi Nicoo, I'm interested in ${p.name} (item ${p.id}). Is it available?`,
     '',
     `Product: ${productUrl.toString()}`,
     `Photo: ${imageUrl.toString()}`,
   ].join('\n');
-  return `${whatsapp}?text=${encodeURIComponent(message)}`;
+  return `${productWhatsapp}?text=${encodeURIComponent(message)}`;
 }
 function render(){
  const count=Object.values(cart).reduce((a,b)=>a+b,0);document.querySelectorAll('[data-cart-count]').forEach(el=>el.textContent=String(count));
@@ -37,7 +37,7 @@ document.addEventListener('click',event=>{const target=(event.target as Element)
  if(target.dataset.close)close(target.dataset.close);
  if(target.dataset.remove){delete cart[target.dataset.remove];save();}
  if(target.dataset.qty){const id=target.dataset.qty;const maximum=products.find(p=>String(p.id)===id)?.testOnly?1:20;cart[id]=Math.max(0,Math.min(maximum,(cart[id]||0)+Number(target.dataset.change)));if(!cart[id])delete cart[id];save();}
- if(target.dataset.product){const p=products.find(p=>p.id===Number(target.dataset.product));if(!p)return;$('#product-details')!.innerHTML=`<div class="product-detail-grid"><div class="product-gallery"><img class="detail-photo" src="${esc(productImage(p.image))}" alt="${esc(p.name)}"/>${p.images.length>1?`<div class="gallery-controls"><button data-gallery-step="-1" aria-label="Previous photo">←</button><span data-gallery-status aria-live="polite">1 / ${p.images.length}</span><button data-gallery-step="1" aria-label="Next photo">→</button></div><div class="gallery-thumbs">${p.images.map((img,i)=>`<button data-gallery-index="${i}" aria-label="View photo ${i+1}" aria-pressed="${i===0}"><img src="${esc(productImage(img))}" alt=""/></button>`).join('')}</div>`:''}</div><div class="detail-copy"><p class="eyebrow">${esc(p.category.toUpperCase())}</p><h2 id="product-title">${esc(p.name)}</h2><p class="detail-price">${p.quoteOnly?'Ask for price':money(p.price)} ${p.onSale ? `<del>${money(p.originalPrice)}</del><small class="detail-offer">Save ${money(p.savings)} · ${p.discountPercent}% off</small>` : ''}</p><p class="detail-description">${esc(p.description)}</p>${p.quoteOnly?`<a class="button dark" target="_blank" rel="noopener noreferrer" href="${quoteInquiry(p)}">Ask on WhatsApp ↗</a>`:`<button class="button dark" data-add="${p.id}">Add to bag <span>+</span></button>`}<small>Visit us in Donholm, Nairobi, to confirm dimensions, finishes and availability.</small></div></div>`;galleryProduct=p;galleryIndex=0;open('product-dialog');}
+ if(target.dataset.product){const p=products.find(p=>p.id===Number(target.dataset.product));if(!p)return;$('#product-details')!.innerHTML=`<div class="product-detail-grid"><div class="product-gallery"><img class="detail-photo" src="${esc(productImage(p.image))}" alt="${esc(p.name)}"/>${p.images.length>1?`<div class="gallery-controls"><button data-gallery-step="-1" aria-label="Previous photo">←</button><span data-gallery-status aria-live="polite">1 / ${p.images.length}</span><button data-gallery-step="1" aria-label="Next photo">→</button></div><div class="gallery-thumbs">${p.images.map((img,i)=>`<button data-gallery-index="${i}" aria-label="View photo ${i+1}" aria-pressed="${i===0}"><img src="${esc(productImage(img))}" alt=""/></button>`).join('')}</div>`:''}</div><div class="detail-copy"><p class="eyebrow">${esc(p.category.toUpperCase())}</p><h2 id="product-title">${esc(p.name)}</h2><p class="detail-price">${p.quoteOnly?'Ask for price':money(p.price)} ${p.onSale ? `<del>${money(p.originalPrice)}</del><small class="detail-offer">Save ${money(p.savings)} · ${p.discountPercent}% off</small>` : ''}</p><p class="detail-description">${esc(p.description)}</p><div class="detail-actions">${p.quoteOnly?'':`<button class="button dark" data-add="${p.id}">Add to bag <span>+</span></button>`}<a class="product-whatsapp" target="_blank" rel="noopener noreferrer" href="${productInquiry(p)}" aria-label="Ask about ${esc(p.name)} on WhatsApp" title="Ask about this product on WhatsApp"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 .8A15 15 0 0 0 3 23.3L.9 31l7.9-2.1A15.2 15.2 0 1 0 16 .8Zm0 27.7a12.5 12.5 0 0 1-6.4-1.8l-.5-.3-4.7 1.3 1.3-4.6-.3-.5A12.5 12.5 0 1 1 16 28.5Zm6.9-9.4c-.4-.2-2.2-1.1-2.5-1.2-.4-.1-.6-.2-.9.2-.2.4-.9 1.2-1.1 1.4-.2.3-.4.3-.8.1-1.1-.5-2-1-2.9-1.8-.7-.7-1.3-1.4-1.8-2.2-.2-.4 0-.6.1-.8l.6-.7.4-.6c.1-.3 0-.5 0-.7l-1.1-2.6c-.3-.7-.6-.6-.9-.6h-.8c-.3 0-.7.1-1 .5-.4.4-1.4 1.3-1.4 3.2s1.4 3.7 1.6 4c.2.3 2.8 4.3 6.8 6 1 .4 1.7.6 2.2.7 1 .3 1.8.3 2.5.2.8-.1 2.2-.9 2.5-1.8.3-.9.3-1.7.2-1.8-.1-.2-.3-.3-.7-.5Z"/></svg></a></div><small>Visit us in Donholm, Nairobi, to confirm dimensions, finishes and availability.</small></div></div>`;galleryProduct=p;galleryIndex=0;open('product-dialog');}
  if(target.dataset.galleryIndex!==undefined)showGallery(Number(target.dataset.galleryIndex));
  if(target.dataset.galleryStep)showGallery(galleryIndex+Number(target.dataset.galleryStep));
 });
