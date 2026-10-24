@@ -2,9 +2,13 @@
 import Layout from '../layouts/Layout.astro';
 import ProductCard from '../components/ProductCard.astro';
 import Icon from '../components/Icon.astro';
-import {categories,money} from '../data/products';
+import {categories,money,productImage} from '../data/products';
 import {pageCatalogue} from '../server/catalogue';
 const products=(await pageCatalogue(Astro.locals)).filter(p=>!p.testOnly);
+const sharedProduct=products.find(p=>String(p.id)===Astro.url.searchParams.get('product'));
+const pageTitle=sharedProduct?`${sharedProduct.name} — Nicoo Furniture Hub`:'The Furniture Edit — Nicoo Furniture Hub';
+const pageDescription=sharedProduct?`Ask Nicoo Furniture Hub about ${sharedProduct.name}. View the product, price and availability.`:'Shop office chairs, desks, workstations and more at Nicoo Furniture Hub in Nairobi.';
+const pageImage=sharedProduct?productImage(sharedProduct.image):undefined;
 import {whatsapp} from '../data/contact';
 import '../styles/collection-redesign.css';
 const standing=products.find(p=>p.image.includes('electric_height_adjustable_standing_desk_white'))!;
@@ -13,7 +17,7 @@ const meeting=products.find(p=>p.category==='Conference tables')!;
 const categoryLabels:Record<string,string>={'Seating':'Chairs & seating','Desks':'Everyday desks','Standing desks':'Standing desks','Workspace sets':'Workstations','Conference tables':'Meeting tables','Reception desks':'Reception','Accessories':'Finishing touches'};
 const featured=[standing,chair,...products.filter(p=>![standing.id,chair.id].includes(p.id))];
 ---
-<Layout title="The Furniture Edit — Nicoo Furniture Hub">
+<Layout title={pageTitle} description={pageDescription} image={pageImage}>
 <div class="shop-edit">
   <section class="edit-hero">
     <div class="edit-hero-copy"><div class="edit-kicker"><span class="edit-dot"></span> THE FURNITURE EDIT <span>01 / NICOO</span></div><h1>Good work.<br/>Great spaces.<br/><em>Start here.</em></h1><p>For the corner that’s finally yours.<br/>For the team that’s getting bigger.<br/>Find furniture that fits your everyday.</p><a class="edit-primary" href="#all-products">Find your next piece <Icon name="arrow" size={21}/></a><div class="edit-hero-foot"><span>DONHOLM, NAIROBI</span><span>{products.length} PIECES. YOUR POSSIBILITIES.</span></div></div>
