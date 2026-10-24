@@ -13,13 +13,13 @@ function open(id:string){const el=document.getElementById(id) as HTMLDialogEleme
 function close(id:string){(document.getElementById(id) as HTMLDialogElement).close();}
 function total(){return products.reduce((sum,p)=>sum+p.price*(cart[p.id]||0),0)}
 function productInquiry(p:typeof products[number]){
-  const productUrl=new URL('/collection',location.origin);productUrl.searchParams.set('product',String(p.id));
-  const imageUrl=new URL(productImage(p.image),location.origin);
+  const productUrl=new URL('/collection',location.origin);
+  productUrl.searchParams.set('product',String(p.id));
+  productUrl.searchParams.set('share','whatsapp');
   const message=[
     `Hi Nicoo, I'm interested in ${p.name} (item ${p.id}). Is it available?`,
     '',
-    `Product: ${productUrl.toString()}`,
-    `Photo: ${imageUrl.toString()}`,
+    productUrl.toString(),
   ].join('\n');
   return `${productWhatsapp}?text=${encodeURIComponent(message)}`;
 }
