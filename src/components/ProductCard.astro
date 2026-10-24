@@ -3,9 +3,18 @@ import Icon from './Icon.astro';
 import {money,productImage} from '../data/products';
 import {productWhatsapp} from '../data/contact';
 const {product:p}=Astro.props;
+const productUrl=new URL('/collection',Astro.url.origin);
+productUrl.searchParams.set('product',String(p.id));
+const imageUrl=new URL(productImage(p.image),Astro.url.origin);
+const quoteInquiryLink=`${productWhatsapp}?text=${encodeURIComponent([
+  `Hi Nicoo, I'm interested in ${p.name} (item ${p.id}). Please share the current price and availability.`,
+  '',
+  `Product: ${productUrl.toString()}`,
+  `Photo: ${imageUrl.toString()}`,
+].join('\n'))}`;
 ---
 <article class="product-card" data-category={p.category}>
  <button class="product-image" data-product={p.id} aria-label={`View ${p.name}`}><img src={productImage(p.image)} alt={p.name} loading="lazy" width="600" height="600"/>{p.onSale && <span class="sale-badge">SAVE {money(p.savings)}</span>}<span class="product-peek">Take a closer look <Icon name="plus" size={18}/></span></button>
  <div class="product-meta"><span>{p.category}</span><span>{String(p.id).padStart(2,'0')}</span></div>
- <div class="product-bottom"><div><button class="product-name" data-product={p.id}>{p.name}</button><p class="product-price">{p.quoteOnly?'Ask for price':money(p.price)} {p.onSale && <del aria-label={`Original price ${money(p.originalPrice)}`}>{money(p.originalPrice)}</del>}</p>{p.images.length>1&&<small class="photo-count">{p.images.length} views · Open gallery</small>}</div>{p.quoteOnly?<a class="add-button" href={`${productWhatsapp}?text=${encodeURIComponent(`Hi Nicoo, I'm interested in ${p.name} (item ${p.id}). Please share the current price and availability.`)}`} target="_blank" rel="noopener noreferrer">Enquire ↗</a>:<button class="add-button" data-add={p.id} aria-label={`Add ${p.name} to cart`}><Icon name="bag" size={17}/><span>Add to cart</span></button>}</div>
+ <div class="product-bottom"><div><button class="product-name" data-product={p.id}>{p.name}</button><p class="product-price">{p.quoteOnly?'Ask for price':money(p.price)} {p.onSale && <del aria-label={`Original price ${money(p.originalPrice)}`}>{money(p.originalPrice)}</del>}</p>{p.images.length>1&&<small class="photo-count">{p.images.length} views · Open gallery</small>}</div>{p.quoteOnly?<a class="add-button" href={quoteInquiryLink} target="_blank" rel="noopener noreferrer">Enquire ↗</a>:<button class="add-button" data-add={p.id} aria-label={`Add ${p.name} to cart`}><Icon name="bag" size={17}/><span>Add to cart</span></button>}</div>
 </article>
