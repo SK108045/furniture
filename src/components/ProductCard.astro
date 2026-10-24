@@ -5,12 +5,11 @@ import {productWhatsapp} from '../data/contact';
 const {product:p}=Astro.props;
 const productUrl=new URL('/collection',Astro.url.origin);
 productUrl.searchParams.set('product',String(p.id));
-const imageUrl=new URL(productImage(p.image),Astro.url.origin);
+productUrl.searchParams.set('share','whatsapp');
 const quoteInquiryLink=`${productWhatsapp}?text=${encodeURIComponent([
   `Hi Nicoo, I'm interested in ${p.name} (item ${p.id}). Please share the current price and availability.`,
   '',
-  `Product: ${productUrl.toString()}`,
-  `Photo: ${imageUrl.toString()}`,
+  productUrl.toString(),
 ].join('\n'))}`;
 ---
 <article class="product-card" data-category={p.category}>
