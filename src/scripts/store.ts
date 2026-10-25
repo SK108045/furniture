@@ -15,7 +15,7 @@ function total(){return products.reduce((sum,p)=>sum+p.price*(cart[p.id]||0),0)}
 function productInquiry(p:typeof products[number]){
   const productUrl=new URL('/collection',location.origin);
   productUrl.searchParams.set('product',String(p.id));
-  productUrl.searchParams.set('share','whatsapp');
+  productUrl.searchParams.set('share','whatsapp-v2');
   const message=[
     `Hi Nicoo, I'm interested in ${p.name} (item ${p.id}). Is it available?`,
     '',
