@@ -8,7 +8,7 @@ const products=(await pageCatalogue(Astro.locals)).filter(p=>!p.testOnly);
 const sharedProduct=products.find(p=>String(p.id)===Astro.url.searchParams.get('product'));
 const pageTitle=sharedProduct?`${sharedProduct.name} — Nicoo Furniture Hub`:'The Furniture Edit — Nicoo Furniture Hub';
 const pageDescription=sharedProduct?`Ask Nicoo Furniture Hub about ${sharedProduct.name}. View the product, price and availability.`:'Shop office chairs, desks, workstations and more at Nicoo Furniture Hub in Nairobi.';
-const pageImage=sharedProduct?productImage(sharedProduct.image):undefined;
+const pageImage=sharedProduct?`/api/social-product/${sharedProduct.id}.jpg`:undefined;
 import {whatsapp} from '../data/contact';
 import '../styles/collection-redesign.css';
 const standing=products.find(p=>p.image.includes('electric_height_adjustable_standing_desk_white'))!;
