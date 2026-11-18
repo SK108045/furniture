@@ -321,8 +321,28 @@
       }},
     ]);
   }
+
+  function fitSidebar() {
+    const nav = document.querySelector('.portal-nav');
+    const mask = document.querySelector('.portal-nav-mask');
+    if (!nav || !mask || !layout.cfg) return;
+
+    function align() {
+      const canvasBounds = canvas.getBoundingClientRect();
+      const { targetX, baseWidth } = layout.cfg;
+      const reportLeft = Math.floor(canvasBounds.left + targetX * canvasBounds.width / baseWidth);
+      // The fixed sidebar is outside the scaled report canvas.
+      mask.style.maxWidth = Math.max(0, reportLeft) + 'px';
+      nav.style.maxWidth = Math.max(0, reportLeft - 2) + 'px';
+    }
+
+    align();
+    addEventListener('resize', align);
+  }
+
   function mount(kind,root,controls,reportLayout,makeText,box) {
     page=kind;canvas=root;ui=controls;layout=reportLayout;makeBox=box;
+    fitSidebar();
     root.querySelectorAll('[data-report-x]').forEach(el=>{
       const cls=el.classList.contains('t')?'t':'b';
       nodes.set([cls,el.dataset.reportX,el.dataset.reportY].join(':'),el);
