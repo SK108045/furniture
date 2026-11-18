@@ -1,4 +1,4 @@
-export const phone = '+254 786 387981';
-export const phoneInternational = '+254786387981';
-export const whatsapp = 'https://wa.me/254786387981';
-export const productWhatsapp = 'https://wa.me/254786387981';
+export const phone = '+254 707 835322';
+export const phoneInternational = '+254707835322';
+export const whatsapp = 'https://wa.me/254707835322';
+export const productWhatsapp = 'https://wa.me/254707835322';
