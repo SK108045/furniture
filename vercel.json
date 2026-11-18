@@ -3,10 +3,5 @@
   "framework": "astro",
   "buildCommand": "npm run build",
   "installCommand": "npm ci",
-  "redirects": [
-    {"source": "/Analytics/web", "destination": "/Analytics/web/index.html", "permanent": false},
-    {"source": "/Analytics/web/Access%20management.html", "destination": "https://g-analytics.johnwakaba146.workers.dev/Access%20management.html", "permanent": false},
-    {"source": "/Analytics/web/access.html", "destination": "https://g-analytics.johnwakaba146.workers.dev/access.html", "permanent": false}
-  ],
   "crons": [{"path":"/api/receipts/retry","schedule":"0 6 * * *"}]
 }

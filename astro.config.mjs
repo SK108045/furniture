@@ -31,6 +31,10 @@ for(const value of [setting('APP_ORIGIN'),process.env.VERCEL_URL,process.env.VER
 }
 export default defineConfig({
   output:'server',adapter:vercel({maxDuration:60}),
+  redirects: {
+    '/Analytics/web': '/Analytics/web/index.html',
+    '/Analytics/web/Access management.html': 'https://g-analytics.johnwakaba146.workers.dev/Access%20management.html',
+  },
   security:{allowedDomains:[...allowedHostnames].map(hostname=>({hostname}))},
   vite:{plugins:[tailwindcss()],define:{'import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY':JSON.stringify(publishableKey)}},
 });
