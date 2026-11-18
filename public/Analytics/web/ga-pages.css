@@ -53,3 +53,12 @@
 .aud-table-controls{display:flex;align-items:center;gap:7px}.aud-table-search{border:1px solid #d0d0d0;border-radius:2px;height:27px;padding:0 8px;font-size:11px}
 .aud-second-line{stroke:#e37400!important}.aud-compare-chip{display:inline-flex;align-items:center;gap:5px;background:#fef7e0;color:#7a4f00;padding:4px 7px;border-radius:11px;font-size:11px}
 @media(max-width:1000px){.aud-mid,.aud-bottom{grid-template-columns:1fr}.aud-pie-panel{max-width:340px}.aud-kpis{grid-template-columns:repeat(2,1fr)}}
+
+/* Realtime windows can show up to 60 minute bars in a narrow card. */
+[data-rt-minutes] .minute-bars {
+  gap: min(5px, 1%);
+}
+
+[data-rt-minutes] .minute-bars i {
+  min-width: 0;
+}

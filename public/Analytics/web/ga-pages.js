@@ -1,5 +1,6 @@
 (()=>{const main=document.getElementById('app');if(!main)return;const key=document.body.dataset.page;const data = window.NicooReportData;
 const management = ['import', 'library'].includes(key);
+const live = key === 'realtime' || key === 'realtimePages';
 let range = data.selectedRange();
 let report;
 let channels, pages, countries, events;
@@ -26,7 +27,8 @@ function historicalTrend(metric, label) {
   const points = data.series(range, metric);
   return line(points.map(point => point.value), label || 'Active users', 210, points.map(point => point.label));
 }
-function head(title,date=management ? 'Last 90 days' : dateTitle()){const initial=window.PortalSession?.initial?.()||'R';return '<div class="report-head"><div class="report-badge">'+initial+'</div><div class="report-title">'+title+'</div><button class="quality-pill" type="button" data-quality><span class="quality-dot">✓</span><span>Data quality</span></button><div class="report-spacer"></div><button class="date-pill" type="button"><b>'+date+'</b><span class="muted">'+(management ? '' : range.compare ? 'Compare: '+data.rangeLabel(data.previous(range))+' · Demo data' : 'Demo data')+'</span></button><button class="report-action" type="button" data-share aria-label="Share report">↗</button><button class="report-action" type="button" data-more aria-label="More report actions">⋮</button></div>'}function path(vals,w=650,h=190,pad=12){const max=Math.max(...vals),min=Math.min(...vals);return vals.map((v,i)=>{const x=pad+i*(w-2*pad)/Math.max(1,vals.length-1),y=pad+(max-v)/(max-min||1)*(h-2*pad);return(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)}).join(' ')}function line(vals,label='Active users',h=210,dates=[]){return '<svg class="chart" viewBox="0 0 650 '+h+'" preserveAspectRatio="none"><g stroke="#e8eaed"><path d="M12 42H638M12 84H638M12 126H638M12 168H638"/></g><path d="'+path(vals,650,h)+'" fill="none" stroke="#1a73e8" stroke-width="2" vector-effect="non-scaling-stroke"/></svg><div class="legend"><span><i class="dot" style="background:#1a73e8"></i>'+label+'</span>'+(dates.length?'<span class="muted">'+dates[0]+' – '+dates[dates.length-1]+'</span>':'')+'</div>'}function bars(rows){const m=Math.max(1,...rows.map(r=>r[1]));return '<div class="bars">'+rows.map(r=>'<div class="bar-row"><span>'+r[0]+'</span><div class="bar-track"><div class="bar-fill" style="width:'+(r[1]/m*100).toFixed(1)+'%"></div></div><b>'+fmt(r[1])+'</b></div>').join('')+'</div>'}function table(headers,rows,first='Dimension'){return '<div class="ga-table-wrap"><div class="table-tools">⌕ <input class="table-search" placeholder="Search..."><span class="right">Rows per page: 10    1-'+Math.min(10,rows.length)+' of '+rows.length+'</span></div><table class="ga-table"><thead><tr><th>'+first+'</th>'+headers.map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+rows.map((r,i)=>'<tr><td><span class="rank">'+(i+1)+'</span> '+r[0]+'</td>'+r.slice(1).map(v=>'<td>'+v+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>'}function minuteBars(vals){const m=Math.max(1,...vals);return '<div class="minute-bars">'+vals.map(v=>'<i style="height:'+(v/m*100)+'%"></i>').join('')+'</div>'}function world(){return '<img class="world" src="ga-world-map.webp" alt="Active users by country map" style="object-fit:contain;background:#fff">'}function closeReportMenus(){document.querySelectorAll('.report-menu').forEach(x=>x.remove())}
+function head(title,date=management ? 'Last 90 days' : dateTitle()){const initial=window.PortalSession?.initial?.()||'R';return '<div class="report-head"><div class="report-badge">'+initial+'</div><div class="report-title">'+title+'</div><button class="quality-pill" type="button" data-quality><span class="quality-dot">✓</span><span>Data quality</span></button><div class="report-spacer"></div><button class="date-pill" type="button"><b>'+date+'</b><span class="muted">'+(live ? 'Simulated data' : management ? '' : range.compare ? 'Compare: '+data.rangeLabel(data.previous(range))+' · Demo data' : 'Demo data')+'</span></button><button class="report-action" type="button" data-share aria-label="Share report">↗</button><button class="report-action" type="button" data-more aria-label="More report actions">⋮</button></div>'}function path(vals,w=650,h=190,pad=12){const max=Math.max(...vals),min=Math.min(...vals);return vals.map((v,i)=>{const x=pad+i*(w-2*pad)/Math.max(1,vals.length-1),y=pad+(max-v)/(max-min||1)*(h-2*pad);return(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)}).join(' ')}function line(vals,label='Active users',h=210,dates=[]){return '<svg class="chart" viewBox="0 0 650 '+h+'" preserveAspectRatio="none"><g stroke="#e8eaed"><path d="M12 42H638M12 84H638M12 126H638M12 168H638"/></g><path d="'+path(vals,650,h)+'" fill="none" stroke="#1a73e8" stroke-width="2" vector-effect="non-scaling-stroke"/></svg><div class="legend"><span><i class="dot" style="background:#1a73e8"></i>'+label+'</span>'+(dates.length?'<span class="muted">'+dates[0]+' – '+dates[dates.length-1]+'</span>':'')+'</div>'}function bars(rows){const m=Math.max(1,...rows.map(r=>r[1]));return '<div class="bars">'+rows.map(r=>'<div class="bar-row"><span>'+r[0]+'</span><div class="bar-track"><div class="bar-fill" style="width:'+(r[1]/m*100).toFixed(1)+'%"></div></div><b>'+fmt(r[1])+'</b></div>').join('')+'</div>'}function tableRows(rows) { return rows.map((r,i)=>'<tr><td><span class="rank">'+(i+1)+'</span> '+r[0]+'</td>'+r.slice(1).map(v=>'<td>'+v+'</td>').join('')+'</tr>').join(''); }
+function table(headers,rows,first='Dimension'){return '<div class="ga-table-wrap"><div class="table-tools">⌕ <input class="table-search" placeholder="Search..."><span class="right">Rows per page: 10    1-'+Math.min(10,rows.length)+' of '+rows.length+'</span></div><table class="ga-table"><thead><tr><th>'+first+'</th>'+headers.map(h=>'<th>'+h+'</th>').join('')+'</tr></thead><tbody>'+tableRows(rows)+'</tbody></table></div>'}function minuteBars(vals){const m=Math.max(1,...vals);return '<div class="minute-bars">'+vals.map(v=>'<i style="height:'+(v/m*100)+'%"></i>').join('')+'</div>'}function world(){return '<img class="world" src="ga-world-map.webp" alt="Active users by country map" style="object-fit:contain;background:#fff">'}function closeReportMenus(){document.querySelectorAll('.report-menu').forEach(x=>x.remove())}
 function reportMenu(anchor,title,items){
   closeReportMenus();
   const r=anchor.getBoundingClientRect(),m=document.createElement('div');m.className='panel-menu report-menu';
@@ -66,7 +68,13 @@ function exportCurrentTable(){
     const metric=document.querySelector('.metric,.metric-sm');if(rows.length===1&&metric)rows.push('"Report value","'+metric.textContent.trim().replace(/"/g,'""')+'"');
   }
   if(rows.length<=1){GAToast('No exportable report data found');return}
+  if (live) rows = rows.map((row, index) => row + (index === 0 ? ',"Data source"' : ',"Simulated data"'));
   const blob=new Blob([rows.join('\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(document.title.replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').toLowerCase()||'analytics-report')+'.csv';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);GAToast('CSV download started');
+}
+function filterReportTable(input) {
+  const query = input.value.toLowerCase();
+  const body = input.closest('.ga-table-wrap').querySelector('tbody');
+  for (const row of body.rows) row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
 }
 function bind(){
   document.querySelectorAll('[data-quality]').forEach(b=>b.onclick=()=>simpleModal('Data quality','<div style="display:flex;gap:12px;align-items:flex-start"><div class="status-orb">✓</div><div><b>Report data is available</b><div class="sub" style="margin-top:5px">These are demo figures for Nicoo Furniture Hub.</div></div></div>',[{label:'Close',primary:true,action:c=>c()}]));
@@ -101,7 +109,7 @@ function bind(){
       ]);
     };
   });
-  document.querySelectorAll('.table-search').forEach(inp=>inp.addEventListener('input',()=>{const q=inp.value.toLowerCase(),tbody=inp.closest('.ga-table-wrap').querySelector('tbody');[...tbody.rows].forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none')}));
+  main.querySelectorAll('.table-search').forEach(input => input.addEventListener('input', () => filterReportTable(input)));
   document.querySelectorAll('[data-event-name]').forEach(a=>a.addEventListener('click',e=>{
     e.preventDefault();const name=a.dataset.eventName,row=events.find(x=>x[0]===name);
     if(!row)return;
@@ -133,75 +141,92 @@ function customRange() {
     } },
   ]);
 }
-const RealtimeSim={
-  minutes:30,
-  timer: null,
+function realtimePageRows(snapshot) {
+  return group('page', 'views', snapshot).map(row => [data.pageNames[row.label], fmt(row.views), fmt(row.users)]);
+}
+function paintRealtimeMinutes(values) {
+  const chart = main.querySelector('[data-rt-minutes]');
+  const bars = chart.querySelectorAll('.minute-bars > i');
+  if (bars.length !== values.length) {
+    chart.innerHTML = minuteBars(values);
+    return;
+  }
+  const max = Math.max(1, ...values);
+  bars.forEach((bar, index) => { bar.style.height = values[index] / max * 100 + '%'; });
+}
+const RealtimeSim = {
+  minutes: 30,
+  slot: null,
   load() {
     const saved = Number(localStorage.getItem('gaRealtimeWindow'));
     this.minutes = [5, 30, 60].includes(saved) ? saved : 30;
   },
   paint() {
-    const realtime = data.realtime(this.minutes);
+    const now = Date.now();
+    const slot = Math.floor(now / data.realtimeStepMs);
+    if (this.slot === slot) return;
+    this.slot = slot;
+    const snapshot = data.realtime(this.minutes, now);
+    main.querySelector('[data-rt-active]').textContent = fmt(snapshot.users);
+    paintRealtimeMinutes(snapshot.minuteUsers);
+
+    if (key === 'realtimePages') {
+      main.querySelector('[data-rt-views]').textContent = fmt(snapshot.views);
+      main.querySelector('.ga-table tbody').innerHTML = tableRows(realtimePageRows(snapshot));
+      filterReportTable(main.querySelector('.table-search'));
+      return;
+    }
     const parts = {
-      'rt-active': fmt(realtime.users),
-      'rt-minutes': minuteBars(realtime.minuteUsers),
-      'rt-source': bars(pairs('source', 'users', realtime)),
-      'rt-page': bars(pairs('page', 'views', realtime)),
-      'rt-event': bars(pairs('event', 'count', realtime)),
+      'rt-source': bars(pairs('source', 'users', snapshot)),
+      'rt-page': bars(pairs('page', 'views', snapshot)),
+      'rt-event': bars(pairs('event', 'count', snapshot)),
     };
-    Object.entries(parts).forEach(([part, html]) => {
+    for (const [part, html] of Object.entries(parts)) {
       const target = main.querySelector('[data-'+part+']');
-      if (target) target.innerHTML = html;
-    });
+      if (target.innerHTML !== html) target.innerHTML = html;
+    }
   },
   setWindow(minutes) {
     this.minutes = minutes;
     localStorage.setItem('gaRealtimeWindow', String(minutes));
-    if (key === 'realtimePages') realtimePages();
-    else this.mount();
-  },
-  mount(){
-    const m=this.minutes;
-    main.innerHTML=head('Realtime overview','Last '+m+' minutes')+
-      '<div class="content"><div class="hero-grid">'+
-      '<div class="card realtime-card"><h3 data-rt-title>Active users in last '+m+' minutes</h3><div class="metric" data-rt-active></div><div class="sub">Users per minute · Simulated</div><div data-rt-minutes></div></div>'+
-      '<div class="card realtime-card"><h3>Active users by Country</h3>'+world()+'<div class="sub" style="margin-top:5px">Simulated realtime activity</div></div>'+
-      '</div><div class="grid" style="margin-top:14px">'+
-      '<div class="card" style="grid-column:span 4"><h3>Active users by First user source</h3><div data-rt-source></div></div>'+
-      '<div class="card" style="grid-column:span 4"><h3>Views by Page title</h3><div data-rt-page></div></div>'+
-      '<div class="card" style="grid-column:span 4"><h3>Event count by Event name</h3><div data-rt-event></div></div>'+
-      '</div></div>';
-    bind();
+    main.querySelector('.date-pill b').textContent = 'Last ' + minutes + ' minutes';
+    const title = main.querySelector('[data-rt-title]');
+    if (title) title.textContent = 'Active users in last ' + minutes + ' minutes';
+    this.slot = null;
     this.paint();
-    clearInterval(this.timer);
-    let minute = Math.floor(Date.now()/60000);
-    this.timer = setInterval(() => {
-      const next = Math.floor(Date.now()/60000);
-      if (!document.hidden && next !== minute) {
-        minute = next;
-        this.paint();
-      }
-    }, 5000);
-  }
+  },
+  start() {
+    this.paint();
+    setInterval(() => {
+      if (!document.hidden) this.paint();
+    }, 1_000);
+  },
 };
-window.RealtimeSim=RealtimeSim;
-function realtime(){RealtimeSim.mount()}
-function realtimePages() {
-  const realtime = data.realtime(RealtimeSim.minutes);
-  const rows = group('page', 'views', realtime).map(row => [data.pageNames[row.label], fmt(row.views), fmt(row.users)]);
-  main.innerHTML = head('Realtime pages', 'Last '+RealtimeSim.minutes+' minutes') +
-    '<div class="content"><div class="kpi-grid"><div class="kpi"><small>Views</small><strong>'+fmt(realtime.views)+
-    '</strong></div><div class="kpi"><small>Active users</small><strong>'+fmt(realtime.users)+
-    '</strong></div><div class="kpi" style="grid-column:span 2"><small>Active users per minute</small>'+
-    minuteBars(realtime.minuteUsers)+'</div></div><div style="margin-top:14px">'+
-    table(['Views','Active users'],rows,'Page path and screen class')+'</div></div>';
+window.RealtimeSim = RealtimeSim;
+function realtime() {
+  const minutes = RealtimeSim.minutes;
+  main.innerHTML = head('Realtime overview', 'Last ' + minutes + ' minutes') +
+    '<div class="content"><div class="hero-grid">' +
+    '<div class="card realtime-card"><h3 data-rt-title>Active users in last ' + minutes + ' minutes</h3><div class="metric" data-rt-active></div><div class="sub">Users per minute · Simulated</div><div data-rt-minutes></div></div>' +
+    '<div class="card realtime-card"><h3>Active users by Country</h3>' + world() + '<div class="sub" style="margin-top:5px">Simulated realtime activity</div></div>' +
+    '</div><div class="grid" style="margin-top:14px">' +
+    '<div class="card" style="grid-column:span 4"><h3>Active users by First user source</h3><div data-rt-source></div></div>' +
+    '<div class="card" style="grid-column:span 4"><h3>Views by Page title</h3><div data-rt-page></div></div>' +
+    '<div class="card" style="grid-column:span 4"><h3>Event count by Event name</h3><div data-rt-event></div></div>' +
+    '</div></div>';
   bind();
-  clearInterval(RealtimeSim.timer);
-  let minute = Math.floor(Date.now()/60000);
-  RealtimeSim.timer = setInterval(() => {
-    if (!document.hidden && Math.floor(Date.now()/60000) !== minute && !main.contains(document.activeElement)
-      && !document.querySelector('.report-menu')) realtimePages();
-  }, 5000);
+  RealtimeSim.start();
+}
+function realtimePages() {
+  const snapshot = data.realtime(RealtimeSim.minutes);
+  main.innerHTML = head('Realtime pages', 'Last ' + RealtimeSim.minutes + ' minutes') +
+    '<div class="content"><div class="kpi-grid"><div class="kpi"><small>Views</small><strong data-rt-views></strong>' +
+    '</div><div class="kpi"><small>Active users</small><strong data-rt-active></strong>' +
+    '</div><div class="kpi" style="grid-column:span 2"><small>Active users per minute</small>' +
+    '<div data-rt-minutes></div></div></div><div style="margin-top:14px">' +
+    table(['Views','Active users'], realtimePageRows(snapshot), 'Page path and screen class') + '</div></div>';
+  bind();
+  RealtimeSim.start();
 }
 function objective(title,type){const isLead=type==='lead';main.innerHTML=head(title)+'<div class="content"><div class="objective-head">WHAT ARE YOUR TOP RESULTS?</div><div class="grid"><div class="card" style="grid-column:span 6"><h3>Sessions by Session primary channel group</h3>'+bars(channels)+'</div><div class="card" style="grid-column:span 6"><h3>'+(isLead?'Lead events':'Purchase activity')+'</h3>'+(isLead?'<div class="no-data"><div><div class="circle">◇</div><b>No lead key events configured</b><div class="sub">Configure a key event to populate lead performance.</div></div></div>':'<div class="no-data"><div><div class="circle">▣</div><b>No ecommerce purchase data</b><div class="sub">Purchase metrics will appear after ecommerce events are collected.</div></div></div>')+'</div><div class="card" style="grid-column:span 6"><h3>New users by First user primary channel group</h3>'+bars(pairs('firstChannel','newUsers').slice(0,5))+'</div><div class="card" style="grid-column:span 6"><h3>'+(isLead?'Landing pages':'Purchase journey')+'</h3>'+(isLead?bars(pairs('page','landing').slice(0,5)):'<div class="funnel"><div class="funnel-step" style="height:100%">Session start</div><div class="funnel-step" style="height:64%">View item</div><div class="funnel-step" style="height:22%">Add to cart</div><div class="funnel-step" style="height:8%">Purchase</div></div>')+'</div></div></div>';bind()}function behavior(){main.innerHTML=head('Understand web and/or app performance')+'<div class="content"><div class="grid"><div class="card" style="grid-column:span 7"><h3>Views over time</h3>'+historicalTrend('views','Views')+'</div><div class="card" style="grid-column:span 5"><h3>Views by Page title and screen class</h3>'+bars(pages)+'</div><div class="card" style="grid-column:span 6"><h3>Event count by Event name</h3>'+bars(events.slice(0,6).map(r=>[r[0],r[1]]))+'</div><div class="card" style="grid-column:span 6"><h3>User activity over time</h3>'+historicalTrend('users')+'</div></div></div>';bind()}function engagement(){main.innerHTML=head('Engagement overview')+'<div class="content"><div class="grid"><div class="card" style="grid-column:span 7"><h3>Average engagement time per active user</h3><div class="metric-sm">'+data.time(data.ratio(report.seconds,report.users))+'</div>'+historicalTrend('avgEngagement','Engagement time')+'</div><div class="card" style="grid-column:span 5"><h3>Views by Page title</h3>'+bars(pages.slice(0,6))+'</div><div class="card" style="grid-column:span 6"><h3>Event count by Event name</h3>'+bars(events.slice(0,6).map(r=>[r[0],r[1]]))+'</div><div class="card" style="grid-column:span 6"><h3>Active users by Country</h3>'+bars(countries.slice(0,6))+'</div></div></div>';bind()}function eventsPage(){const rows=events.map(r=>['<a class="event-link" href="#event-'+encodeURIComponent(r[0])+'" data-event-name="'+r[0]+'">'+r[0]+'</a>',fmt(r[1]),fmt(r[2]),data.ratio(r[1],r[2]).toFixed(2),'KES 0.00']);main.innerHTML=head('Events: Event name')+'<div class="content"><div class="card" style="margin-bottom:14px"><h3>Event count by Event name over time</h3>'+historicalTrend('count','Event count')+'</div>'+table(['Event count','Total users','Event count per user','Total revenue'],rows,'Event name')+'</div>';bind()}function pagesPage(){const rows=group('page','views').map(r=>[data.pageNames[r.label],fmt(r.views),fmt(r.users),data.ratio(r.views,r.users).toFixed(2),data.time(data.ratio(r.seconds,r.users))]);main.innerHTML=head('Pages and screens: Page title and screen class')+'<div class="content"><div class="grid" style="margin-bottom:14px"><div class="card" style="grid-column:span 8"><h3>Views by Page title and screen class over time</h3>'+historicalTrend('views','Views')+'</div><div class="card" style="grid-column:span 4"><h3>Views by Page title</h3>'+bars(pages)+'</div></div>'+table(['Views','Active users','Views per active user','Average engagement time'],rows,'Page title and screen class')+'</div>';bind()}
 function importPage(){
@@ -540,7 +565,6 @@ const renderers = {
   behavior, engagement, events:eventsPage, pages:pagesPage, import:importPage, userOverview,
   audiences, techOverview, library,
 };
-const live = key === 'realtime' || key === 'realtimePages';
 RealtimeSim.load();
 if (!management && !live) loadReport();
 renderers[key]?.();

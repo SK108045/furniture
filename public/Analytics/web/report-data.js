@@ -8,6 +8,7 @@
   const presets = [7, 30, 90];
   // Each sampled visitor represents eight demo visitors with the same activity.
   const trafficMultiplier = 8;
+  const realtimeStepMs = 6_000;
 
   const locations = [
     ['Kenya', 62, ['Nairobi', 'Mombasa', 'Nakuru', 'Kisumu', 'Eldoret']],
@@ -159,17 +160,17 @@
     if (!group.has(label)) group.set(label, counter());
     return group.get(label);
   }
-  function toRow([label, value]) {
+  function toRow([label, value], multiplier) {
     return {
       label,
-      users: value.users.size * trafficMultiplier,
-      newUsers: value.newUsers * trafficMultiplier,
-      sessions: value.sessions * trafficMultiplier,
-      engaged: value.engaged * trafficMultiplier,
-      seconds: value.seconds * trafficMultiplier,
-      views: value.views * trafficMultiplier,
-      count: value.count * trafficMultiplier,
-      landing: value.landing * trafficMultiplier,
+      users: value.users.size * multiplier,
+      newUsers: value.newUsers * multiplier,
+      sessions: value.sessions * multiplier,
+      engaged: value.engaged * multiplier,
+      seconds: value.seconds * multiplier,
+      views: value.views * multiplier,
+      count: value.count * multiplier,
+      landing: value.landing * multiplier,
     };
   }
   function sumSession(target, session) {
@@ -183,7 +184,7 @@
     target.newUsers += Number(record.isNew);
   }
 
-  function summarize(activities) {
+  function summarize(activities, multiplier = trafficMultiplier) {
     const total = counter();
     const dimensions = ['country', 'city', 'firstChannel', 'source', 'device', 'browser', 'system', 'resolution', 'language', 'provider', 'age'];
     const groups = Object.fromEntries([...dimensions, 'channel', 'page', 'event'].map(name => [name, new Map()]));
@@ -233,8 +234,8 @@
       }
     }
     return {
-      ...toRow(['Total', total]),
-      groups: Object.fromEntries(Object.entries(groups).map(([name, map]) => [name, Array.from(map, toRow)])),
+      ...toRow(['Total', total], multiplier),
+      groups: Object.fromEntries(Object.entries(groups).map(([name, map]) => [name, Array.from(map, row => toRow(row, multiplier))])),
     };
   }
 
@@ -301,16 +302,19 @@
   }
 
   function realtime(minutes, now = Date.now()) {
-    const end = Math.floor(now / 60_000);
+    const slotsPerMinute = 60_000 / realtimeStepMs;
+    const end = Math.floor(now / realtimeStepMs);
+    const start = end - minutes * slotsPerMinute + 1;
     const activities = [];
-    const minuteUsers = [];
-    for (let minute = end - minutes + 1; minute <= end; minute++) {
-      const rng = random(minute * 71);
-      const count = Number(rng() < 0.45) + Number(rng() < 0.12);
-      minuteUsers.push(count * trafficMultiplier);
-      for (let i = 0; i < count; i++) activities.push(activity(visitor(minute * 4 + i), rng() < 0.67, rng, true));
+    const minuteUsers = Array(minutes).fill(0);
+    // Both reports use the same rolling window of seeded, individual demo visits.
+    for (let slot = start; slot <= end; slot++) {
+      const rng = random(slot * 71);
+      if (rng() >= 0.46) continue;
+      minuteUsers[Math.floor((slot - start) / slotsPerMinute)]++;
+      activities.push(activity(visitor(slot), rng() < 0.67, rng, true));
     }
-    return { ...summarize(activities), minuteUsers };
+    return { ...summarize(activities, 1), minuteUsers };
   }
 
   function ratio(value, whole) { return whole ? value / whole : 0; }
@@ -320,7 +324,7 @@
 
   window.NicooReportData = {
     presets, last, previous, selectedRange, saveRange, custom, today, isoDay, dateLabel, rangeLabel, pageNames,
-    summarize: range => summarize(records(range)), series, activitySeries, cohorts, realtime, ratio, ranked,
+    summarize: range => summarize(records(range)), series, activitySeries, cohorts, realtime, realtimeStepMs, ratio, ranked,
     number: value => numbers.format(Math.round(value)),
     percent: value => (value * 100).toFixed(1) + '%',
     time(value) {
