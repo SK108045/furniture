@@ -287,10 +287,10 @@ T(21,848,'&#9881;','font-size:27px;color:#5f6368;transform:translateY(-52%)');T(
 B(274,172,28,28,BLUE,'border-radius:50%');const SNAPSHOT_INITIAL=(()=>{try{const s=JSON.parse(localStorage.getItem('gaPortalSession')||'null');const m=String(s?.email||'').split('@')[0].match(/[A-Za-z0-9]/);return (m?.[0]||'R').toUpperCase()}catch{return 'R'}})();const snapshotInitialEl=T(288,186,SNAPSHOT_INITIAL,'color:#fff;font-size:16px;transform:translate(-50%,-50%)');snapshotInitialEl.classList.add('snapshot-session-initial');
 const snapshotAdd=B(312,176,21,21,'transparent');snapshotAdd.classList.add('ga-plus-circle');
 T(353,187,'Reports snapshot','font-size:22px;color:#202124');
-B(1134,157,300,48,'#f8fafd','border:1px solid #dadce0;border-radius:5px;box-sizing:border-box');
-T(1146,171,'Last 90 days &nbsp;&nbsp;Aug 21 - Nov 18, 2026','font-size:14px;font-weight:600;color:#202124');
-T(1146,193,'Compare: May 14 - Aug 11, 2026','font-size:11.5px;color:#5f6368');
-T(1417,171,'&#9662;','font-size:10px;color:#5f6368','c');
+const snapshotDatePanel=B(1134,157,300,48,'#f8fafd','border:1px solid #dadce0;border-radius:5px;box-sizing:border-box');
+const snapshotDateLabel=T(1146,171,'Last 90 days &nbsp;&nbsp;Aug 21 - Nov 18, 2026','font-size:14px;font-weight:600;color:#202124');
+const snapshotDateComparison=T(1146,193,'Compare: May 14 - Aug 11, 2026','font-size:11.5px;color:#5f6368');
+const snapshotDateCaret=T(1417,171,'&#9662;','font-size:10px;color:#5f6368','c');
 B(1444,164,34,34,'transparent','border-radius:50%');I(1461,181,19,'M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7a3.27 3.27 0 0 0 0-1.39l7.05-4.11A3 3 0 1 0 15 5c0 .23.03.45.08.66L8.03 9.77a3 3 0 1 0 0 4.46l7.12 4.16c-.05.19-.07.39-.07.61a3 3 0 1 0 2.92-2.92z','#5f6368');
 B(1484,164,34,34,'transparent','border-radius:50%');I(1501,181,19,'M5 20h14v-2H5v2zm7-18-5.5 5.5 1.42 1.42L11 5.84V16h2V5.84l3.08 3.08L17.5 7.5 12 2z','#5f6368');
 B(1524,164,34,34,'transparent','border-radius:50%');I(1541,181,20,'M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z','#5f6368');
@@ -713,7 +713,29 @@ PortalNav.mount({"active":"reports","top":76,"width":271,"maskWidth":273,"height
 
 
 UI.hit(198,108,190,42,()=>UI.property(205,151),'Property selector');
-UI.hit(1134,157,300,48,()=>UI.range(1125,210),'Change date range');
+let snapshotDateMenuTop=210;
+const snapshotDateButton=UI.hit(1134,157,300,48,()=>UI.range(1125,snapshotDateMenuTop),'Change date range');
+function fitSnapshotDatePicker(){
+  const header=document.querySelector('.portal-fixed-header');
+  const coverHeight=parseFloat(getComputedStyle(header,'::after').height)||0;
+  const bounds=S.getBoundingClientRect();
+  if(!bounds.width)return;
+
+  // Convert the fixed header clearance into the scaled report's coordinates.
+  const scale=bounds.width/1600;
+  const canvasTop=bounds.top+scrollY;
+  const top=Math.max(157,82+(header.offsetHeight+coverHeight+2-canvasTop)/scale);
+  const height=Math.max(32,Math.min(48,227-top));
+  for(const element of [snapshotDatePanel,snapshotDateButton]){
+    element.style.top=top+'px';
+    element.style.height=height+'px';
+  }
+  snapshotDateLabel.style.top=snapshotDateCaret.style.top=(top+height*14/48)+'px';
+  snapshotDateComparison.style.top=(top+height*36/48)+'px';
+  snapshotDateMenuTop=top+height+5;
+}
+addEventListener('resize',fitSnapshotDatePicker);
+fitSnapshotDatePicker();
 UI.hit(1444,164,34,34,()=>UI.share(),'Share report');
 UI.hit(1484,164,34,34,()=>UI.downloadCSV(),'Download CSV');
 UI.hit(1524,164,34,34,()=>UI.simpleMenu(1270,207),'More report actions');
