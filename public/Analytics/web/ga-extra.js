@@ -16,6 +16,7 @@
     pages:'Pages and screens.html'
   };
   const page=document.body.dataset.page||'';
+  const mobile = matchMedia('(max-width: 767px)');
   let progressTimer;
 
   const progress={
@@ -200,13 +201,23 @@
       internal=true;scrollTo(0,scrollY+d*.22);internal=false;raf=requestAnimationFrame(step);
     }
     addEventListener('wheel',e=>{
-      if(e.ctrlKey||e.metaKey||e.target.closest('.portal-nav,.ga-top,.panel-menu'))return;
+      if(mobile.matches||e.ctrlKey||e.metaKey||e.target.closest('.portal-nav,.ga-top,.panel-menu'))return;
       e.preventDefault();target=clamp((raf?target:scrollY)+e.deltaY*.55);if(!raf)raf=requestAnimationFrame(step);
     },{passive:false});
     addEventListener('scroll',()=>{if(!internal&&!raf)target=scrollY},{passive:true});
   }
 
   top();nav();slower();progress.start();
+  function enableMobileNav() {
+    if (!mobile.matches) return;
+    mobile.removeEventListener('change', enableMobileNav);
+    import('./ga-mobile.js').then(async ({ loadMobileStyles, mountMobileNavigation }) => {
+      await loadMobileStyles();
+      mountMobileNavigation(document.querySelector('.ga-top'));
+    });
+  }
+  mobile.addEventListener('change', enableMobileNav);
+  enableMobileNav();
   addEventListener('pageshow',()=>setTimeout(()=>progress.done(),330),{once:true});
   addEventListener('click',e=>{if(!e.target.closest('[data-create],.nav-create-menu'))document.querySelector('.nav-create-menu')?.remove()});
 })();

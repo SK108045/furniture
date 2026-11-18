@@ -192,6 +192,8 @@
     return [number(row.users),number(row.sessions),number(row.engaged),time(ratio(row.seconds,row.sessions)),
       ratio(row.engaged,row.users).toFixed(2),ratio(row.count,row.sessions).toFixed(1)];
   }
+  const trafficHeaders = ['Users','Sessions','Engaged sessions','Average engagement time per session','Engaged sessions per user','Events per session'];
+
   function trafficRows() {
     const rows=ranked('channel','users');
     const start=trafficPage*trafficY.length;
@@ -207,7 +209,7 @@
   }
   function traffic() {
     trafficValues(report).forEach((value,i)=>write([806,910,1030,1174,1306,1428][i],601,value,
-      ['Users','Sessions','Engaged sessions','Average engagement time per session','Engaged sessions per user','Events per session'][i]));
+      trafficHeaders[i]));
     trafficRows();
     const channels=ranked('channel','sessions');
     const scale=Math.max(4,Math.ceil(channels[0].sessions/400)*400);
@@ -220,7 +222,7 @@
     chart(chartChannels.map(name=>data.series(range,'sessions','day',null,'channel',name)),
       [[1016,155],[1016,202],[1016,249],[1016,297],[1016,348]],
       [410,542,689,834,976].map(x=>[x,363]),[402,982,155,348,5]);
-    exportReport(['Session default channel group','Users','Sessions','Engaged sessions','Average engagement time per session','Engaged sessions per user','Events per session'],
+    exportReport(['Session default channel group',...trafficHeaders],
       ranked('channel','users').map(row=>[row.label,...trafficValues(row)]),'traffic-acquisition');
   }
   function cohorts() {
@@ -378,6 +380,37 @@
     sync();
     addEventListener('pageshow',sync);
     addEventListener('storage',sync);
+
+    const mobile = matchMedia('(max-width: 767px)');
+    function enableMobileReport() {
+      if (!mobile.matches) return;
+      mobile.removeEventListener('change', enableMobileReport);
+      import('./ga-mobile.js').then(async ({ loadMobileStyles, mountMobileNavigation, mountMobileReport }) => {
+        await loadMobileStyles();
+        mountMobileNavigation(document.querySelector('.portal-fixed-header'));
+        mountMobileReport(kind, {
+          share: () => ui.share(),
+          download: () => ui.downloadCSV(),
+          engagementHeaders,
+          engagementValues,
+          trafficHeaders,
+          trafficValues,
+          setRange(next) {
+            trafficPage = 0;
+            data.saveRange(next);
+            update(next);
+          },
+          selectedMetric: () => metricKeys[selectedMetric],
+          setMetric(metric) {
+            selectedMetric = Object.keys(metricKeys).find(label => metricKeys[label] === metric);
+            localStorage.setItem('nicooGaMetric', selectedMetric);
+            snapshotChart();
+          },
+        });
+      });
+    }
+    mobile.addEventListener('change', enableMobileReport);
+    enableMobileReport();
   }
   window.LegacyReport={
     mount,search,formatChart,get scale(){return chartScale;},
