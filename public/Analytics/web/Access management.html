@@ -1,12 +1,52 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="refresh" content="0; url=https://g-analytics.johnwakaba146.workers.dev/Access%20management">
-  <title>Nicoo Furniture Analytics Access Management</title>
-</head>
-<body>
-  <a href="https://g-analytics.johnwakaba146.workers.dev/Access%20management">Continue to Access Management</a>
-</body>
-</html>
+<!doctype html><html lang="en"><head><meta name="referrer" content="no-referrer"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Analytics | Access management</title><link rel="stylesheet" href="ga-extra.css"><style>body{background:#f8fafd;font-family:Roboto,Arial,sans-serif;margin:0;color:#202124}.page{max-width:900px;margin:0 auto;padding:38px 22px}.head{display:flex;align-items:center;gap:13px;margin-bottom:20px}.head h1{font-size:24px;font-weight:500;margin:0}.card{background:#fff;border:1px solid #dadce0;border-radius:10px;padding:22px}.grid{display:grid;grid-template-columns:1fr 220px;gap:14px}.field{display:grid;gap:6px}.field label{font-size:12px;font-weight:600}.field input,.field select{height:40px;border:1px solid #dadce0;border-radius:5px;padding:0 10px;font:13px Roboto,Arial}.check{display:flex;align-items:center;gap:8px;margin:16px 0;font-size:13px}.actions{display:flex;gap:9px}.primary,.secondary{height:38px;border-radius:5px;padding:0 14px;font-weight:600;cursor:pointer}.primary{border:0;background:#1a73e8;color:#fff}.secondary{border:1px solid #dadce0;background:#fff}.result{margin-top:17px;padding:12px;border-radius:6px;background:#f8fafd;font-size:13px;white-space:pre-wrap;display:none}.note{font-size:12px;color:#5f6368;margin-top:8px}@media(max-width:700px){.grid{grid-template-columns:1fr}}</style></head><body><main class="page"><div class="head"><div style="font-size:24px">👤</div><div><h1>Access management</h1><div class="note">Invite someone to view the analytics portal.</div></div></div><section class="card"><div class="grid"><div class="field"><label for="email">User email</label><input id="email" type="email" placeholder="name@example.com"></div><div class="field"><label for="role">Role</label><select id="role"><option>Viewer</option><option>Analyst</option></select></div></div><label class="check"><input id="notify" type="checkbox" checked> Notify new user by email</label><div class="field" style="margin-bottom:14px"><label for="adminKey">Admin invite key</label><input id="adminKey" type="password" autocomplete="off" placeholder="Required to send invites"><div class="note">Use your existing analytics admin invite key.</div></div><div class="actions"><button class="primary" id="send">Send invitation</button><a class="secondary" style="display:inline-grid;place-items:center;text-decoration:none;color:#3c4043" href="Analytics%20_%20Reports%20snapshot.html">Back to reports</a></div><div class="result" id="result" role="status"></div></section></main><script>
+const email = document.getElementById('email');
+const role = document.getElementById('role');
+const notify = document.getElementById('notify');
+const key = document.getElementById('adminKey');
+const result = document.getElementById('result');
+const send = document.getElementById('send');
+
+function showResult(message) {
+  result.style.display = 'block';
+  result.textContent = message;
+}
+
+send.onclick = async () => {
+  const recipient = email.value.trim().toLowerCase();
+  if (!recipient || !email.checkValidity()) {
+    showResult('Enter a valid email address.');
+    return;
+  }
+  const adminKey = key.value.trim();
+  if (!adminKey) {
+    showResult('Enter the admin invite key.');
+    return;
+  }
+
+  send.disabled = true;
+  send.textContent = notify.checked ? 'Sending…' : 'Creating link…';
+  showResult(send.textContent);
+  try {
+    const response = await fetch('send-invite', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + adminKey,
+      },
+      body: JSON.stringify({ email: recipient, role: role.value, send: notify.checked }),
+    });
+    const invite = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(invite.error || 'Invitation failed.');
+    showResult((invite.sent ? 'Invitation email sent.' : 'Invite link created.') + '\n');
+    const link = document.createElement('a');
+    link.href = invite.accessUrl;
+    link.textContent = invite.accessUrl;
+    result.appendChild(link);
+  } catch (error) {
+    showResult(error.message || 'Invitation failed.');
+  } finally {
+    send.disabled = false;
+    send.textContent = 'Send invitation';
+  }
+};
+</script></body></html>
